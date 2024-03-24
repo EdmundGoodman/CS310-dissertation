@@ -1,0 +1,26 @@
+\makeatletter
+\begin{titlepage}
+    \textbf{\Huge \@title} \\[1.5cm]
+    \Large \textbf{\@author} \\
+    Department of Computer Science \\
+    University of Warwick \\
+    \ifdefempty{\@supervisor}{}{
+        Supervised by \@supervisor \\
+    }
+    \ifdefempty{\@yearofstudy}{}{
+        Year of Study: \@yearofstudy \\
+    }
+
+    \vfill
+    \today
+
+    \begin{adjustwidth}{-\oddsidemargin-1in}{-\rightmargin}
+        \centering
+        \includegraphics[width=\paperwidth]{images/line.png}
+    \end{adjustwidth}
+    \vspace*{-3.5cm}
+\end{titlepage}
+\makeatother
+
+% TODO: Make this look prettier!
+% TODO: Add inner page liner or similar? (see Musab's notes)

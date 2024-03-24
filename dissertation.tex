@@ -1,0 +1,33 @@
+\documentclass[a4paper,fleqn,twoside,12pt]{report}
+
+\input{utils/preamble.tex}
+
+\author{Edmund Goodman}
+\title{Assessing the Viability of Rust in HPC}
+\supervisor{Richard Kirk}
+
+%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\input{utils/titlepage.tex}
+
+\pagestyle{plain}
+
+\input{chapters/0_abstract.tex}
+
+\tableofcontents
+
+\input{chapters/1_introduction.tex}
+\input{chapters/2_background.tex}
+\input{chapters/3_design.tex}
+\input{chapters/4_implementation.tex}
+\input{chapters/5_evaluation.tex}
+\input{chapters/6_conclusions.tex}
+
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography}
+
+% TODO: Add appendices
+
+\end{document}
