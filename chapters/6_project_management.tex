@@ -1,13 +1,55 @@
 \chapter{Project Management}
 \label{ch:project-management}
-
 % https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/marking/management
-% Organisation: Did the student plan their activities in advance and keep to the plan? Did the student exhibit good time-management skills?
-% Specification: Did the student make clear at the start of the project what they intended to do?
-% Effort and motivation: Did the student work hard?
-% Professionalism: Has the student taken into account matters such as ethics, social issues, and the law, as they relate to the project?
+
+\section{Specification}
+\label{sec:specification}
+% Did the student make clear at the start of the project what they intended to do?
+
+At the start of the project, a set of MoSCoW prioritised \cite{CaseMethodFastTrack} requirements was created, which fully defined concrete goals for the project. % TODO: Include requirements as an appendix?
+These fixed requirements gave the project a clear overall goal from a very early stage, and helped adopt good planning and development methodologies. These methodologies are discussed in the next section, \ref{sec:organisation}.
+
+\section{Organisation}
+\label{sec:organisation}
+% Did the student plan their activities in advance and keep to the plan? Did the student exhibit good time-management skills?
+
+% Gantt chart and planning
+% Responding to unforeseen issues
+% - Duplicate and review risk matrix from spec
+
+% Development methodology
+% - Pull diagram from presentation
 
 
-\section{Legal, social, ethical and professional issues}
+\section{Effort and motivation}
+\label{sec:effort-and-motivation}
+% Did the student work hard?
+
+I believe this project could be described as high effort through deeply consistent work. In the first term, I had no timetabled activities on Fridays, so set them aside as a time to work exclusively on the project, without incurring the cost of context switching to other activities. This allowed me to make strong progress, completing the translation and parallelisation objectives ahead of schedule. In the new year, I came up with and undertook a challenge along with a group of friends to make a project-related \texttt{git} commit every day during the month of January (``proj-anuary'', a portmanteau of project and January). I then chose to continue this for the entirety of the second term of this academic year, as shown in Figure \ref{fig:github_year_long_contributions}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/6_project_management/github_year_long_contributions.png}
+    \caption{A diagram showing my GitHub contributions over the past academic year. Commits from January 1\textsuperscript{st} to March 18\textsuperscript{th} form an unbroken consecutive streak of 78 days.}
+    \label{fig:github_year_long_contributions}
+\end{figure}
+
+This punctilious approach to project progress paid great dividends, with even stronger progress being made in the second term than the first. This included successfully completing the stretch goal of running Rust code across clustered compute resources using MPI, and building the HPC MultiBench tool for generalised performance analysis of software executed via Slurm.
+
+\section{Legal, social, ethical, and professional issues}
 \label{sec:legal-social-ethical-professional-issues}
-% TODO: Decide on sentence vs title case and be consistent throughout
+% Has the student taken into account matters such as ethics, social issues, and the law, as they relate to the project?
+% https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/reusingcontent
+
+At the start of the project, any possible legal, social, ethical, and professional issues relating to the project were identified. 
+
+Firstly, a small number of legal issues could relate the the project, largely relating to software licensing. Since High-Performance Computing is an active field of development in industry, some libraries or tools may have restrictive licences, so care was taken when picking and using tools to conform to the terms of their licences. Additionally, when identifying possible legal issues in the specifcation, it was noted that some mini-applications in the Mantevo suite are based on simulations of experiments in nuclear physics, so working with them might require special care to conform to relevant UK law. However, this issue was mitigated by selecting to examine the HPCCG mini-application \cite{herouxHPCCGSolverPackage2007}, which is instead based on methods of conjugate gradients solving linear systems \cite{hestenesMethodsConjugateGradients1952}.
+
+Secondly, a level of professionalism is required for all projects. This project does not necessitate any professional considerations above basic norms, such as making meaningful commit messages, or avoiding profanity in source code comments. % TODO: Change this list of basic norms
+
+Finally, since this project does not use human-generated data (for example data from surveys), nor is it creating a product humans directly use, it does not have any notable ethical nor social considerations. This was verified by following the flowchart on the \href{https://warwick.ac.uk/fac/sci/dcs/teaching/ethics}{ethical consent page of the project website}. % TODO: Could argue that shift to building HPC multibench requires social considerations
+
+Due to the importance of these categories of issues, they were reviewed again for any changes at the midpoint of the project when writing the progress report, and yet again at the end when writing the final report. Since the project remained broadly fixed in scope, no additional issues were identified at these points.
+
+In summary, this project carefully considered all relevant legal, social, ethical, and professional issues pertaining to the project, 
+
