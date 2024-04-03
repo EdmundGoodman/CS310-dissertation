@@ -1,22 +1,48 @@
 \chapter{Introduction}
 \label{ch:introduction} % 500 words
-
 % Write around four paragraphs establishing the context and motivating your project.
 
-% % TODO: Does this overlap with literature review?
-% \section{Related work}
-% \label{sec:related-work}
 
-% Discuss related work.
+Rust is a type-safe programming language which was originally developed at Mozilla, and was first released in 2010. Since then, it has gained a large community of dedicated followers -- from 2016 to 2023 (inclusive) it has been rated as the most loved programming language on Stack Overflow's developer survey \cite{StackOverflowDeveloper}. Designed to be memory-safe and have foundations in functional programming, it claims to be highly performant, safe, and provide a robust development toolchain \cite{RustProgrammingLanguage}.
+% Add note about Rust in the news
+
+The Rust compiler is designed to prohibit code which exhibits undefined behaviour, including memory or thread unsafe code such as accessing uninitialised memory or data races in parallel workloads. 
+% Detecting this at compile time rather than runtime is good - gives guarantees and easier debugging
+In conjunction with this, the Chromium project noted memory-safety bugs represent over 70\% of their serious security bugs \cite{MemorySafety}. Since Rust prohibits these bugs at compile time by default, this has motivated various efforts to use it for critical parts of existing products, for example Mozilla's ``Oxidation'' project, which refers to ``integrating Rust code in and around Firefox'' \cite{OxidationMozillaWiki}. These efforts may also be fruitful in the field of High-Performance Computing, as Rust's promise of ``Fearless concurrency'' may ease the complexity of writing verifiably correct highly parallelised code, which constitutes one of the main challenges of large scale high performance software projects. % TODO cite
+
+% TODO: Note that some work had been done for simple snippets in HPC specifically, but none for larger codebases
+
+High-Performance Computing\footnote{Sometimes shortened to HPC} is defined by IBM as ``technology that uses clusters of powerful processors, working in parallel, to process massive multidimensional datasets (big data) and solve complex problems at extremely high speeds''\cite{WhatHPCIntroduction}. Such High-Performance Computing resources are incredibly useful for solving computationally intensive problems across a spectrum of disciplines \cite{JournalDescriptionInternational}. Within the field of High-Performance Computing, mini-apps (also called proxy applications) are simple pieces of code which replicate the performance characteristics of larger applications without requiring including large codebases \cite{heroux2013mantevo}. This makes them desirable for use as benchmarks for comparing High-Performance Computing systems. Two repositories of mini-apps are the ECP Proxy applications \cite{ECPProxyApplications}, and the UK-MAC \cite{UKMiniAppConsortium}. C++ and FORTRAN are the two de-facto languages for building modern High-Performance Computing software -- together they make up 80 of the 84 listed ECP proxy applications \cite{ECPProxyApps2018}. However, this project will only draw comparisons between Rust and C++, not Rust and FORTRAN. This is because C++ is more modern than FORTRAN, and FORTRAN has many heavily optimised libraries which would make the comparison of the languages alone more ambiguous.
+
+% TODO: Add note about P3HPC
+
 
 
 \section{Objectives}
 \label{sec:objectives}
-
 % One sentence summary of your project. Followed by a short list of concrete objectives:
 
-% \begin{itemize}
-%     \item Objective 1
-%     \item Objective 2
-%     \item Objective 3
-% \end{itemize}
+The overall objective of this project is to produce an assessment of whether Rust is a viable replacement for C++ in High-Performance Computing applications. As discussed in the \hyperref[ch:introduction]{introduction}, there are high-profile ongoing efforts to translate existing codebases into Rust, motivated by the benefits from guaranteeing the absence of undefined behaviour -- often in the context of writing security critical code. This project will examine whether these guarantees also yield benefits in the domain of High-Performance Computing, and critically assess whether any such benefits justify the cost of the replacement process and any incurred performance impacts.
+
+The assessment will then be informed by undertaking the process of translating, proving program equivalence, and performance analysis of a relevant C++ application on large parallel and clustered compute resources. This also provides an opportunity for developing workflows and tooling for problematic aspects identified in this replacement process. Such workflows and tools may then improve the calculus of the assessment of viability.
+
+For the purposes of this project, the following three criteria will be considered when assessing viability:
+
+\begin{itemize}
+    \item \textbf{Ease of translation}. Different languages express software functionality in different ways. How do the differences in Rust and C++'s programming models and expressiveness affect the software engineering effort required to perform a translation between the two. If this effort exceeds the commensurate benefits of using Rust, then it is not a viable replacement.
+    \item \textbf{Ease of equivalence checking}. When producing a translation, it is of utmost importance that the original and translated versions exhibit exactly the same behaviour. For Rust to be a viable replacement, there must exist verification techniques which provide strong confidence that the original and translated versions do exhibit the same behaviour.
+    \item \textbf{Comparable performance}. In High-Performance Computing applications, performance is clearly paramount. For Rust to be a viable replacement, the performance of the translated code must not be noticeably worse than that of the original code.
+\end{itemize}
+
+The proposed steps to undertake this project are quantified as MoSCoW prioritised \cite{CaseMethodFastTrack} enumeration of requirements in the appendix. % TODO: Add to appendix and link (also referenced in project management section)
+
+\section{Contributions}
+\label{sec:contributions}
+
+By fulfilling these objectives, this project aims to make the following novel contributions to the domain of software engineering in High-Performance Computing:
+
+\begin{itemize}
+    \item The implementation of a Rust translation of the HPCCG mini-app for serial, parallel, and clustered compute resources
+    \item The assessment of the viability of Rust in HPC on full codebases rather than toy examples, such as HPCCG
+    \item The development of tooling and workflows to improve the viability of translation to Rust for HPC applications
+\end{itemize}

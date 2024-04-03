@@ -1,6 +1,7 @@
 \chapter{Project Management}
 \label{ch:project-management}
 % https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/marking/management
+% https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/reusingcontent
 
 \section{Specification}
 \label{sec:specification}
@@ -13,13 +14,53 @@ These fixed requirements gave the project a clear overall goal from a very early
 \label{sec:organisation}
 % Did the student plan their activities in advance and keep to the plan? Did the student exhibit good time-management skills?
 
+\subsection{Project plan}
+\label{ssec:organisation-plan}
 % Gantt chart and planning
-% Responding to unforeseen issues
-% - Duplicate and review risk matrix from spec
 
-% Development methodology
-% - Pull diagram from presentation
+\subsection{Development methodology}
+\label{ssec:organisation-methodology}
 
+% What is an Agile methodology
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/6_project_management/excalidraw_agile.png}
+    \caption{A diagram of a typical workflow for the Scrum flavour of Agile development.}
+    \label{fig:excalidraw_agile}
+\end{figure}
+
+% Tools selected for use
+
+\subsection{Responding to unforeseen issues}
+\label{ssec:organisation-unforeseen-issues}
+
+As discussed in the previous section, \ref{ssec:organisation-methodology}, following an Agile methodology empowered the project to be flexible to change, allowing the original plan to be adapted based on new information or ongoing supervisor discussions. A concrete example of this is the development of the HPC MultiBench tool was not an explicit project requirement enumerated in the specification, but following identification of a need and supervisor discussion, it was included as part of the performance analysis requirements. This successful deviation from the initial project plan also supports the fact that the chosen methodology would have been robust against major unforeseen issues, had any occurred.
+
+% TODO: typeset risk matrix better, or move to appendix
+In the project specification, a Risk Matrix characterising possible issues was generated, as shown in Table \ref{tab:risk_matrix}.
+Of these identified possible risks, the only one which manifested itself was compute resources becoming busy, which is consistent with it having the highest estimated likelihood. This had a low impact on the project progress, as I had access two resources (both \texttt{kudu} on DCS and \texttt{Avon} on SCRTP), and could switch to other tasks whilst waiting for long jobs to complete.
+
+
+% When generating the Risk Matrix for the specification, some possible risks were excluded, such as personal computer failure. However, this was experienced multiple times during the project
+
+\begin{table}[H]
+\begin{adjustwidth}{-3em}{-3em}
+    \centering
+    \caption{The proposed Risk Matrix for the project, from the project specification.}
+    \label{tab:risk_matrix}
+    \begin{tabular}{|p{0.2\linewidth}|p{0.25\linewidth}|p{0.065\linewidth}|p{0.085\linewidth}|p{0.055\linewidth}|p{0.24\linewidth}|} \hline
+         Risk&  Cause of risk&  Bad- ness&  Likeli- hood&  Score& Mitigation strategy\\ \hline
+         Major upheaval of the Rust language&  The Rust Foundation making a controversial decision \cite{AmNoLonger2023} \cite{AddRFCGovernance} \cite{TelemetryGoToolchain}&  4&  1&  \cellcolor{green!25}4 & Use a previous edition of Rust via \texttt{rustup}\\ \hline 
+         Data structure for selected mini-app cannot be recreated under Rust's memory safety
+  constraints&  Some data structures cannot be represented with Rust's ownership model, such as doubly linked lists \cite{leeBuildingMemorysafeNetwork2017}&  5&  6&  \cellcolor{red!25}30& Create a safe API around the required unsafe data structure\\ \hline 
+         Compute resources become busy slowing development and testing&    In late term two many students use \texttt{kudu} for courseworks and dissertations&  2&  8&  \cellcolor{orange!25}16& Use a different compute resource, for example if \texttt{kudu} is busy use SCRTP or local machines\\ \hline 
+         Unable to install Rust on compute resources&  Some compute resources may have restrictive permissions for users&  9&  3&  \cellcolor{red!25}27& Install only for a single user, or leverage containerisation to avoid installation issues\\ \hline 
+ Loss of access to IBM computer resources or mentor and connections& Internal changes to IBM unrelated to the project& 4& 1& \cellcolor{green!25}4 &Whilst the IBM resources are nice to have, none of them are essential to the project, so can just continue without them\\ \hline
+    \end{tabular}
+    \end{adjustwidth}
+\end{table}
 
 \section{Effort and motivation}
 \label{sec:effort-and-motivation}
@@ -34,12 +75,11 @@ I believe this project could be described as high effort through deeply consiste
     \label{fig:github_year_long_contributions}
 \end{figure}
 
-This punctilious approach to project progress paid great dividends, with even stronger progress being made in the second term than the first. This included successfully completing the stretch goal of running Rust code across clustered compute resources using MPI, and building the HPC MultiBench tool for generalised performance analysis of software executed via Slurm.
+This punctilious approach to project progression paid great dividends, with even stronger progress being made in the second term than the first. This included successfully completing the stretch goal of running Rust code across clustered compute resources using MPI, and building the HPC MultiBench tool for generalised performance analysis of software executed via Slurm.
 
 \section{Legal, social, ethical, and professional issues}
 \label{sec:legal-social-ethical-professional-issues}
 % Has the student taken into account matters such as ethics, social issues, and the law, as they relate to the project?
-% https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/reusingcontent
 
 At the start of the project, any possible legal, social, ethical, and professional issues relating to the project were identified. 
 
