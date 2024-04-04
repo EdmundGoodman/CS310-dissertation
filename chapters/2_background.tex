@@ -1,27 +1,132 @@
 \chapter{Background}
 \label{ch:background}
 
+% TODO: Be consistent with mini-apps/mini-applications/proxy applications
+This background of this project draws from two key areas: the field of High-Performance Computing, including mini-applications  and pragmatic considerations; and related prior work analysing the performance of the Rust programming language. As a result of this, the background section will first discuss the origins of mini-apps, followed by an in depth explanation of the mini-app selected for translation, along with a broader commentary on existing tools and pragmatic considerations for High-Performance Computing. Following this, a literature review of existing performance analyses of Rust will be given, along with an explanation of how this project is novel in this respect.
 
+
+% TODO: Could add section introducing rust / borrow checking etc. - or explicitly note this is out of scope
+\section{The Rust Language}
+\label{sec:rust} % 500 words
+
+% Basis in functional languages and the type system
+
+% The borrow checker
+
+% Fearless parallelism
 
 \section{High performance computing}
 \label{sec:hpc} % 500 words
 
+% HPC is the combination of hardware/software
+
+In the early 2010s, physical limitations began to change how computer hardware was designed. Before this point, performance gains in hardware could be guaranteed by increasing clock speeds, along with relying on foundries following Moore's law to double the number of transistors in an integrated circuit every eighteen months \cite{}. However, as shown in Figure \ref{fig:scaling-trends-transistor-clock} power limitations stalled the increase of clock speeds \cite{}, and transistors began experiencing quantum effects as they shrunk to only a few atoms in size \cite{}, leading to ``the death of Moore's law'' \cite{}.
+
+% he so-called death of CPU frequency scaling in 2004, marked by the cancella-tion of a 4-GHz CPU project by Intel \cite{markovLimitsFundamentalLimits2014}, also marked the year in which parallelization became the way forward in the competition for computation power. 
+
+% Add diagram of clock speed/transistor count etc.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/2_background/Scaling-trends-for-the-transistor-count-clock-frequency-number-of-cores-and.png}
+    \caption{A diagram showing scaling trends for the transistor count, clock frequency, number of cores, and single-thread performance of microprocessor chips. Figure created by C. Batten \cite{hardwareTrendsArticle}.}
+    \label{fig:scaling-trends-transistor-clock}
+\end{figure}
+
+As a result of this, the 2013 Mantevo paper notes ``future performance gains come almost solely from running sets of instructions concurrently''. There are some mechanisms which allow this to be implemented transparently to the programmer in hardware, with superscalar processing through instruction-level parallelism. However, the most performant 
+
+Since these hardware improvements are not transparent to the programmer, hardware-software co-design, defined by the Mantevo paper as ``collaborative simultaneous development of all system components'' became essential. As a result of this, new techniques were required for the effective co-design of high-performance systems.
 
 \subsection{Mini-apps and the Mantevo Suite}
 \label{ssec:mantevo} % 250 words
+
+The Mantevo project at Sandia National Labs pioneered the concept of mini-apps as a tool for hardware-software co-design, publishing the Mantevo Suite in late 2012 as a collection of full-featured mini-apps for this purpose. It defines mini-apps as ``Small software programs [...] whose performance characteristics model full-scale applications, yet require only a fraction of the lines of code, making [them] easier to study, design, and re-write''.
+
+The use of mini-apps makes hardware-software co-design with respect to very large complex application possible. This is because they can be used in place of the production application whose performance they model when making very early design decisions, without incurring the cost of massive complexity of the production application. Traditionally, mini-apps have been used to predict the performance of production applications on new hardware. However, this concept can be inverted to instead use mini-apps to predict the performance on the underlying software stack, for example the programming language of implementation.
+
+% TODO: Consider adding more
 
 
 \subsection{HPCCG}
 \label{ssec:hpccg} % 500 words
 
+% What is HPCCG
 
-\subsection{HPC tools}
-\label{ssec:hpc-tools} % 250 words
+\subsubsection{Why HPCCG?}
+\label{sssec:why-hpccg}
+% Why was HPCCG selected
+
+\subsubsection{Understanding HPCCG}
+\label{sssec:understanding-hpccg}
+% Understanding HPCCG
 
 
 \subsection{Performance, Productivity, and Portability}
 \label{ssec:p3hpc} % 500 words
 
+% How the concept of mini-apps tie into general principles of pragmatic HPC engineering
 
-\section{Performance analyses of Rust} % 750 words
-\label{sec:related-work-rust-performance}
+
+\subsection{HPC software}
+\label{ssec:hpc-tools} % 250 words
+
+
+\subsubsection{HPC packages}
+\label{sssec:hpc-packages}
+% MPI/OpenMP/Rayon/Kokkos
+
+\subsubsection{HPC tooling}
+\label{sssec:hpc-tooling}
+% Existing HPC tools, like slurm/likwid I guess?
+% Identify/foreshadow niches which will be filled later
+
+
+
+\section{Literature review} % 750 words
+\label{sec:literature-review}
+
+% Despite Rust being a relatively young language, its popularity has lead to academic investigations of its suitability for many tasks.
+Rust's popularity has lead to academic investigations of its suitability for many tasks, despite it being a relatively young language. This literature review will start with a paper discussing the overall landscape of language performance for High-Performance Computing, comparing a single workload across 10 languages. Then, it will critically evaluate a number of performance analyses of Rust in High-Performance Computing, in order to cover a variety of techniques, from serial to highly parallel, and a variety of benchmark types, from algorithm snippets to full codebases. This project differs from existing work, as no existing analysis covers the application of a full codebase to highly-parallel clustered compute, and it will include an assessment of practical suitability beyond just performance measurements. Furthermore, it will go beyond comparison to build tooling and workflows to directly improve any issues identified during this assessment.
+
+% Benchmarking the Parallel 1D Heat Equation Solver in Chapel, Charm++, C++, HPX, Go, Julia, Python, Rust, Swift, and Java
+Diehl et al. present a general overview of the landscape of language performance for a representative High-Performance Computing workload in their paper ``Benchmarking the Parallel 1D Heat Equation Solver in Chapel, Charm++, C++, HPX, Go, Julia, Python, Rust, Swift, and Java'' \cite{diehlBenchmarkingParallel1D2023}. This paper selects a 1D heat diffusion solver algorithm to implement as it uses block-structured meshes, which are commonly used in high-performance computing applications. It then goes on to qualititavely discuss the experience of implemeting the algorithm in the different languages, and suggests a quantitative metric for assesing implementation difficulty using a Constructive Cost Model (COCOMO) \cite{}. Finally, it benchmarks these implementations across three different hardware architectures, and constructs a plot comparing program runtime against its metric for implementation difficulty, duplicated in Figure \ref{fig:1d_heat_results}. The paper concludes that ``one solution does not fit all'', but names C++ as a common choice as it is both popular and performant, whilst noting Rust's ``innovative ideas will make it ideally suited for many applications''.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/2_background/1d_heat_results.png}
+    \caption{A summary plot from Diehl et al.'s paper \cite{diehlBenchmarkingParallel1D2023}, showing ``two-dimensional classification using the computational time and the COCOMO model''.}
+    \label{fig:1d_heat_results}
+    % TODO: Check paper website for permission to reproduce
+\end{figure}
+
+Diehl et al. provide a strong empirically-backed analysis of the landscape of languages in the context of High-Performance Computing, and provide source code as a GitHub repository \cite{} along with naming the multiple processors used for benchmarking, allowing reproducibility of their results. However, they explicitly do not provide their measurements other then in plots, choosing ``not to name a winner with respect to speed''. Additionally, they do not provide details on their test methodology beyond naming the metrics measured and the names of hardware they used. Providing concrete results, along with a more specific methodology such as thread counts, memory size, or number or experiment re-runs would provide much more confidence in the conclusions drawn. % Note about tools to do this?
+Finally, their future work notes that the selected algorithm only runs on a single CPU, and as such does not explore using MPI for distributing compute over a clustered resource, nor does it explore GPU support using a language like CUDA, nor abstractions layers like Kokkos.
+
+% Rust language for supercomputing applications
+Bychkov and Nikolskiy examine the readiness of the Rust language for supercomputer applications in their paper ``Rust Language for Supercomputing Applications'' \cite{bychkovRustLanguageSupercomputing2021}. The main contribution of this paper is the critical comparison of Rust and C++ over a set of benchmarks. The first benchmark characterises serial performance via a handwritten implementation of the matrix multiplication algorithm in each language. The authors note that nai\"ve rust implementations perform poorly in comparison with C++, but writing Rust in an idiomatic way and leverage optimisation techniques can close this performance gap. A later benchmark characterises the performance of shared-memory parallelism via multi-threading, using OpenMP and Rayon for C++ and Rust respectively, finding that both have similar performance and scaling characteristics on the selected benchmark, as shown in Figure \ref{fig:supercomputing_openmp_rayon}. The final benchmark compares the C++ native implementation of the MPI specification with the Rust bindings to it. The paper notes that the since the Rust bindings are \mintinline{rust}{safe} and leverage the rich type system, they provide many desirable properties such as guarantees of memory and thread safety and minimising boilerplate. The paper concludes that Rust is competitive to C++ for the benchmarks it explored, and that sufficient tooling exists for writing parallel code.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/2_background/supercomputing_openmp_rayon.png}
+    \caption{A performance comparison plot of OpenMP and Rayon in a numerical integration benchmark, from Bychkov and Nikolskiy's paper \cite{bychkovRustLanguageSupercomputing2021}.}
+    \label{fig:supercomputing_openmp_rayon}
+    % TODO: Check paper website for permission to reproduce
+\end{figure}
+
+% Criticism
+Bychkov and Nikolskiy present an empirically-backed analysis directly comparing Rust and C++ only across a number of different benchmarks, contrasting Diehl et al. by providing a more specific analysis rather than a general view of the landscape. The paper gives good reproducibility by clearly stating the benchmarking methodology, including machine specifications, operating system, and compiler versions. However, the choice of methodology for non-clustered machines has weaknesses. Notably, the benchmarks were run on a laptop, which can introduce noise into performance measurements if other applications are running in the background. Furthermore, the benchmarks are run under Windows Subsystem for Linux, a virtualisation technology, which significantly impacts program performance and may not be comparable to benchmarks run on unvirtualised systems. Finally, although the MPI benchmarks are run on a compute cluster which avoids the previously itemised issues, the results appear erroneous, with the authors noting ``we discovered [an] unexpected difference between Rust and C++ performance in MPI latency benchmarks'', and stating intent to re-validate the results.
+
+
+% Emerging technologies, Rust in HPC
+
+% Performance vs Programming Effort between Rust and C on Multicore Architectures: Case Study in N-Body
+
+% Rust programming language in the high-performance computing environment
+
+% Towards Safe HPC: Productivity and Performance via Rust Interfaces for a Distributed C++ Actors Library
+
+
+%% Summary
+
+%% Novel contributions
+% Assessment of a full-featured mini-app, not just a code snippet
+% Assessment of MPI for clustered compute
