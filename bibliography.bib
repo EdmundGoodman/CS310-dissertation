@@ -1,4 +1,80 @@
 
+@misc{P3HPC,
+	title = {{P3HPC}},
+	url = {https://p3hpc.github.io/},
+	abstract = {Performance, Portability \& Productivity in HPC},
+	language = {en},
+	urldate = {2024-04-05},
+	journal = {P3HPC},
+}
+
+@article{matsakisRustLanguage2014,
+	title = {The rust language},
+	volume = {34},
+	issn = {1094-3641},
+	url = {https://dl.acm.org/doi/10.1145/2692956.2663188},
+	doi = {10.1145/2692956.2663188},
+	abstract = {Rust is a new programming language for developing reliable and efficient systems. It is designed to support concurrency and parallelism in building applications and libraries that take full advantage of modern hardware. Rust's static type system is safe1 and expressive and provides strong guarantees about isolation, concurrency, and memory safety. Rust also offers a clear performance model, making it easier to predict and reason about program efficiency. One important way it accomplishes this is by allowing fine-grained control over memory representations, with direct support for stack allocation and contiguous record storage. The language balances such controls with the absolute requirement for safety: Rust's type system and runtime guarantee the absence of data races, buffer overflows, stack overflows, and accesses to uninitialized or deallocated memory.},
+	number = {3},
+	urldate = {2023-10-10},
+	journal = {ACM SIGAda Ada Letters},
+	author = {Matsakis, Nicholas D. and Klock, Felix S.},
+	month = oct,
+	year = {2014},
+	keywords = {affine type systems, memory management, rust, systems programming},
+	pages = {103--104},
+}
+
+@article{kubrich_integration_2020,
+	title = {Integration and {Test} of {RUST} {Tool} {Support} for {MPI}},
+	url = {https://mediatum.ub.tum.de/1576727},
+	abstract = {With increasingly high performance expectations in modern computer platforms, parallel computing becomes more and more critical. However, implementing bug-free programs to compute efficiently in parallel is, in general, significantly more demanding than implementing their sequential counterpart.
+
+Parallel applications have always been complicated to implement, maintain, or inspect. The Rust programming language aims to provide static programming with zero-cost guarantees for memory-safety. This technology, used to create MPI-Tools, can significantly improve any developers' workflow creating or maintaining HPC applications.
+This thesis presents the Rust-Library Rmpi, which provides MPI access with memory safety, a framework implementation for the creation of PMPI -and QMPI-Tools for the programming language Rust, as well as an extensive performance analysis.},
+	urldate = {2024-04-04},
+	author = {Kübrich, Matthias},
+	year = {2020},
+}
+
+@inproceedings{qin_understanding_2020,
+	address = {New York, NY, USA},
+	series = {{PLDI} 2020},
+	title = {Understanding memory and thread safety practices and issues in real-world {Rust} programs},
+	isbn = {978-1-4503-7613-6},
+	url = {https://doi.org/10.1145/3385412.3386036},
+	doi = {10.1145/3385412.3386036},
+	abstract = {Rust is a young programming language designed for systems software development. It aims to provide safety guarantees like high-level languages and performance efficiency like low-level languages. The core design of Rust is a set of strict safety rules enforced by compile-time checking. To support more low-level controls, Rust allows programmers to bypass these compiler checks to write unsafe code. It is important to understand what safety issues exist in real Rust programs and how Rust safety mechanisms impact programming practices. We performed the first empirical study of Rust by close, manual inspection of 850 unsafe code usages and 170 bugs in five open-source Rust projects, five widely-used Rust libraries, two online security databases, and the Rust standard library. Our study answers three important questions: how and why do programmers write unsafe code, what memory-safety issues real Rust programs have, and what concurrency bugs Rust programmers make. Our study reveals interesting real-world Rust program behaviors and new issues Rust programmers make. Based on our study results, we propose several directions of building Rust bug detectors and built two static bug detectors, both of which revealed previously unknown bugs.},
+	urldate = {2024-04-04},
+	booktitle = {Proceedings of the 41st {ACM} {SIGPLAN} {Conference} on {Programming} {Language} {Design} and {Implementation}},
+	publisher = {Association for Computing Machinery},
+	author = {Qin, Boqin and Chen, Yilun and Yu, Zeming and Song, Linhai and Zhang, Yiying},
+	month = jun,
+	year = {2020},
+	keywords = {Bug Study, Concurrency Bug, Memory Bug, Rust},
+	pages = {763--779},
+}
+
+@article{markovLimitsFundamentalLimits2014,
+	title = {Limits on fundamental limits to computation},
+	volume = {512},
+	copyright = {2014 Springer Nature Limited},
+	issn = {1476-4687},
+	url = {https://www.nature.com/articles/nature13570},
+	doi = {10.1038/nature13570},
+	abstract = {To evaluate the promise of potential computing technologies, this review examines a wide range of fundamental limits, such as to performance, power consumption, size and cost, from the device level to the system level.},
+	language = {en},
+	number = {7513},
+	urldate = {2024-04-04},
+	journal = {Nature},
+	author = {Markov, Igor L.},
+	month = aug,
+	year = {2014},
+	note = {Publisher: Nature Publishing Group},
+	keywords = {Applied physics, Computer science, Electrical and electronic engineering},
+	pages = {147--154},
+}
+
 @article{hardwareTrendsArticle,
 	title = {Server engineering insights for large-scale online services},
 	volume = {30},
@@ -534,13 +610,6 @@
 	author = {Cox, Russ},
 }
 
-@misc{TeaLeaf,
-	title = {{TeaLeaf}},
-	url = {https://uk-mac.github.io/TeaLeaf/},
-	urldate = {2023-11-21},
-	author = {UK-MAC},
-}
-
 @misc{StackOverflowDeveloper,
 	title = {Stack {Overflow} {Developer} {Survey} 2023},
 	url = {https://survey.stackoverflow.co/2023/},
@@ -962,23 +1031,6 @@ tex.issue\_date: June 2007},
 	pages = {1--12},
 }
 
-@article{matsakis_rust_2014,
-	title = {The rust language},
-	volume = {34},
-	issn = {1094-3641},
-	url = {https://dl.acm.org/doi/10.1145/2692956.2663188},
-	doi = {10.1145/2692956.2663188},
-	abstract = {Rust is a new programming language for developing reliable and efficient systems. It is designed to support concurrency and parallelism in building applications and libraries that take full advantage of modern hardware. Rust's static type system is safe1 and expressive and provides strong guarantees about isolation, concurrency, and memory safety. Rust also offers a clear performance model, making it easier to predict and reason about program efficiency. One important way it accomplishes this is by allowing fine-grained control over memory representations, with direct support for stack allocation and contiguous record storage. The language balances such controls with the absolute requirement for safety: Rust's type system and runtime guarantee the absence of data races, buffer overflows, stack overflows, and accesses to uninitialized or deallocated memory.},
-	number = {3},
-	urldate = {2023-10-10},
-	journal = {ACM SIGAda Ada Letters},
-	author = {Matsakis, Nicholas D. and Klock, Felix S.},
-	month = oct,
-	year = {2014},
-	keywords = {affine type systems, memory management, rust, systems programming},
-	pages = {103--104},
-}
-
 @article{millerEmpiricalStudyReliability1990,
 	title = {An empirical study of the reliability of {UNIX} utilities},
 	volume = {33},
@@ -1046,17 +1098,6 @@ tex.issue\_date: June 2007},
 	year = {2018},
 	note = {Google-Books-ID: iVv6DwAAQBAJ},
 	keywords = {COMPUTERS / Programming / General, Computers / Programming / Open Source},
-}
-
-@inproceedings{matsakisRustLanguage2014,
-	title = {The {Rust} {Language}},
-	volume = {34},
-	booktitle = {{ACM} {SIGAda} {Ada} {Letters}},
-	publisher = {ACM},
-	author = {Matsakis, Nicholas D and Klock II, Felix S},
-	year = {2014},
-	note = {Issue: 3},
-	pages = {103--104},
 }
 
 @misc{beckManifestoAgileSoftware2001,

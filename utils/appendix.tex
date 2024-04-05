@@ -1,0 +1,68 @@
+\appendix
+
+\chapter{Project collateral}
+\label{ch:project-collateral}
+
+\section{Project Requirements}
+\label{sec:project-requirements}
+
+The specification document enumerated the set of MoSCoW prioritised \cite{CaseMethodFastTrack} requirements which unambiguously define the project scope. These requirements are replicated below:
+
+% TODO: Uncomment when word count stops being tracked
+% \begin{enumerate}
+% \item
+%   Select a target mini-app from ECP proxy applications or UK-MAC
+%   (\textbf{Must have})
+% \item
+%   Fuzz test\footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990 \cite{millerEmpiricalStudyReliability1990}\cite{liangFuzzingStateArt2018}} the possible mini-apps for memory safety issues using static analysis tooling \cite{stepanovMemorySanitizerFastDetector2015}
+%   (\textbf{Should have}, \textit{depends on 1})
+% \item
+%   Build tooling for running Rust unit tests on C++ code
+%   (\textbf{Could have})
+% \item
+%   Write unit tests for the original C++ version of the
+%   mini-app
+%   (\textbf{Should have}, \textit{depends on 1, (3)})
+% \item
+%   Write direct translation of serial version mini-app from C++ to Rust
+%   (\textbf{Must have}, \textit{depends on 1})
+% \item
+%   Modify serial version of translated code to be idiomatic Rust \cite{endlerMreIdiomaticrust2023} 
+%   (\textbf{Should have}, \textit{depends on 5})
+% \item
+%   Equivalence check serial translated code by comparing results of end-to-end tests with original C++ code
+%   (\textbf{Must have}, \textit{depends on 5}))
+% \item
+%   Equivalence check serial translated code by applying passing C++ unit tests to rust code
+%   (\textbf{Must have}, \textit{depends on 4, 5})
+% \item
+%   Equivalence check serial translated code with limited formal verification techniques
+%   (\textbf{Could have}, \textit{depends on 5})
+% \item
+%   Equivalence check serial translated code by comparing generated LLVM IR of the C++ and translated Rust versions
+%   (\textbf{Could have}, \textit{depends on 5})
+% \item
+%   Modify the serial translated code to allow parallel execution
+%   (\textbf{Must have}, \textit{depends on 5})
+% \item
+%   Equivalence check parallel translated code via all previous techniques
+%   (\textbf{Must have}, \textit{depends on 7, 8, (9), (10), 11})
+% \item
+%   Carry out a performance analysis of the serial translated Rust code with the original C++ code
+%   (\textbf{Must have}, \textit{depends on 5})
+% \item
+%   Carry out a performance analysis of the parallel translated Rust code with the original C++ code
+%   (\textbf{Must have}, \textit{depends on 11})
+% \item
+%   Modify the parallel translated code to allow execution across clustered compute resources
+%   (\textbf{Could have}, \textit{depends on 11})
+% \item
+%   Equivalence check clustered translated code via all previous techniques
+%   (\textbf{Could have}, \textit{depends on 7, 8, (9), (10), 15})
+% \item
+%   Carry out a performance analysis of the clustered translated Rust code with the original C++ code
+%   (\textbf{Could have}, \textit{depends on 15})
+% \end{enumerate}
+
+% \section{Mini-app selection}
+% \label{sec:miniapp-selection}

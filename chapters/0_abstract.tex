@@ -1,10 +1,19 @@
+% Assessing the Viability of Rust in HPC
+% Assessing the viability of and workflows for performant and productive Rust translations of HPC codebases
+% Assessing the viability of performant and productive Rust translations of HPC codebases
+
 \begin{abstract}
-    Rust is a type-safe programming language originally developed by Mozilla in 2010. Since its first release, it has gained a large community of dedicated followers. Designed to be memory safe and have foundations in functional programming, it claims to be highly performant, safe, and provide a robust development toolchain.
+    % Rust is a type-safe programming language originally developed by Mozilla in 2010. Since its first release, it has gained a large community of dedicated followers. Designed to be memory safe and have foundations in functional programming, it claims to be highly performant, safe, and provide a robust development toolchain.
 
-    The aim for this project is to take a proxy application, for example from the Mantevo Suite, and translate it from C/C++ to Rust. Both versions should be multi-threaded and should be validated against each other for all inputs. Once this has been achieved, a performance study of both versions of the application would be required, contrasting the translated Rust against the original C/C++.
+    % The aim for this project is to take a proxy application, for example from the Mantevo Suite, and translate it from C/C++ to Rust. Both versions should be multi-threaded and should be validated against each other for all inputs. Once this has been achieved, a performance study of both versions of the application would be required, contrasting the translated Rust against the original C/C++.
 
-    An extension to this is to implement a Rust+MPI version of the application, and test this against an equivalent C/C++ version across a large amount of compute nodes.
+    % An extension to this is to implement a Rust+MPI version of the application, and test this against an equivalent C/C++ version across a large amount of compute nodes.
 
+    Rust is a type-safe programming language originally developed by Mozilla in 2010. Since its first release, it has gained a large community of dedicated followers. Designed to be memory safe and have foundations in functional programming, it claims to be highly performant, safe, and provide a robust development toolchain \cite{RustProgrammingLanguage}.
+
+    The Mantevo Suite \cite{heroux2013mantevo} is a collection of mini-apps, small software codebases with performance characteristics representative of full-scale applications. Traditionally, mini-apps are used for hardware-software co-design -- allowing simple but accurate estimates of application performance on hardware. However, they can also be used to assess the software stack they are run on, for example
+
+    This project assesses the viability of and workflows for Rust translations of HPC codebases in the context of HPCCG, ``the original Mantevo mini-app'' \cite{MantevoHPCCG2023}. We present a Rust implementation of the HPCCG, showing the possibility of both shared and distributed memory parallelism in Rust using Rayon and MPI, along with a workflow for translation including a novel tool for equivalence checking between Rust and C++. We further present a performance analysis within a novel framework empowering reproducibility, which empirically shows Rust closely trails C++ in performance on real-world applications. We conclude that Rust is a viable language for High-Performance Computing applications, as despite its performance closely trailing C++, it provides commensurate benefits in developer productivity through its compiler guarantees of memory and thread safety, along with its robust toolchain.
     
     \textbf{Keywords:} \textit{High-Performance Computing, Parallel Computing, Mini-application, Mantevo, HPCCG, Rust, C++, OpenMP, Rayon, MPI}
 \end{abstract}

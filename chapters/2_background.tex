@@ -1,6 +1,8 @@
 \chapter{Background}
 \label{ch:background}
 
+% ``Everybody who learns concurrency thinks they understand it, ends up finding mysterious races they thought weren’t possible, and discovers that they didn’t actually understand it yet after all.'' -- Herb Sutter, chair of the ISO C++ standards committee, Microsoft.
+
 % TODO: Be consistent with mini-apps/mini-applications/proxy applications
 This background of this project draws from two key areas: the field of High-Performance Computing, including mini-applications  and pragmatic considerations; and related prior work analysing the performance of the Rust programming language. As a result of this, the background section will first discuss the origins of mini-apps, followed by an in depth explanation of the mini-app selected for translation, along with a broader commentary on existing tools and pragmatic considerations for High-Performance Computing. Following this, a literature review of existing performance analyses of Rust will be given, along with an explanation of how this project is novel in this respect.
 
@@ -88,6 +90,7 @@ The use of mini-apps makes hardware-software co-design with respect to very larg
 Rust's popularity has lead to academic investigations of its suitability for many tasks, despite it being a relatively young language. This literature review will start with a paper discussing the overall landscape of language performance for High-Performance Computing, comparing a single workload across 10 languages. Then, it will critically evaluate a number of performance analyses of Rust in High-Performance Computing, in order to cover a variety of techniques, from serial to highly parallel, and a variety of benchmark types, from algorithm snippets to full codebases. This project differs from existing work, as no existing analysis covers the implementation of an established mini-application to highly-parallel clustered compute, and it will include an assessment of practical suitability beyond just performance measurements. Furthermore, it will go beyond comparison to build tooling and workflows to directly improve any issues identified during this assessment.
 
 % Benchmarking the Parallel 1D Heat Equation Solver in Chapel, Charm++, C++, HPX, Go, Julia, Python, Rust, Swift, and Java
+% https://github.com/diehlpk/async_heat_equation/tree/main
 Diehl et al. present a general overview of the landscape of language performance for a representative High-Performance Computing workload in their paper ``Benchmarking the Parallel 1D Heat Equation Solver in Chapel, Charm++, C++, HPX, Go, Julia, Python, Rust, Swift, and Java'' \cite{diehlBenchmarkingParallel1D2023}. This paper selects a 1D heat diffusion solver algorithm to implement as it uses block-structured meshes, which are commonly used in high-performance computing applications. It then goes on to qualititavely discuss the experience of implemeting the algorithm in the different languages, and suggests a quantitative metric for assesing implementation difficulty using a Constructive Cost Model (COCOMO) \cite{}. Finally, it benchmarks these implementations across three different hardware architectures, and constructs a plot comparing program runtime against its metric for implementation difficulty, duplicated in Figure \ref{fig:1d_heat_results}. The paper concludes that ``one solution does not fit all'', but names C++ as a common choice as it is both popular and performant, whilst noting Rust's ``innovative ideas will make it ideally suited for many applications''.
 
 \begin{figure}[H]
@@ -135,6 +138,7 @@ Parrish et al. present a framework for writing parellel programs, including a pe
 However, the data shown in Figure \ref{actors_bad_histogram} does not support the claim that Rust is as performant as C++. The inclusion of the much slower ``upc'' and ``shmem'' implementations skew the scale of the plot so Rust and C++ versions look the same, but in fact by examining the data labels we can see the implementation is on average $1.46\times$ slower for this kernel, which is non-negligibly slower. This aligns with the results of other publications such as Costanza et al. who observed a $1.18\times$ slowdown, and noted it as such. In the authors opinion, this paper is emblematic of common problem in literature about the Rust programming language -- the bias held by some that the Rust programming language is better in all respects than other programming languages. Despite the fact that the data in the paper shows that the Rust implementation is slower \ref{actors_bad_histogram}, the data is presented in a disingenuous way in order to draw the conclusion that it is equally performant.
 
 
+% TODO: If needed, perhaps later...
 % Rust programming language in the high-performance computing environment
 % Rayon + MPI implementation of code snippet, run data but no source code
 
