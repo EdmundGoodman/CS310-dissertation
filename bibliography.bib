@@ -1,4 +1,162 @@
 
+@misc{phazer99_heres_2023,
+	type = {Reddit {Comment}},
+	title = {Here's [a playground…},
+	url = {www.reddit.com/r/rust/comments/120mmdw/emerging_technologies_rust_in_hpc/jdjn9lr/},
+	urldate = {2024-04-05},
+	journal = {r/rust},
+	author = {phazer99},
+	month = mar,
+	year = {2023},
+	note = {Post URL: www.reddit.com/r/rust/comments/120mmdw/emerging\_technologies\_rust\_in\_hpc/},
+}
+
+@misc{moranPaperFalse,
+	title = {Rust {Playground}},
+	url = {https://play.rust-lang.org/?version=stable&mode=release&edition=2021&gist=8c39a3c82da29010d022652f2c7fe36b},
+	urldate = {2024-04-05},
+}
+
+@misc{noauthor_lmoran94eurocc_cfd_nodate,
+	title = {lmoran94/eurocc\_cfd: {CFD} code in {Rust}, {C}, and {Fortran}},
+	url = {https://github.com/lmoran94/eurocc_cfd/tree/main},
+	urldate = {2024-04-05},
+}
+
+@article{dagum_openmp_1998,
+	title = {{OpenMP}: an industry standard {API} for shared-memory programming},
+	volume = {5},
+	issn = {1558-190X},
+	shorttitle = {{OpenMP}},
+	url = {https://ieeexplore.ieee.org/abstract/document/660313},
+	doi = {10.1109/99.660313},
+	abstract = {At its most elemental level, OpenMP is a set of compiler directives and callable runtime library routines that extend Fortran (and separately, C and C++ to express shared memory parallelism. It leaves the base language unspecified, and vendors can implement OpenMP in any Fortran compiler. Naturally, to support pointers and allocatables, Fortran 90 and Fortran 95 require the OpenMP implementation to include additional semantics over Fortran 77. OpenMP leverages many of the X3H5 concepts while extending them to support coarse grain parallelism. The standard also includes a callable runtime library with accompanying environment variables.},
+	number = {1},
+	urldate = {2024-04-05},
+	journal = {IEEE Computational Science and Engineering},
+	author = {Dagum, L. and Menon, R.},
+	month = jan,
+	year = {1998},
+	note = {Conference Name: IEEE Computational Science and Engineering},
+	keywords = {ANSI standards, Coherence, Computer architecture, Hardware, Message passing, Parallel processing, Parallel programming, Power system modeling, Scalability, Software systems},
+	pages = {46--55},
+}
+
+@inproceedings{edwards_kokkos_2013,
+	title = {Kokkos: {Enabling} {Performance} {Portability} {Across} {Manycore} {Architectures}},
+	shorttitle = {Kokkos},
+	url = {https://ieeexplore.ieee.org/abstract/document/6805038},
+	doi = {10.1109/XSW.2013.7},
+	abstract = {The manycore revolution in computational hardware can be characterized by increasing thread counts, decreasing memory per thread, and architecture specific performance constraints for memory access patterns. High performance computing (HPC) on emerging many core architectures requires codes to exploit every opportunity for thread-level parallelism and satisfy conflicting performance constraints. We developed the Kokkos C++ library to provide scientific and engineering codes with a user accessible many core performance portable programming model. The two foundational abstractions of Kokkos are (1) dispatch work to a many core device for parallel execution and (2) manage multidimensional arrays with polymorphic layouts. The integration of these abstractions enables users' code to satisfy multiple architecture specific memory access pattern performance constraints without having to modify their source code. In this paper we describe the Kokkos abstractions, summarize its application programmer interface (API), and present performance results for a molecular dynamics computational kernel and finite element mini-application.},
+	urldate = {2024-04-05},
+	booktitle = {2013 {Extreme} {Scaling} {Workshop} (xsw 2013)},
+	author = {Edwards, H. Carter and Trott, Christian R.},
+	month = aug,
+	year = {2013},
+	note = {ISSN: 2381-2036},
+	keywords = {Arrays, Indexes, Kernel, Layout, Libraries, Performance evaluation, Programming},
+	pages = {18--24},
+}
+
+@misc{RayonRust,
+	title = {rayon - {Rust}},
+	url = {https://docs.rs/rayon/latest/rayon/},
+	urldate = {2024-04-05},
+}
+
+@inproceedings{thempiforumMPIMessagePassing1993,
+	address = {New York, NY, USA},
+	series = {Supercomputing '93},
+	title = {{MPI}: a message passing interface},
+	isbn = {978-0-8186-4340-8},
+	shorttitle = {{MPI}},
+	url = {https://dl.acm.org/doi/10.1145/169627.169855},
+	doi = {10.1145/169627.169855},
+	urldate = {2024-04-05},
+	booktitle = {Proceedings of the 1993 {ACM}/{IEEE} conference on {Supercomputing}},
+	publisher = {Association for Computing Machinery},
+	author = {The MPI Forum, CORPORATE},
+	month = dec,
+	year = {1993},
+	pages = {878--883},
+}
+
+@misc{laneHeterogeneousSparseMatrixVector2023,
+	title = {Heterogeneous {Sparse} {Matrix}-{Vector} {Multiplication} via {Compressed} {Sparse} {Row} {Format}},
+	url = {http://arxiv.org/abs/2203.05096},
+	doi = {10.48550/arXiv.2203.05096},
+	abstract = {Sparse matrix-vector multiplication (SpMV) is one of the most important kernels in high-performance computing (HPC), yet SpMV normally suffers from ill performance on many devices. Due to ill performance, SpMV normally requires special care to store and tune for a given device. Moreover, HPC is facing heterogeneous hardware containing multiple different compute units, e.g., many-core CPUs and GPUs. Therefore, an emerging goal has been to produce heterogeneous formats and methods that allow critical kernels, e.g., SpMV, to be executed on different devices with portable performance and minimal changes to format and method. This paper presents a heterogeneous format based on CSR, named CSR-k, that can be tuned quickly and outperforms the average performance of Intel MKL on Intel Xeon Platinum 8380 and AMD Epyc 7742 CPUs while still outperforming NVIDIA's cuSPARSE and Sandia National Laboratories' KokkosKernels on NVIDIA A100 and V100 for regular sparse matrices, i.e., sparse matrices where the number of nonzeros per row has a variance \${\textbackslash}leq\$ 10, such as those commonly generated from two and three-dimensional finite difference and element problems. In particular, CSR-k achieves this with reordering and by grouping rows into a hierarchical structure of super-rows and super-super-rows that are represented by just a few extra arrays of pointers. Due to its simplicity, a model can be tuned for a device and used to select super-row and super-super-rows sizes in constant time.},
+	urldate = {2024-04-05},
+	publisher = {arXiv},
+	author = {Lane, Phillip Allen and Booth, Joshua Dennis},
+	month = jan,
+	year = {2023},
+	note = {arXiv:2203.05096 [cs]},
+	keywords = {Computer Science - Data Structures and Algorithms, Computer Science - Distributed, Parallel, and Cluster Computing, Computer Science - Performance},
+}
+
+@article{eisenstat1977yale,
+	title = {Yale sparse matrix package: {II}. the nonsymmetric codes},
+	volume = {114},
+	journal = {Res. Rep},
+	author = {Eisenstat, SC and Gursky, MC and Schultz, MH and Sherman, AH},
+	year = {1977},
+}
+
+@misc{PackagesMantevo,
+	title = {Packages {\textbar} {Mantevo}},
+	url = {https://mantevo.github.io/packages.html},
+	urldate = {2024-04-05},
+}
+
+@article{pardo2021modeling,
+	title = {Modeling of resistivity and acoustic borehole logging measurements using finite element methods},
+	author = {Pardo, David and Matuszyk, Paweł J and Puzyrev, Vladimir and Torres-Verdin, Carlos and Nam, Myung Jin and Calo, Victor M},
+	year = {2021},
+	note = {Publisher: Elsevier},
+}
+
+@misc{SharedMemoryParallelism,
+	title = {Shared {Memory} {Parallelism} ({SMP}) — {Sheffield} {HPC} {Documentation}},
+	url = {https://docs.hpc.shef.ac.uk/en/latest/parallel/SMP.html#gsc.tab=0},
+	urldate = {2024-04-05},
+}
+
+@article{shahhoseini1999achieving,
+	title = {Achieving the best performance on superscalar processors},
+	volume = {27},
+	number = {4},
+	journal = {ACM SIGARCH Computer Architecture News},
+	author = {Shahhoseini, Hadi Shahriar and Naderi, Madjid and Nemati, S},
+	year = {1999},
+	note = {Publisher: ACM New York, NY, USA},
+	pages = {6--11},
+}
+
+@book{pattersonHennessyComputerOrganisationArchitecture,
+	address = {San Francisco, CA, USA},
+	edition = {5},
+	title = {Computer organization and design, fifth edition: {The} {Hardware}/{Software} interface},
+	isbn = {0-12-407726-9},
+	abstract = {The 5th edition of Computer Organization and Design moves forward into the post-PC era with new examples, exercises, and material highlighting the emergence of mobile computing and the cloud. This generational change is emphasized and explored with updated content featuring tablet computers, cloud infrastructure, and the ARM (mobile computing devices) and x86 (cloud computing) architectures. Because an understanding of modern hardware is essential to achieving good performance and energy efficiency, this edition adds a new concrete example, "Going Faster," used throughout the text to demonstrate extremely effective optimization techniques. Also new to this edition is discussion of the "Eight Great Ideas" of computer architecture. As with previous editions, a MIPS processor is the core used to present the fundamentals of hardware technologies, assembly language, computer arithmetic, pipelining, memory hierarchies and I/O. Instructors looking for4th Edition teaching materials should e-mail textbook@elsevier.com. Includes new examples, exercises, and material highlighting the emergence of mobile computing and the Cloud. Covers parallelism in depth with examples and content highlighting parallel hardware and software topics Features the Intel Core i7, ARM Cortex-A8 and NVIDIA Fermi GPU as real-world examples throughout the book Adds a new concrete example, "Going Faster," to demonstrate how understanding hardware can inspire software optimizations that improve performance by 200 times. Discusses and highlights the "Eight Great Ideas" of computer architecture: Performance via Parallelism; Performance via Pipelining; Performance via Prediction; Design for Moore's Law; Hierarchy of Memories; Abstraction to Simplify Design; Make the Common Case Fast; and Dependability via Redundancy. Includes a full set of updated and improved exercises.},
+	publisher = {Morgan Kaufmann Publishers Inc.},
+	author = {Patterson, David A. and Hennessy, John L.},
+	year = {2013},
+}
+
+@incollection{klabnikFearlessConcurrency2018,
+	title = {Fearless {Concurrency}},
+	isbn = {978-1-59327-828-1},
+	language = {en},
+	booktitle = {The {Rust} {Programming} {Language}},
+	publisher = {No Starch Press},
+	author = {Klabnik, Steve and Nichols, Carol},
+	year = {2018},
+	note = {Google-Books-ID: iVv6DwAAQBAJ},
+	keywords = {COMPUTERS / Programming / General, Computers / Programming / Open Source},
+	pages = {57},
+}
+
 @misc{P3HPC,
 	title = {{P3HPC}},
 	url = {https://p3hpc.github.io/},
