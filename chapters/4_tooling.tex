@@ -1,14 +1,89 @@
 \chapter{HPC MultiBench}
 \label{ch:hpc-multibench} % 4000-5000 words
 
-\section{Use case}
-\label{sec:hpc-multibench-use-case} % 750 words
+\section{Motivations}
+\label{sec:hpc-multibench-motivation} % 750 words
 
 \section{Design}
 \label{sec:hpc-multibench-design} % 500 words
 
+% YAML design
+
+% CLI design
+
+% GUI design
+
 \section{Implementation}
 \label{sec:hpc-multibench-implementation} % 2000 words
 
+% Approach
+
+% Selected fun code snippets
+
+% Tooling
+
+% Documentation
+
+\section{Example use case}
+\label{sec:hpc-multibench-example-use-case} % 2000 words
+
+% Appendix using tool to reproduce Moran and Bull's results? Or example use case section?
+
+Replication studies are
+% https://en.wikipedia.org/wiki/Replication_crisis
+% https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10019630/
+% https://royalsocietypublishing.org/rsos/replication-studies
+% https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7100931/
+% https://www.enago.com/academy/importance-of-replication-studies/
+
+As discussed in section \ref{sec:hpc-multibench-motivation}, a key motivation for this tool is streamlining the tedious process of manually running, aggregating, and analysing the results of a large number of program runs to create a statistically confident characterisation of the performance of programs. Since this process is so time-consuming, due to both the process of conducting many runs, and re-writing scripts to aggregate and present the data, it is often not viable to spend time running replication studies of existing work, despite the benefits many benefits this work provides. Beyond the clear use case for this tool of running and analysing original results, which is showcased in full in chapter \ref{ch:performance}, this tool also makes it possible to very quickly conduct replication studies of existing work in the field.
+
+\subsection{Replication study of ``Emerging technologies: Rust in HPC''}
+\label{ssec:hpc-multibench-replication-study}
+
+This section shows the workflow of running a replication study on Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}. This paper was selected as the source code is available as a GitHub repo \cite{}, and the paper draws a different conclusion to other existing work such as Constanza et al. \cite{costanzoPerformanceVsProgramming2021}, so replication would either provide confidence in their results, or elucidate any possible reasons for this difference.
+
+As a result of the focussed design goals of the HPC MultiBench tool, the workflow for the replication study is exceedingly simple, consisting of six short steps -- each of which requires only one terminal command:
+
+\begin{enumerate}
+    \item Clone the GitHub repository containing the source code
+    \item Add the HPC MultiBench tool as a submodule to the repository
+    \item Install the HPC MultiBench tool using \mintinline{bash}{poetry}
+    \item Write a YAML file defining the run configurations and analysis presented in the paper
+    \item Use the \texttt{record} command of the HPC MultiBench tool to run the jobs defined by the YAML file
+    \item Use the \texttt{report} command of the HPC MulitBench tool to run analyse the results defined by the YAML file
+\end{enumerate}
+
+Listing \ref{listing:replication-study-workflow} shows the six terminal commands required to perform these six steps.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{bash}
+git clone https://github.com/lmoran94/eurocc_cfd
+git submodule add https://github.com/EdmundGoodman/hpc-multibench
+cd hpc_multibench && poetry install
+vim replication_study.yaml  # The YAML file representing the paper is written here
+poetry run python3 -m hpc_multibench -y replication_study.yaml record
+poetry run python3 -m hpc_multibench -y replication_study.yaml report
+    \end{minted}
+    \caption{A listing of the six bash commands required to run a full replication study of Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.}
+    \label{listing:replication-study-workflow}
+\end{listing}
+% TODO: add command to pyproject.toml to remove the need for python3 -m
+
+The necessary complexity to represent the unique aspects of the results being replicated is encoded in the YAML file, which is shown in Listing \ref{listing:replication-study-workflow} as being written in \mintinline{bash}{vim}. This is by far the most involved part of the process, but the abstractions in the design of the YAML schema are designed to make it as simple as possible, whilst still being able to represent most common analyses done by papers.
+
+The first step of writing the YAML file is defining the run configurations
+
+The second step of writing the YAML file is writing the test benches
+
+A full listing of the YAML file for the replication study is provided in Appendix \ref{}. It is only ~225 lines long, much of which can be templated from examples in the tool documentation. This is significantly shorter in line length than the code that would be required to script running all the configurations of the programs, aggregating the results, and plotting graphs for them -- and avoids much of the time spent debugging that would be required for writing such custom scripts.
+
+% Side by side results of original paper and new figures
+
+% Summary of results comparison
+
+
+
 \section{Industry review}
 \label{sec:hpc-multibench-industry-review} % 500 words
+

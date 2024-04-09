@@ -1,5 +1,5 @@
 
-@misc{phazer99_heres_2023,
+@misc{phazer99HerePlayground2023,
 	type = {Reddit {Comment}},
 	title = {Here's [a playground…},
 	url = {www.reddit.com/r/rust/comments/120mmdw/emerging_technologies_rust_in_hpc/jdjn9lr/},
@@ -11,19 +11,29 @@
 	note = {Post URL: www.reddit.com/r/rust/comments/120mmdw/emerging\_technologies\_rust\_in\_hpc/},
 }
 
-@misc{moranPaperFalse,
-	title = {Rust {Playground}},
-	url = {https://play.rust-lang.org/?version=stable&mode=release&edition=2021&gist=8c39a3c82da29010d022652f2c7fe36b},
-	urldate = {2024-04-05},
-}
-
-@misc{noauthor_lmoran94eurocc_cfd_nodate,
+@misc{Lmoran94Eurocc_cfdCFD,
 	title = {lmoran94/eurocc\_cfd: {CFD} code in {Rust}, {C}, and {Fortran}},
 	url = {https://github.com/lmoran94/eurocc_cfd/tree/main},
 	urldate = {2024-04-05},
 }
 
-@article{dagum_openmp_1998,
+@inproceedings{edwardsKokkosEnablingPerformance2013,
+	title = {Kokkos: {Enabling} {Performance} {Portability} {Across} {Manycore} {Architectures}},
+	shorttitle = {Kokkos},
+	url = {https://ieeexplore.ieee.org/abstract/document/6805038},
+	doi = {10.1109/XSW.2013.7},
+	abstract = {The manycore revolution in computational hardware can be characterized by increasing thread counts, decreasing memory per thread, and architecture specific performance constraints for memory access patterns. High performance computing (HPC) on emerging many core architectures requires codes to exploit every opportunity for thread-level parallelism and satisfy conflicting performance constraints. We developed the Kokkos C++ library to provide scientific and engineering codes with a user accessible many core performance portable programming model. The two foundational abstractions of Kokkos are (1) dispatch work to a many core device for parallel execution and (2) manage multidimensional arrays with polymorphic layouts. The integration of these abstractions enables users' code to satisfy multiple architecture specific memory access pattern performance constraints without having to modify their source code. In this paper we describe the Kokkos abstractions, summarize its application programmer interface (API), and present performance results for a molecular dynamics computational kernel and finite element mini-application.},
+	urldate = {2024-04-05},
+	booktitle = {2013 {Extreme} {Scaling} {Workshop} (xsw 2013)},
+	author = {Edwards, H. Carter and Trott, Christian R.},
+	month = aug,
+	year = {2013},
+	note = {ISSN: 2381-2036},
+	keywords = {Arrays, Indexes, Kernel, Layout, Libraries, Performance evaluation, Programming},
+	pages = {18--24},
+}
+
+@article{dagumOpenMPIndustryStandard1998,
 	title = {{OpenMP}: an industry standard {API} for shared-memory programming},
 	volume = {5},
 	issn = {1558-190X},
@@ -42,20 +52,64 @@
 	pages = {46--55},
 }
 
-@inproceedings{edwards_kokkos_2013,
-	title = {Kokkos: {Enabling} {Performance} {Portability} {Across} {Manycore} {Architectures}},
-	shorttitle = {Kokkos},
-	url = {https://ieeexplore.ieee.org/abstract/document/6805038},
-	doi = {10.1109/XSW.2013.7},
-	abstract = {The manycore revolution in computational hardware can be characterized by increasing thread counts, decreasing memory per thread, and architecture specific performance constraints for memory access patterns. High performance computing (HPC) on emerging many core architectures requires codes to exploit every opportunity for thread-level parallelism and satisfy conflicting performance constraints. We developed the Kokkos C++ library to provide scientific and engineering codes with a user accessible many core performance portable programming model. The two foundational abstractions of Kokkos are (1) dispatch work to a many core device for parallel execution and (2) manage multidimensional arrays with polymorphic layouts. The integration of these abstractions enables users' code to satisfy multiple architecture specific memory access pattern performance constraints without having to modify their source code. In this paper we describe the Kokkos abstractions, summarize its application programmer interface (API), and present performance results for a molecular dynamics computational kernel and finite element mini-application.},
+@phdthesis{chen_energy-efficient_2014,
+	title = {Energy-efficient electrical and silicon-photonic networks in manycore systems},
+	abstract = {During the past decade, the very large scale integration (VLSI) community has migrated towards incorporating multiple cores on a single chip to sustain the historic performance improvement in computing systems. As the core count continuously increases, the performance of network-on-chip (NoC), which is responsible for the communication between cores, caches and memory controllers, is increasingly becoming critical for sustaining the performance improvement. In this dissertation, we propose several methods to improve the energy efficiency of both electrical and silicon-photonic NoCs. Firstly, for electrical NoC, we propose a flow control technique, Express Virtual Channel with Taps (EVC-T), to transmit both broadcast and data packets efficiently in a mesh network. A low-latency notification tree network is included to maintain the order of broadcast packets. The EVC-T technique improves the NoC latency by 24\% and the system energy efficiency in terms of energy-delay product (EDP) by 13\%. In the near future, the silicon-photonic links are projected to replace the electrical links for global on-chip communication due to their lower datadependent power and higher bandwidth density, but the high laser power can more than offset these advantages. Therefore, we propose a silicon-photonic multi-bus NoC architecture and a methodology that can reduce the laser power by 49\% on average through bandwidth reconfiguration at runtime based on the variations in bandwidth requirements of applications. We also propose a technique to reduce the laser power by dynamically activating/deactivating the L2 cache banks and switching ON/OFF the corresponding silicon-photonic links in a crossbar NoC. This cache-reconfiguration based technique can save laser power by 23.8\% and improves system EDP by 5.52\% on average. In addition, we propose a methodology for placing and sharing on-chip laser sources by jointly considering the bandwidth requirements, thermal constraints and physical layout constraints. Our proposed methodology for placing and sharing of on-chip laser sources reduces laser power. In addition to reducing the laser power to improve the energy efficiency of silicon-photonic NoCs, we propose to leverage the large bandwidth provided by silicon-photonic NoC to share computing resources. The global sharing of floating-point units can save system area by 13.75\% and system power by 10\%.},
+	author = {Chen, Chao},
+	month = jan,
+	year = {2014},
+	doi = {10.13140/RG.2.1.2153.6802},
+}
+
+@misc{witkowski_moores_nodate,
+	title = {'{Moore}'s {Law}'s dead,' {Nvidia} {CEO} {Jensen} {Huang} says in justifying gaming-card price hike},
+	url = {https://www.marketwatch.com/story/moores-laws-dead-nvidia-ceo-jensen-says-in-justifying-gaming-card-price-hike-11663798618},
+	abstract = {Nvidia Corp. Chief Executive Jensen Huang on Wednesday said he thinks it's going to be "a pretty terrific Q4 for Ada," the company's next-generation chip...},
+	language = {EN-US},
 	urldate = {2024-04-05},
-	booktitle = {2013 {Extreme} {Scaling} {Workshop} (xsw 2013)},
-	author = {Edwards, H. Carter and Trott, Christian R.},
-	month = aug,
-	year = {2013},
-	note = {ISSN: 2381-2036},
-	keywords = {Arrays, Indexes, Kernel, Layout, Libraries, Performance evaluation, Programming},
-	pages = {18--24},
+	journal = {MarketWatch},
+	author = {Witkowski, Wallace},
+	note = {Section: Industries},
+}
+
+@article{theisEndMooreLaw2017,
+	title = {The {End} of {Moore}'s {Law}: {A} {New} {Beginning} for {Information} {Technology}},
+	volume = {19},
+	issn = {1558-366X},
+	shorttitle = {The {End} of {Moore}'s {Law}},
+	url = {https://ieeexplore.ieee.org/abstract/document/7878935},
+	doi = {10.1109/MCSE.2017.29},
+	abstract = {The insights contained in Gordon Moore's now famous 1965 and 1975 papers have broadly guided the development of semiconductor electronics for over 50 years. However, the field-effect transistor is approaching some physical limits to further miniaturization, and the associated rising costs and reduced return on investment appear to be slowing the pace of development. Far from signaling an end to progress, this gradual "end of Moore's law" will open a new era in information technology as the focus of research and development shifts from miniaturization of long-established technologies to the coordinated introduction of new devices, new integration technologies, and new architectures for computing.},
+	number = {2},
+	urldate = {2024-04-05},
+	journal = {Computing in Science \& Engineering},
+	author = {Theis, Thomas N. and Wong, H.-S. Philip},
+	month = mar,
+	year = {2017},
+	note = {Conference Name: Computing in Science \& Engineering},
+	keywords = {Algorithm design and analysis, Computer architecture, Field effect transistors, Memory management, Moore's Law, Random access memory, Scientific computing, Switching circuits, algorithms implemented in hardware, emerging technologies, introductory and survey, memory technologies, neural nets, scientific computing},
+	pages = {41--50},
+}
+
+@inproceedings{mooreLithographyFutureMoore1995,
+	title = {Lithography and the future of {Moore}'s law},
+	volume = {2439},
+	url = {https://www.spiedigitallibrary.org/conference-proceedings-of-spie/2439/0000/Lithography-and-the-future-of-Moores-law/10.1117/12.209195.full},
+	doi = {10.1117/12.209195},
+	abstract = {The definition of"Moore's Law" has come to refer to almost anything related to the semiconductor industry that when plotted on semi-log paper approximates a straight line. I hesitate to review it's origins and by doing so restrict it's definition. However, today I will review the history and past performance relative to predictions and show where the advances have come from. I will leave the future performance up to you. Certainly continuing on the same slope doesn't get any easier. It presents a difficult challenge to the industry. The original paper that postulated the first version ofthe "law" was an article I wrote for the 3 5th anniversary issue ofElectronics Magazine in 1 965 . My assignment was to predict what was going to happen in the semiconductor components industry over the next ten years --to 1975 . In 1965 the integrated circuit was only a few years old and in many cases was not very well accepted. There was still a large contingent in the user community who wanted to design their own circuits and who considered the job of the semiconductor industry to be to supply them with transistors and diodes so they could get on with their jobs. I was trying to emphasize the fact that integrated circuits really did have an important role to play.},
+	urldate = {2024-04-05},
+	booktitle = {Integrated {Circuit} {Metrology}, {Inspection}, and {Process} {Control} {IX}},
+	publisher = {SPIE},
+	author = {Moore, Gordon E.},
+	month = may,
+	year = {1995},
+	pages = {2--17},
+}
+
+@misc{moranPaperFalse,
+	title = {Rust {Playground}},
+	url = {https://play.rust-lang.org/?version=stable&mode=release&edition=2021&gist=8c39a3c82da29010d022652f2c7fe36b},
+	urldate = {2024-04-05},
 }
 
 @misc{RayonRust,
@@ -231,17 +285,6 @@ This thesis presents the Rust-Library Rmpi, which provides MPI access with memor
 	note = {Publisher: Nature Publishing Group},
 	keywords = {Applied physics, Computer science, Electrical and electronic engineering},
 	pages = {147--154},
-}
-
-@article{hardwareTrendsArticle,
-	title = {Server engineering insights for large-scale online services},
-	volume = {30},
-	doi = {10.1109/MM.2010.73},
-	journal = {Micro, IEEE},
-	author = {Kozyrakis, Christos and Kansal, Aman and Sankar, Sriram and Vaid, Kushagra},
-	month = sep,
-	year = {2010},
-	pages = {8 -- 19},
 }
 
 @book{moscowPrioritisation,

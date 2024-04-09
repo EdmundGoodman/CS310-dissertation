@@ -189,3 +189,119 @@ The following example describes how HPCCG uses a pointer-based variant of the co
 % To traverse the values in a row $i$ of this data structure, first retrieve the pointer to the starting point in the list of values from \texttt{ptr\_to\_vals\_in\_row[i]}. Then, traverse through the list of values for the number of non-zeroes, \texttt{nnz\_in\_row[i]}. This same process applies to traversing indices in a row.
 
 % This data structure provides significant performance improvements over a full matrix representation for the sparse matrix-vector multiplication operation. This is because it minimises both the memory bandwidth and arithmetic operations required, by omitting the zero-values which would not contribute to the product.
+
+
+\chapter{Results}
+\label{ch:results-appendix}
+
+\section{Hardware specifications}
+\label{sec:hardware-specifications}
+
+The results of \texttt{lscpu} on the compute nodes for each of the systems are listed below.
+
+% % Athena
+% Architecture:             x86_64
+%   CPU op-mode(s):         32-bit, 64-bit
+%   Address sizes:          39 bits physical, 48 bits virtual
+%   Byte Order:             Little Endian
+% CPU(s):                   8
+%   On-line CPU(s) list:    0-7
+% Vendor ID:                GenuineIntel
+%   Model name:             Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz
+%     CPU family:           6
+%     Model:                142
+%     Thread(s) per core:   2
+%     Core(s) per socket:   4
+%     Socket(s):            1
+%     Stepping:             12
+%     CPU(s) scaling MHz:   21%
+%     CPU max MHz:          4600.0000
+%     CPU min MHz:          400.0000
+%     BogoMIPS:             4001.60
+%     Flags:                fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art 
+%                           arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 s
+%                           se4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpri
+%                           ority ept vpid ept_ad fsgsbase tsc_adjust sgx bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat 
+%                           pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
+% Virtualization features:  
+%   Virtualization:         VT-x
+% Caches (sum of all):      
+%   L1d:                    128 KiB (4 instances)
+%   L1i:                    128 KiB (4 instances)
+%   L2:                     1 MiB (4 instances)
+%   L3:                     8 MiB (1 instance)
+% NUMA:                     
+%   NUMA node(s):           1
+%   NUMA node0 CPU(s):      0-7
+% Vulnerabilities:          
+%   Gather data sampling:   Mitigation; Microcode
+%   Itlb multihit:          KVM: Mitigation: VMX disabled
+%   L1tf:                   Not affected
+%   Mds:                    Not affected
+%   Meltdown:               Not affected
+%   Mmio stale data:        Mitigation; Clear CPU buffers; SMT vulnerable
+%   Reg file data sampling: Not affected
+%   Retbleed:               Mitigation; Enhanced IBRS
+%   Spec rstack overflow:   Not affected
+%   Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl
+%   Spectre v1:             Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+%   Spectre v2:             Mitigation; Enhanced / Automatic IBRS, IBPB conditional, RSB filling, PBRSB-eIBRS SW sequence
+%   Srbds:                  Mitigation; Microcode
+%   Tsx async abort:        Not affected
+
+% % Kudu
+% Architecture:        x86_64
+% CPU op-mode(s):      32-bit, 64-bit
+% Byte Order:          Little Endian
+% CPU(s):              40
+% On-line CPU(s) list: 0-39
+% Thread(s) per core:  2
+% Core(s) per socket:  10
+% Socket(s):           2
+% NUMA node(s):        2
+% Vendor ID:           GenuineIntel
+% CPU family:          6
+% Model:               63
+% Model name:          Intel(R) Xeon(R) CPU E5-2660 v3 @ 2.60GHz
+% Stepping:            2
+% CPU MHz:             3300.000
+% CPU max MHz:         3300.0000
+% CPU min MHz:         1200.0000
+% BogoMIPS:            5199.67
+% Virtualization:      VT-x
+% L1d cache:           32K
+% L1i cache:           32K
+% L2 cache:            256K
+% L3 cache:            25600K
+% NUMA node0 CPU(s):   0-9,20-29
+% NUMA node1 CPU(s):   10-19,30-39
+% Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm cpuid_fault epb invpcid_single pti intel_ppin ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm xsaveopt cqm_llc cqm_occup_llc dtherm ida arat pln pts md_clear flush_l1d
+
+
+% % Avon
+% Architecture:        x86_64
+% CPU op-mode(s):      32-bit, 64-bit
+% Byte Order:          Little Endian
+% CPU(s):              48
+% On-line CPU(s) list: 0-47
+% Thread(s) per core:  1
+% Core(s) per socket:  24
+% Socket(s):           2
+% NUMA node(s):        4
+% Vendor ID:           GenuineIntel
+% CPU family:          6
+% Model:               85
+% Model name:          Intel(R) Xeon(R) Platinum 8268 CPU @ 2.90GHz
+% Stepping:            7
+% CPU MHz:             3506.916
+% BogoMIPS:            5800.00
+% Virtualization:      VT-x
+% L1d cache:           32K
+% L1i cache:           32K
+% L2 cache:            1024K
+% L3 cache:            36608K
+% NUMA node0 CPU(s):   0,4,8,12,16,20,24,28,32,36,40,44
+% NUMA node1 CPU(s):   1,5,9,13,17,21,25,29,33,37,41,45
+% NUMA node2 CPU(s):   2,6,10,14,18,22,26,30,34,38,42,46
+% NUMA node3 CPU(s):   3,7,11,15,19,23,27,31,35,39,43,47
+% Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3 invpcid_single intel_ppin ssbd mba ibrs ibpb stibp ibrs_enhanced fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb intel_pt avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts pku ospke avx512_vnni md_clear flush_l1d arch_capabilities
