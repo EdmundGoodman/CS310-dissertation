@@ -203,13 +203,19 @@ The use of mini-apps makes hardware-software co-design for large, complex applic
 
 HPCCG is an initialism for ``High Performance Computing Conjugate Gradients'', and is ``the original Mantevo mini-app'' \cite{herouxHPCCGSolverPackage2007}. It is designed to be ``the best approximation to an unstructured implicit finite element or finite volume application in 800 lines or fewer.'' \cite{PackagesMantevo}. This short length, along with its simple build system, and support for OpenMP and MPI with no other dependencies made it a good choice for translation to Rust. A full description of the process leading to the selection of HPCCG is described in Appendix \ref{sec:miniapp-selection}.
 
-It is based on the iterative method of gradient descent for conjugate gradients first proposed by Hestnes and Steifel in 1952\cite{hestenesMethodsConjugateGradients1952}, who researched it and wrote an implementation for the contemporary Z4 processor.
+It is based on the iterative method of gradient descent for conjugate gradients first proposed by Hestnes and Steifel in 1952\cite{hestenesMethodsConjugateGradients1952}, who researched it and wrote an implementation for the contemporary Z4 processor. This process can be used to model, and hence visualise, pressure dissipation over time in a three dimensional mesh as shown in Figure \ref{fig:acacgs_silo_output}.
+
+% TODO: Add cube figure and description of how it runs. Consider moving the following or final only paragraphs into the translation section?
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/2_background/acacgs_silo_output.png}
+    \caption{A screenshot of a silo visualisation from ACACGS, a C translation of HPCCG by Richard Kirk used in the CS257 coursework.}
+    \label{fig:acacgs_silo_output}
+\end{figure}
 
 There are three main operations in this iterative method of conjugate gradients: calculating a vector dot product, pairwise summation of two scaled vectors, and calculating the product of a sparse matrix and a vector. Of the three operations, the third operation is responsible for most of the floating point operations, and consequently the majority of the runtime. This is because calculating sparse matrix-vector products requires larger and more complex data structures to efficiently represent sparse matrices, rather than just vectors.
 
 Sparse matrix-vector products are a common workload in High-Performance Computing, and remain an active field of research, with Lane and Booth describing them as ``one of the most important kernels in high-performance computing'' \cite{laneHeterogeneousSparseMatrixVector2023}. This means that the performance characteristics of HPCCG, which are dominated by this kernel, are representative of many large applications. Since sparse matrices are ubiquitous in computational tasks, there are well-established data structures to represent them. One of these representations is compressed row storage, often called Yale format, as it was first proposed in the 1977 Yale Sparse Matrix Package report \cite{eisenstat1977yale}.
-
-HPCCG uses a custom, pointer based implementation of the Yale format to represent sparse matrices. The details of this implementation, which deviates from the traditional index based implementation of the Yale format, is described in Appendix \ref{sec:hpccg-matrix-representation}.
 
 \subsection{Performance, Productivity, and Portability}
 \label{ssec:p3hpc} % 500 words

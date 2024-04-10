@@ -16,26 +16,82 @@ As discussed in \Cref{ch:background}, this translation effort is novel with resp
 \section{Design}
 \label{sec:translation-design} % 500 words
 
-In traditional software development tasks, such as building the HPC MultiBench tool discussed in \Cref{ch:hpc-multibench}, system design is paramount to building a coherent product. However, for translation tasks the reference implementation has already been designed.
-
+In traditional software development tasks, such as building the HPC MultiBench tool discussed in \Cref{ch:hpc-multibench}, system design is paramount to building a coherent product. However, for translation tasks the reference implementation has already been designed. As a result of this, the majority of the effort is in understanding the codebase to be translated, and identifying difficulties arising from the differences in program model between the original and target language.
 
 \subsection{Differences in the Rust and C++ programming models}
-\label{sec:overview-hpccg}
+\label{sec:rust-cpp-programming-models}
+
+Every programming language can be though of as presenting a different abstraction over the capabilities of a variety of physical computer hardware. For low-level languages such as Assembly, this abstraction directly maps to the machine code instructions executed on the bare metal. Above this, languages such as C provide abstractions for common structures such as iteration, but require manual management of properties of the machine such as memory allocation. High-level scripting languages such as Python provide abstractions over memory management as well, leaving an interface very devolved from the hardware it runs on. Across many languages, the problem of program translation is reconciling these abstractions to allow the expression of the original functionality in another language.
+
+Typically, the abstractions across programming languages are equally powerful. However, there are some caveats to this. Lambda Calculus was one of the first expressions of computation within the young field of computer science, proposed by Alonzo Church in 1933 \cite{church1932set}. Seven years later in 1940, Church proposed Simply-Typed Lambda Calculus \cite{church1940formulation}, which restricts the domain of valid programs from all programs to only well-typed ones. This is referred to as a reduction in power of the language. However, this reduction in power is beneficial to programmers, as incorrectly-typed programs are not useful. % todo: explain why/how - can't be run or internally inconsistent?
+
+This restriction of valid programs being well-typed in Simply-Typed Lambda Calculus is mirrored by the prohibition of undefined behaviour in Rust, as shown in Figure \ref{fig:excalidraw_programs_venn}. It is beneficial to programmers, as they largely do not want to write programmers which exhibit on undefined behaviour. This is supported by the fact that programmers in other languages like C++ use dynamic and static analysis tools such as Valgrind \cite{ValgrindHome} and AddressSanitiser \cite{Sanitizers2023} to guarantee these properties outside the compiler
+
+% TODO: Consider replacing this diagram with tikz?
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/3_translation/excalidraw_programs_venn.png}
+    \caption{A diagram to show the relative powers
+of increasingly restrictive program models.}
+    \label{fig:excalidraw_programs_venn}
+    % TODO: Check paper website for permission to reproduce
+\end{figure}
+
+When translating from languages which allow undefined behaviour such as C++ to Rust, which prohibits it my default, there are additional challenges beyond just reconciling the abstractions of the program models to express the same functionality. There are fewer safe Rust programs than C++ programs, and as a result a direct mapping to Rust may not exist if the program relies on undefined behaviour. In this case, the translation must either leverage the \mintinline{rust}{unsafe} keyword to allow such behaviour, or use a different, safe, mechanism to express the same functionality.
+
 
 \subsection{Overview of HPCCG}
 \label{sec:overview-hpccg}
 % Overview of HPCCG
 
+% Cite yale normally being index based
+As discussed in the background to HPCCG in section \ref{ssec:hpccg}, the dominant computation kernel is an implementation of sparse matrix-vector multiplication, along with two other kernels, the vector dot product and pairwise summation of two scaled vectors. To facilitate performant implementation of these operations, HPCCG uses a non-standard, pointer based implementation of the traditionally index based Yale format to represent sparse matrices. The following example describes how HPCCG uses a pointer-based variant of the compressed row storage format to represent sparse matrices.
 
-\subsection{Translation methodology}
-\label{sec:translation-methodology}
-% Process of writing incrementally optimised translations
+\begin{align}
+    \begin{pmatrix}
+        0 & 1 & 0 & 2 \\
+        0 & 0 & 5 & 0 \\
+        0 & 4 & 6 & 0 \\
+        3 & 0 & 0 & 0
+    \end{pmatrix}
+    \label{eq:exampleMatrix}
+\end{align}
+
+A sparse matrix can then be represented as two nested lists -- one containing the non-zero values in each row, and the other the indices of those non-zero values in that row. This means the sparse matrix in (\ref{eq:exampleMatrix}) can be written as:
+
+\begin{verbatim}
+list_of_vals = [   [1, 2]  ,  [5]  ,  [4, 6]  ,  [3]   ]
+list_of_inds = [   [1, 3]  ,  [2]  ,  [1, 2]  ,  [0]   ]
+\end{verbatim}
+% \begin{align}
+%     \verb!list_of_vals = [   [1, 2]  ,  [5]  ,  [4, 6]  ,  [3]   ]! \\
+%     \verb!list_of_inds = [   [1, 3]  ,  [2]  ,  [1, 2]  ,  [0]   ]!
+%     \label{eq:exampleMatrixRepr}
+% \end{align}
+
+This structure uses much less memory, but has the drawback that the inner lists for each row are of variable length, making the outer list non-homogenous. HPCCG's data structure is a flattening of the above structure to use single-dimensional arrays rather than nested ones for \texttt{list\_of\_vals} and \texttt{list\_of\_inds}. This then requires a mechanism to distinguish rows, so it uses auxiliary data structures for the lengths of each row (an array of integers called \texttt{nnz\_in\_row}), along with pointers to the start of each row in the values and indices arrays (two arrays of pointers called \texttt{ptr\_to\_vals\_in\_row} and \texttt{ptr\_to\_inds\_in\_row} respectively). Finally, the number of rows (an integer called \texttt{total\_nrow}) is also needed. Hence, HPCCG would represent the sparse matrix in (\ref{eq:exampleMatrix}) as follows:
+
+\begin{verbatim}
+total_nrow          = 4
+nnz_in_row          = [ 2 ,     1 , 2 ,     1 ]
+list_of_vals        = [ 1 , 2 , 5 , 4 , 6 , 3 ]
+ptr_to_vals_in_row  = [ ↑ ,     ↑ , ↑,      ↑ ]
+list_of_inds        = [ 1 , 3 , 2 , 1 , 2 , 0 ]
+ptr_to_inds_in_row  = [ ↑ ,     ↑ , ↑,      ↑ ]
+\end{verbatim}
+
+To traverse the values in a row $i$ of this data structure, first retrieve the pointer to the starting point in the list of values from \texttt{ptr\_to\_vals\_in\_row[i]}. Then, traverse through the list of values for the number of non-zeroes, \texttt{nnz\_in\_row[i]}. This same process applies to traversing indices in a row.
+
+This data structure provides significant performance improvements over a full matrix representation for the sparse matrix-vector multiplication operation. This is because it minimises both the memory bandwidth and arithmetic operations required, by omitting the zero-values which would not contribute to the product.
+
+Unfortunately, this pointer based implementation presents difficulties when translating to Rust, as operations on raw pointers considered unsafe, as the borrower checker is less able to reason about their memory safety. This difficulty is addressed in the first two translation versions, \ref{sec:translation-direct} and \ref{sec:translation-direct}.
 
 
 \section{Implementation}
 \label{sec:translation-implementation} % 3000 words
 
 This section provides a description of the technical details of the translation process. Source code for each of these translations can be found in the \texttt{hpccg-rs} GitHub repository.
+% TODO: Add process of writing incrementally optimised translations
 
 
 \subsection{Direct translation}
@@ -107,6 +163,11 @@ Test-driven development refers to
 % \label{sec:translation-supply-side-verification} % 500 words
 % % Why is this important?
 % % `cargo vet`
+
+
+\subsection{Non-determinism in HPCCG}
+\label{sec:hpccg-race-conditions}
+% Explain uncommon bug resulting in non-deterministic results in HPCCG
 
 
 \section{Lessons learned and proposed workflow}
