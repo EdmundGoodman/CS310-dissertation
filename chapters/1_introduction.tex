@@ -10,6 +10,8 @@ The Rust compiler is designed to prohibit code which exhibits undefined behaviou
 High-Performance Computing is defined by IBM as ``technology that uses clusters of powerful processors, working in parallel, to process massive multidimensional datasets (big data) and solve complex problems at extremely high speeds''\cite{WhatHPCIntroduction}. Such High-Performance Computing resources are incredibly useful for solving computationally intensive problems across a spectrum of disciplines \cite{JournalDescriptionInternational}.
 Within the field of High-Performance Computing, mini-apps (also called proxy applications) are simple pieces of code which replicate the performance characteristics of larger applications without requiring including large codebases \cite{heroux2013mantevo}. These properties make them desirable for use as benchmarks for comparing High-Performance Computing systems.
 % Two repositories of mini-apps are the ECP Proxy applications \cite{ECPProxyApplications}, and the UK-MAC \cite{UKMiniAppConsortium}. C++ and FORTRAN are the two de-facto languages for building modern High-Performance Computing software -- together they make up 80 of the 84 listed ECP proxy applications \cite{ECPProxyApps2018}. However, this project will only draw comparisons between Rust and C++, not Rust and FORTRAN. This is because C++ is more modern than FORTRAN, and FORTRAN has many heavily optimised libraries, which would make the comparison of the languages alone more ambiguous.
+
+% TODO: Cite or somehow make more concrete
 Practical applications of High-Performance Computing have challenges beyond pure performance. Considerations about the productivity of developers writing high performance software, and the portability of this software across a wide variety of hardware, have a deep impact on design decisions in High-Performance systems. As such, the intersection of Performance, Productivity, and Portability is an active field of research, covered by the P3HPC workshop \cite{P3HPC}.
 
 
@@ -19,7 +21,8 @@ Practical applications of High-Performance Computing have challenges beyond pure
 % One sentence summary of your project. Followed by a short list of concrete objectives:
 % NOTE: This is slightly modified from the proposed format; worth checking this is OK?
 
-The overall goal of this project is to produce an assessment of whether Rust is a viable replacement for C++ in High-Performance Computing applications, and develop tooling and workflows to mitigate issues identified during this assessment.
+% The overall goal of this project is to produce an assessment of whether Rust is a viable replacement for C++ in High-Performance Computing applications, and develop tooling and workflows to mitigate issues identified during this assessment.
+The overall goal of this project is to produce an assessment of the suitability of Rust as a replacement for C++ in High-Performance Computing applications, and develop tooling and workflows to mitigate issues identified during this assessment.
 
 \subsection{Project summary}
 \label{ssec:objectives-summary}

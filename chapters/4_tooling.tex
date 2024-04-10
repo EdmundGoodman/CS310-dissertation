@@ -1,22 +1,96 @@
 \chapter{HPC MultiBench}
 \label{ch:hpc-multibench} % 4000-5000 words
 
+Having implemented the Rust translation of the HPCCG codebase, the next step is to characterise its performance. This is typically done by running many tests across a wide variety of configurations and problem sizes to understand how the program scales across these metrics.
+% As discussed in the next section, this process was identified as a frequently occurring task, causing bottlenecks in many workflows, whilst being possible to effectively script. This made it a very good candidate for building tooling to assist with it, as its frequency and propensity to cause bottlenecks make it a high-impact area for improvement.
+
+% TODO: Move specific description into source code
+HPC MultiBench is a tool to generate and run HPC batch compute jobs for performance comparison via Slurm from a convenient YAML configuration file. It can be thought of as ``a Swiss army knife for comparing programs on HPC resources''. This chapter will first discuss the motivation and use case for the tool, then go into technical detail about its design and implementation. Next, it will provide a concrete demonstration of its utility in an example use case, quickly constructing replication studies, by confirming the results of Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}. Finally, the chapter will conclude with thoughts from an industry review of the tool by two PhD candidates working in the High Performance and Scientific Computing Group at Warwick.
+
 \section{Motivations}
 \label{sec:hpc-multibench-motivation} % 750 words
+
+% A common task in HPC is (explain the use of slurm etc.)
+Manually spawning and aggregating the metrics from many similar jobs with different configurations is tedious! It is a repetitive and time-consuming process, and as such discourages duplicating results for statistical confidence -- despite being susceptible to human error. However, it is a common task in workflows for designing High-Performance Computing software, as it provides critical metrics to characterise application performance.
+
+Consider a single trial comparing the performance of two programs across eight problem sizes, with eight different thread counts per problem size, requires 128 program runs. Re-running this trial five times for statistical confidence requires 640 program runs. Currently, there are two approaches to this problem: either ignore statistical confidence and manually spawn many jobs, or create an application-specific script to submit the jobs. Both of these approaches are time-consuming, either manually submitting the jobs or writing and debugging the custom script. As a result of this, this step can form a bottleneck in certain workflows.
+
+However, this process of running and aggregating jobs is very similar between performance trials for different programs, meaning it is possible to create a program to automate the process. This combination of being both time-consuming and amenable to automation makes it a very good candidate for building tooling to facilitate it, as it has a good ratio of being high-impact to achievable programming effort.
+
+\section{Existing tools}
+\label{sec:hpc-multibench-existing-tools}
+
+As High-Performance Computing is an active research space, there are a number of existing tools which also act as a wrapper around Slurm, as shown in Table \ref{tab:hpc-multibench-existing-tools}. However, none of these tools appear to provide first-class support for this particular use case.
+
+% TODO: Check all tables have bold headings
+% TODO: Consider citing GitHub on tool names and papers on tool descriptions?
+\begin{table}[H]
+    \caption{Existing tools which provide wrappers for Slurm.}
+    \label{tab:hpc-multibench-existing-tools}
+    \begin{tabular}{|p{0.2\linewidth}|p{0.8\linewidth}|}
+    \hline
+    \textbf{Tool name}  & \textbf{Tool description} \\ \hline\hline
+    slurmR     & ``A lightweight wrapper for Slurm'' \cite{gvegayonJournalOpenSource}, which provides a framework to distribute computation of programs written in the R language across compute clusters, particularly in the field of bio-statistics. \\ \hline
+    targets    & ``A Make-like pipeline tool for statistics and data science in R'' \cite{landauTargetsPackageDynamic2021}, which orchestrates processing of programs written in R, providing caching capabilities to avoid re-running unchanged parts of the pipeline. \\ \hline
+    batchtools & ``Provides an implementation of a Map-like operation to define and asynchronously execute jobs on a variety of parallel backends'' for the R programming language \cite{langBatchtoolsToolsWork2017}. \\ \hline
+    ClusterMQ  & ``[An R package] to send function calls as jobs on a computing cluster with a minimal interface'' \cite{schubertClustermqEnablesEfficient2019}. \\ \hline
+    \end{tabular}
+\end{table}
+
+In summary, a number of tools exist as wrappers for Slurm for scientific computing workflows. However, these tools are generally focussed on orchestrating High-Performance Computing resources to run scientific computing programs, often in the R programming language, rather than providing a mechanism to run and compare the performance of programs in arbitrary languages. Our research did not identify any existing tools which directly compete with the purpose of HPC MultiBench.
 
 \section{Design}
 \label{sec:hpc-multibench-design} % 500 words
 
-% YAML design
+% When building software tooling, it is critical to have a focussed set of goals to inform the design process. Many software tools, particularly within industry, fall victim to scope creep
 
+\subsection{Configuration file}
+\label{sec:hpc-multibench-configuration-design}
+% YAML design
+The YAML schema of the HPC MultiBench is the key abstraction which drives its ergonomics and simplicity to use. Since the problem of running, aggregating metrics about, and simple analysis of programs is similar across many use cases, it is possible to create a domain-specific configuration language which expresses the majority of the functionality required. In order to maintain the simplicity, and hence usability, of this abstraction, a minority of complex functionality is not supported, but mechanisms such as exporting run data for further analysis are provided to mitigate this issue.
+
+The YAML schema is 
+
+
+\subsection{Command-line interface}
+\label{sec:hpc-multibench-cli-design}
 % CLI design
 
+% TODO: Switch most mintinline to texttt
+The HPC MultiBench command-line user interface is designed to be familiar to users of existing tools, such as the performance profiler \mintinline{bash}{perf}. Much like \mintinline{bash}{perf}, it provides two verb sub-commands \texttt{record} and \texttt{report}. The \texttt{record} command uses the 
+
+
+% \begin{listing}[H]
+%     \begin{minted}[linenos,breaklines]{text}
+% usage: __main__.py [-h] -y YAML_PATH {record,interactive,report} ...
+
+% A Swiss army knife for comparing programs on HPC resources.
+
+% positional arguments:
+%   {record,interactive,report}
+%     record              record data from running the test benches
+%     interactive         show the interactive TUI
+%     report              report analysis about completed test bench runs
+
+% options:
+%   -h, --help            show this help message and exit
+%   -y YAML_PATH, --yaml-path YAML_PATH
+%                         the path to the configuration YAML file
+%     \end{minted}
+%     \caption{A listing showing the help page of the HPC MultiBench tool, the result of running \mintinline{bash}{hpc_multibench --help}.}
+%     \label{listing:replication-study-workflow}
+% \end{listing}
+
+\subsection{Graphical user interface}
+\label{sec:hpc-multibench-gui-design}
 % GUI design
 
 \section{Implementation}
 \label{sec:hpc-multibench-implementation} % 2000 words
 
 % Approach
+
+% Pydantic for expressive YAML parsing
 
 % Selected fun code snippets
 
@@ -43,7 +117,7 @@ As discussed in section \ref{sec:hpc-multibench-motivation}, a key motivation fo
 
 This section shows the workflow of running a replication study on Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}. This paper was selected as the source code is available as a GitHub repo \cite{}, and the paper draws a different conclusion to other existing work such as Constanza et al. \cite{costanzoPerformanceVsProgramming2021}, so replication would either provide confidence in their results, or elucidate any possible reasons for this difference.
 
-As a result of the focussed design goals of the HPC MultiBench tool, the workflow for the replication study is exceedingly simple, consisting of six short steps -- each of which requires only one terminal command:
+As a result of the focussed design goals of the HPC MultiBench tool, the workflow for the replication study facilitated by the HPC MultiBench tool is exceedingly simple, consisting of six short steps -- each of which requires only one terminal command:
 
 \begin{enumerate}
     \item Clone the GitHub repository containing the source code
@@ -57,13 +131,13 @@ As a result of the focussed design goals of the HPC MultiBench tool, the workflo
 Listing \ref{listing:replication-study-workflow} shows the six terminal commands required to perform these six steps.
 
 \begin{listing}[H]
-    \begin{minted}[linenos,breaklines]{bash}
+    \begin{minted}[linenos,breaklines,frame=single]{bash}
 git clone https://github.com/lmoran94/eurocc_cfd
 git submodule add https://github.com/EdmundGoodman/hpc-multibench
 cd hpc_multibench && poetry install
-vim replication_study.yaml  # The YAML file representing the paper is written here
-poetry run python3 -m hpc_multibench -y replication_study.yaml record
-poetry run python3 -m hpc_multibench -y replication_study.yaml report
+vim ../replication_study.yaml  # The YAML file representing the paper is written here
+poetry run python3 -m hpc_multibench -y ../replication_study.yaml record
+poetry run python3 -m hpc_multibench -y ../replication_study.yaml report
     \end{minted}
     \caption{A listing of the six bash commands required to run a full replication study of Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.}
     \label{listing:replication-study-workflow}
@@ -74,7 +148,62 @@ The necessary complexity to represent the unique aspects of the results being re
 
 The first step of writing the YAML file is defining the run configurations
 
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{yaml}
+run_configurations:
+  "cpp-serial":
+    sbatch_config:
+      "nodes": 1
+      "ntasks-per-node": 1
+      "cpus-per-task": 1
+      "exclusive": "mcs"
+      "mem": 60000
+    module_loads: []
+    environment_variables: {}
+    directory: "../C-SER"
+    build_commands:
+      - "make"
+    run_command: "./cfd"
+    \end{minted}
+    \caption{A listing of the YAML configuration defining how the serial C++ version of the program is built and run.}
+    \label{listing:replication-study-workflow}
+\end{listing}
+
 The second step of writing the YAML file is writing the test benches
+
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{yaml}
+benches:
+  "serial":
+    run_configurations:
+      - "cpp-serial"
+      - "fortran-serial"
+      - "rust-serial"
+    reruns:
+      number: 10
+      unaggregatable_metrics:
+        - "Problem size"
+    matrix:
+      args:
+        - "1 5000"
+        - "2 5000"
+        - "4 5000"
+        - "8 5000"
+        # [snip...]
+        - "128 5000"
+    analysis:
+      metrics:
+        "Problem size": "=== RUN INSTANTIATION ===\n\\{.*args: (\\d+) .*\\}"
+        "Total time (s)": "Time for\\s+\\d+ iterations was\\s+([\\d\\.eE\\-+]+)\\s+seconds"
+      line_plots:
+        - title: "Serial Implementation Comparison"
+          x: "Problem size"
+          y: "Total time (s)"
+          y_log: True
+    \end{minted}
+    \caption{A listing of the YAML configuration defining how the serial C++ version of the program is built and run.}
+    \label{listing:replication-study-workflow}
+\end{listing}
 
 A full listing of the YAML file for the replication study is provided in Appendix \ref{}. It is only ~225 lines long, much of which can be templated from examples in the tool documentation. This is significantly shorter in line length than the code that would be required to script running all the configurations of the programs, aggregating the results, and plotting graphs for them -- and avoids much of the time spent debugging that would be required for writing such custom scripts.
 
@@ -87,3 +216,10 @@ A full listing of the YAML file for the replication study is provided in Appendi
 \section{Industry review}
 \label{sec:hpc-multibench-industry-review} % 500 words
 
+Once development of the HPC MultiBench tool was complete, meetings with two PhD candidates, Toby Flynn and Sam Curtis, both working in the High Performance and Scientific Computing Group at Warwick were organised. These meeting served review the tool, help understand how it fits into the existing landscape, and collect suggestions for future features.
+
+In the first meeting with Toby, the use case and a demonstration of the tool was presented. Toby commented that it ``sounds like a really good idea for seeing how things went'', and that ``anything I have done in the past I think I could do in the YAML file'', which confirms the use case and the abstraction provided by the YAML schema respectively. In the second meeting with Sam, as with the first meeting, the use case and a demonstration of the tool was presented. Sam commented that ``I would definitely use something like this'', and ``the problem you think exists definitely does'', similarly confirming the validity of the use case and usefulness of the tool.
+
+% Add note that both were asked if they were happy with me quoting them for the presentation/dissertation
+
+In both of the meetings, there was discussion of future features which could improve the usefulness of the tool. This included first-class support for the Spack package manager (as is currently supported with module loads), the capability to average across results in a metric, and support for extending environment variables as well as overwriting them. In addition to this, the on-going development to support plotting rooflines was received favourably, with Sam stating ``roofline plotting is one of the most painful things in HPC'', so tooling to simplify it is desirable.

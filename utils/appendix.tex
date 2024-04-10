@@ -170,6 +170,12 @@ The following example describes how HPCCG uses a pointer-based variant of the co
 
 % This sparse matrix can then be represented as two nested lists -- one containing the non-zero values in each row, and the other the indices of those non-zero values in that row. This means the sparse matrix in (\ref{eq:exampleMatrix}) can be written as:
 
+% % TODO: This needs the listings package ; consider finding an alternative
+% % \usepackage{listings}
+% % \lstset{
+% %   basicstyle=\ttfamily,
+% %   mathescape
+% }
 % \begin{lstlisting}
 % list_of_vals = [   [1, 2]  ,  [5]  ,  [4, 6]  ,  [3]   ]
 % list_of_inds = [   [1, 3]  ,  [2]  ,  [1, 2]  ,  [0]   ]

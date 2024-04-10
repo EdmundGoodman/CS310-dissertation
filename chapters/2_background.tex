@@ -7,80 +7,85 @@
 % TODO: Be consistent with HPC vs High-Performnace Computing
 The background for this project will provide a summary of relevant aspects of the Rust programming language and the field of High-Performance computing, along with a literature review of existing performance analyses of Rust in High-Performance Computing applications.
 
-\section{The Rust Language}
-\label{sec:rust} % 500 words
-
-% As described in the introduction \ref{ch:introduction}
-
-This section provides a brief summary of salient features of the Rust language, which are required to understand the intricacies of the translation, equivalence checking, and performance analysis processes described in this project. Some of the examples used in this section are derived from Klabnik and Nichols' book ``The Rust Programming Language'' \cite{RustProgrammingLanguage} -- this is the seminal text for beginners learning Rust, affectionately nicknamed ``the book'' within the Rust community \cite{LearnRust}.
-
-\subsection{Basic syntax}
-\label{ssec:rust-syntax}
-
-% Hello world
-In any programming language, the first program written tends to be printing ``Hello World'' \cite{}. In Rust, the ``Hello world'' program is shown in Listing \ref{fig:rust-hello-world}.
-
-% TOOD: Check all other minted blocks are in listings not figures
-\begin{listing}[H]
-    \begin{minted}[linenos]{rust}
-fn main() {
-    println!("Hello, world!");
-}
-    \end{minted}
-    \caption{A Rust program to print ``Hello, world!'', derived from Listing 1-1 of ``The Rust Programming Language'' \cite{RustProgrammingLanguage}.}
-    \label{fig:rust-hello-world}
-\end{listing}
-
-Despite the influence of functional programming on languages, the influence of C-family of languages on its syntax is clear -- for example the use of braces and semicolons, along with a \mintinline{rust}{main} function. After having printed ``Hello World'', the next thing a programmer is likely to do in an imperative language is define a variable. However, this is where the influence of functional languages like Haskell and the ML-family begins to show -- variables in Rust are immutable by default. As chapter 3-1 of the Rust book states, this is ``one of the many nudges Rust gives you to write your code in a way that takes advantage of the safety and easy concurrency that Rust offers'' \cite{RustProgrammingLanguage}, since immutable variables are easier for the compiler to reason about to provide guarantees of memory safety.
-
-Variables in Rust are defined using the \mintinline{rust}{let} keyword, and can be explicitly marked as mutable when required using the \mintinline{rust}{mut} keyword. In addition to this, namespace shadowing can be used to redefine variables with new values, by re-using the \mintinline{rust}{let} keyword. Some of the semantics of Rust variables are shown in Listing \ref{}.
-
-% Listing
-
-
-% Type system
-Another aspect of Rust's pedigree from functional languages is its rich type system.
-
-
-% panic! and Result<T,E>
-
-% Iterators
-One of the many ergonomic features Rust provides is ``zero-cost abstractions''. This refers to high-level structures to perform common tasks, such as the \mintinline{rust}{fold} operation on vectors, which compiles down to the same, performant, assembly as a more verbose iterative expression of the same functionality. Zero-cost abstractions allow programmers to write terse code, whilst not sacrificing performance.
-
-One example of a zero-cost abstraction is Rust's iterators.
 
 
 
 
 
-\subsection{Ownership model}
-\label{ssec:rust-ownership}
+% \section{The Rust Language}
+% \label{sec:rust} % 500 words
 
-As mentioned in the introduction, a core feature of Rust is its guarantees against undefined behaviour. These guarantees are provided in large part by its ownership model, enforced by an aspect of the compiler called the borrow checker. Most languages employ one of two strategies for memory management: garbage collection or manual memory management. In garbage collected languages such as Java and Python, there is runtime which runs alongside the executing program, allocating memory when required, and de-allocating it when it is no longer in use. However, this additional overhead of the garbage collector running in parallel typically incurs a performance cost. In manual memory management, the allocation and de-allocation of memory is explicitly controlled by the programmer. This avoids the runtime cost of the garbage collector, but can lead to errors and undefined behaviour if the programmer makes a mistake, such as double-free and use-after-free errors respectively.
+% % As described in the introduction \ref{ch:introduction}
 
-Rust takes a third approach to memory management, enforcing a set of ownership rules checked by the compiler. By following these rules, the compiler can always infer when memory is no longer in use through scope or explicit lifetimes, and de-allocate it as required. Furthermore, it provides strong guarantees against undefined behaviour as a result of invalid memory accesses and data races, since these are prohibited by the ownership rules.
+% This section provides a brief summary of salient features of the Rust language, which are required to understand the intricacies of the translation, equivalence checking, and performance analysis processes described in this project. Some of the examples used in this section are derived from Klabnik and Nichols' book ``The Rust Programming Language'' \cite{RustProgrammingLanguage} -- this is the seminal text for beginners learning Rust, affectionately nicknamed ``the book'' within the Rust community \cite{LearnRust}.
 
-In ``The Rust Programming Language'' \cite{RustProgrammingLanguage}, Klabnik and Nichols summarise Rust's ownership model through three rules:
+% \subsection{Basic syntax}
+% \label{ssec:rust-syntax}
 
-\begin{enumerate}
-    \item Each value in Rust has an owner.
-    \item There can only be one owner at a time.
-    \item When the owner goes out of scope, the value will be dropped.
-\end{enumerate}
+% % Hello world
+% In any programming language, the first program written tends to be printing ``Hello World'' \cite{}. In Rust, the ``Hello world'' program is shown in Listing \ref{fig:rust-hello-world}.
 
-% unsafe rust and the rustinomicon
+% % TOOD: Check all other minted blocks are in listings not figures
+% \begin{listing}[H]
+%     \begin{minted}[linenos]{rust}
+% fn main() {
+%     println!("Hello, world!");
+% }
+%     \end{minted}
+%     \caption{A Rust program to print ``Hello, world!'', derived from Listing 1-1 of ``The Rust Programming Language'' \cite{RustProgrammingLanguage}.}
+%     \label{fig:rust-hello-world}
+% \end{listing}
 
-\subsection{Fearless parallelism}
-\label{ssec:rust-parallelism}
+% Despite the influence of functional programming on languages, the influence of C-family of languages on its syntax is clear -- for example the use of braces and semicolons, along with a \mintinline{rust}{main} function. After having printed ``Hello World'', the next thing a programmer is likely to do in an imperative language is define a variable. However, this is where the influence of functional languages like Haskell and the ML-family begins to show -- variables in Rust are immutable by default. As chapter 3-1 of the Rust book states, this is ``one of the many nudges Rust gives you to write your code in a way that takes advantage of the safety and easy concurrency that Rust offers'' \cite{RustProgrammingLanguage}, since immutable variables are easier for the compiler to reason about to provide guarantees of memory safety.
 
-\subsection{Toolchain and infrastructure}
-\label{ssec:rust-toolchain}
+% Variables in Rust are defined using the \mintinline{rust}{let} keyword, and can be explicitly marked as mutable when required using the \mintinline{rust}{mut} keyword. In addition to this, namespace shadowing can be used to redefine variables with new values, by re-using the \mintinline{rust}{let} keyword. Some of the semantics of Rust variables are shown in Listing \ref{}.
 
-A final key feature of Rust is its strong development toolchain. Firstly, Rust is incredibly easy to install and update using the \mintinline{bash}{rustup} tool. Installation does not require elevated privileges, and requires only a single command, lowering the barrier to entry for using the language. Once Rust is installed, its compiler \mintinline{bash}{rustc} is well known for its verbose and clear error messages, which typically contain suggestions on how to fix errors when they occur, as shown in Figure \ref{}
+% % Listing
 
-% TODO: Add figure here.
+% % Type system
+% Another aspect of Rust's pedigree from functional languages is its rich type system.
 
-On top of this, Rust provides a canonical auto-formatter called \mintinline{bash}{rustfmt}, and a linter called \mintinline{bash}{clippy}, which are a key component of modern development best practices. This contrasts C++, where various different, often contradictory lint and auto-format standards exist, meaning developers have to make the decision to pick one, rather than just using the canonical one. Finally, Rust provides a package manager called \mintinline{bash}{cargo}, and a package repository called \textit{crates.io}. These allow the Rust community to share packages to extend the functionality of Rust beyond the base language. As a result of this, despite its comparatively young age, Rust has a thriving ecosystem of packages for many tasks. This again contrasts C++, which does not have a canonical package manager, with programmers being split across \mintinline{bash}{conan}, \mintinline{bash}{vcpkg}, and manual installation through header files, causing fragmentation of the ecosystem.
+
+% % Iterators
+% One of the many ergonomic features Rust provides is ``zero-cost abstractions''. This refers to high-level structures to perform common tasks, such as the \mintinline{rust}{fold} operation on vectors, which compiles down to the same, performant, assembly as a more verbose iterative expression of the same functionality. Zero-cost abstractions allow programmers to write terse code, whilst not sacrificing performance.
+
+% One example of a zero-cost abstraction is Rust's iterators.
+
+
+
+% \subsection{Ownership model}
+% \label{ssec:rust-ownership}
+
+% As mentioned in the introduction, a core feature of Rust is its guarantees against undefined behaviour. These guarantees are provided in large part by its ownership model, enforced by an aspect of the compiler called the borrow checker. Most languages employ one of two strategies for memory management: garbage collection or manual memory management. In garbage collected languages such as Java and Python, there is runtime which runs alongside the executing program, allocating memory when required, and de-allocating it when it is no longer in use. However, this additional overhead of the garbage collector running in parallel typically incurs a performance cost. In manual memory management, the allocation and de-allocation of memory is explicitly controlled by the programmer. This avoids the runtime cost of the garbage collector, but can lead to errors and undefined behaviour if the programmer makes a mistake, such as double-free and use-after-free errors respectively.
+
+% Rust takes a third approach to memory management, enforcing a set of ownership rules checked by the compiler. By following these rules, the compiler can always infer when memory is no longer in use through scope or explicit lifetimes, and de-allocate it as required. Furthermore, it provides strong guarantees against undefined behaviour as a result of invalid memory accesses and data races, since these are prohibited by the ownership rules.
+
+% In ``The Rust Programming Language'' \cite{RustProgrammingLanguage}, Klabnik and Nichols summarise Rust's ownership model through three rules:
+
+% \begin{enumerate}
+%     \item Each value in Rust has an owner.
+%     \item There can only be one owner at a time.
+%     \item When the owner goes out of scope, the value will be dropped.
+% \end{enumerate}
+
+% % unsafe rust and the rustinomicon
+
+% \subsection{Fearless parallelism}
+% \label{ssec:rust-parallelism}
+
+% \subsection{Toolchain and infrastructure}
+% \label{ssec:rust-toolchain}
+
+% A final key feature of Rust is its strong development toolchain. Firstly, Rust is incredibly easy to install and update using the \mintinline{bash}{rustup} tool. Installation does not require elevated privileges, and requires only a single command, lowering the barrier to entry for using the language. Once Rust is installed, its compiler \mintinline{bash}{rustc} is well known for its verbose and clear error messages, which typically contain suggestions on how to fix errors when they occur, as shown in Figure \ref{}
+
+% % TODO: Add figure here.
+
+% On top of this, Rust provides a canonical auto-formatter called \mintinline{bash}{rustfmt}, and a linter called \mintinline{bash}{clippy}, which are a key component of modern development best practices. This contrasts C++, where various different, often contradictory lint and auto-format standards exist, meaning developers have to make the decision to pick one, rather than just using the canonical one. Finally, Rust provides a package manager called \mintinline{bash}{cargo}, and a package repository called \textit{crates.io}. These allow the Rust community to share packages to extend the functionality of Rust beyond the base language. As a result of this, despite its comparatively young age, Rust has a thriving ecosystem of packages for many tasks. This again contrasts C++, which does not have a canonical package manager, with programmers being split across \mintinline{bash}{conan}, \mintinline{bash}{vcpkg}, and manual installation through header files, causing fragmentation of the ecosystem.
+
+
+
+
+
 
 
 % Further reading
@@ -278,7 +283,7 @@ Costanza et al. provide a very compelling empirical analysis comparing Rust and 
 % https://github.com/lmoran94/eurocc_cfd (112 lines of Rust)
 Moran and Bull \cite{moranEmergingTechnologiesRust2023} investigate the performance of Rust as compared with C++ and FORTRAN on computational fluid dynamics problems in their technical report ``Emerging Technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}. As with Costanza et al., Rust is introduced as a programming language which may be suitable for HPC, and the selected problem domain is explained as representative of common High-Performance Computing workloads. The paper goes on to benchmark Rust implementations of the problem on a HPC system, and compare them to C++ and FORTRAN implementations. The paper concludes that Rust is slower than C++ and FORTRAN for parallel workloads.
 
-Moran and Bull present a similar empirical analysis to Costanza et al., comparing a small custom codebase which is representative of High-Performance Computing workloads, but differs by including FORTRAN in its comparisons, along with placing a greater focus on performance analysis and scaling, and less consideration to programming effort. However, Moran and Bull report significantly slower performance, significantly trailing C++ and FORTRAN, which contrasts Costanza et al.'s findings of Rust being slightly slower or equally performant. Moran and Bull attribute their findings to the Rust compiler's attitude to memory safety. However, inspecting the source code made public after the publication of the paper \cite{Lmoran94Eurocc_cfdCFD}, it can be seen that the implementation does not fully leverage the capabilities of Rust, for example it does not apply the optimisation techniques enumerated in Costanza et al.'s paper. A reader of the paper created an optimised version  \cite{moranPaperFalse} \cite{phazer99HerePlayground2023}, which shows a 50\% performance increase over the paper's implementation by avoiding an extraneous copy operation, bringing Rust's performance closer to C++ and FORTRAN. However, this change makes the comparison against FORTRAN and C++ unfair, as the reference implementations also rely on this extraneous copy operation. A replication trial of the experiments in the paper using the published code is presented in section \ref{}, as both a demonstration of the utility of the HPC MultiBench tool, and to investigate the difference to Costanza et al.'s findings. % In summary, possibly flawed due to bounds checked memory access, but not as flawed as some commentators looking only at the Rust implementation think it is.
+Moran and Bull present a similar empirical analysis to Costanza et al., comparing a small custom codebase which is representative of High-Performance Computing workloads, but differs by including FORTRAN in its comparisons, along with placing a greater focus on performance analysis and scaling, and less consideration to programming effort. However, Moran and Bull report significantly slower performance, significantly trailing C++ and FORTRAN, which contrasts Costanza et al.'s findings of Rust being slightly slower or equally performant. Moran and Bull attribute their findings to the Rust compiler's attitude to memory safety. However, inspecting the source code made public after the publication of the paper \cite{Lmoran94Eurocc_cfdCFD}, it can be seen that the implementation does not fully leverage the capabilities of Rust, for example it does not apply the optimisation techniques enumerated in Costanza et al.'s paper. A reader of the paper created an optimised version  \cite{moranPaperFalse} \cite{phazer99HerePlayground2023}, which shows a 50\% performance increase over the paper's implementation by avoiding an extraneous copy operation, bringing Rust's performance closer to C++ and FORTRAN. However, this change makes the comparison against FORTRAN and C++ unfair, as the reference implementations also rely on this extraneous copy operation. A replication trial of the experiments in the paper using the published code is presented in section \ref{ssec:hpc-multibench-replication-study}, as both a demonstration of the utility of the HPC MultiBench tool, and to investigate the difference to Costanza et al.'s findings. % In summary, possibly flawed due to bounds checked memory access, but not as flawed as some commentators looking only at the Rust implementation think it is.
 % TODO: Following replication study, this may need a re-work?
 
 

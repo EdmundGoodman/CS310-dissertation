@@ -1,4 +1,208 @@
 
+@misc{FlamegraphrsFlamegraph2024,
+	title = {flamegraph-rs/flamegraph},
+	copyright = {Apache-2.0},
+	url = {https://github.com/flamegraph-rs/flamegraph},
+	abstract = {Easy flamegraphs for Rust projects and everything else, without Perl or pipes {\textless}3},
+	urldate = {2024-03-25},
+	publisher = {flamegraph-rs},
+	month = mar,
+	year = {2024},
+	note = {original-date: 2019-03-07T16:31:30Z},
+	keywords = {flamegraphs, perf, profiling},
+}
+
+@misc{witkowskiMooreLawDead,
+	title = {'{Moore}'s {Law}'s dead,' {Nvidia} {CEO} {Jensen} {Huang} says in justifying gaming-card price hike},
+	url = {https://www.marketwatch.com/story/moores-laws-dead-nvidia-ceo-jensen-says-in-justifying-gaming-card-price-hike-11663798618},
+	abstract = {Nvidia Corp. Chief Executive Jensen Huang on Wednesday said he thinks it's going to be "a pretty terrific Q4 for Ada," the company's next-generation chip...},
+	language = {EN-US},
+	urldate = {2024-04-05},
+	journal = {MarketWatch},
+	author = {Witkowski, Wallace},
+	note = {Section: Industries},
+}
+
+@article{schubertClustermqEnablesEfficient2019,
+	title = {clustermq enables efficient parallelization of genomic analyses},
+	volume = {35},
+	copyright = {http://creativecommons.org/licenses/by/4.0/},
+	issn = {1367-4803, 1367-4811},
+	url = {https://academic.oup.com/bioinformatics/article/35/21/4493/5499081},
+	doi = {10.1093/bioinformatics/btz284},
+	abstract = {Abstract
+            
+              Motivation
+              High performance computing (HPC) clusters play a pivotal role in large-scale bioinformatics analysis and modeling. For the statistical computing language R, packages exist to enable a user to submit their analyses as jobs on HPC schedulers. However, these packages do not scale well to high numbers of tasks, and their processing overhead quickly becomes a prohibitive bottleneck.
+            
+            
+              Results
+              Here we present clustermq, an R package that can process analyses up to three orders of magnitude faster than previously published alternatives. We show this for investigating genomic associations of drug sensitivity in cancer cell lines, but it can be applied to any kind of parallelizable workflow.
+            
+            
+              Availability and implementation
+              The package is available on CRAN and https://github.com/mschubert/clustermq. Code for performance testing is available at https://github.com/mschubert/clustermq-performance.
+            
+            
+              Supplementary information
+              Supplementary data are available at Bioinformatics online.},
+	language = {en},
+	number = {21},
+	urldate = {2024-04-09},
+	journal = {Bioinformatics},
+	author = {Schubert, Michael},
+	editor = {Wren, Jonathan},
+	month = nov,
+	year = {2019},
+	pages = {4493--4495},
+}
+
+@inproceedings{qinUnderstandingMemoryThread2020,
+	address = {New York, NY, USA},
+	series = {{PLDI} 2020},
+	title = {Understanding memory and thread safety practices and issues in real-world {Rust} programs},
+	isbn = {978-1-4503-7613-6},
+	url = {https://doi.org/10.1145/3385412.3386036},
+	doi = {10.1145/3385412.3386036},
+	abstract = {Rust is a young programming language designed for systems software development. It aims to provide safety guarantees like high-level languages and performance efficiency like low-level languages. The core design of Rust is a set of strict safety rules enforced by compile-time checking. To support more low-level controls, Rust allows programmers to bypass these compiler checks to write unsafe code. It is important to understand what safety issues exist in real Rust programs and how Rust safety mechanisms impact programming practices. We performed the first empirical study of Rust by close, manual inspection of 850 unsafe code usages and 170 bugs in five open-source Rust projects, five widely-used Rust libraries, two online security databases, and the Rust standard library. Our study answers three important questions: how and why do programmers write unsafe code, what memory-safety issues real Rust programs have, and what concurrency bugs Rust programmers make. Our study reveals interesting real-world Rust program behaviors and new issues Rust programmers make. Based on our study results, we propose several directions of building Rust bug detectors and built two static bug detectors, both of which revealed previously unknown bugs.},
+	urldate = {2024-04-04},
+	booktitle = {Proceedings of the 41st {ACM} {SIGPLAN} {Conference} on {Programming} {Language} {Design} and {Implementation}},
+	publisher = {Association for Computing Machinery},
+	author = {Qin, Boqin and Chen, Yilun and Yu, Zeming and Song, Linhai and Zhang, Yiying},
+	month = jun,
+	year = {2020},
+	keywords = {Bug Study, Concurrency Bug, Memory Bug, Rust},
+	pages = {763--779},
+}
+
+@inproceedings{langePalaciosKittenNew2010,
+	title = {Palacios and {Kitten}: {New} high performance operating systems for scalable virtualized and native supercomputing},
+	shorttitle = {Palacios and {Kitten}},
+	doi = {10.1109/IPDPS.2010.5470482},
+	abstract = {Palacios is a new open-source VMM under development at Northwestern University and the University of New Mexico that enables applications executing in a virtualized environment to achieve scalable high performance on large machines. Palacios functions as a modularized extension to Kitten, a high performance operating system being developed at Sandia National Laboratories to support large-scale supercomputing applications. Together, Palacios and Kitten provide a thin layer over the hardware to support full-featured virtualized environments alongside Kitten's lightweight native environment. Palacios supports existing, unmodified applications and operating systems by using the hardware virtualization technologies in recent AMD and Intel processors. Additionally, Palacios leverages Kitten's simple memory management scheme to enable low-overhead pass-through of native devices to a virtualized environment. We describe the design, implementation, and integration of Palacios and Kitten. Our benchmarks show that Palacios provides near native (within 5\%), scalable performance for virtualized environments running important parallel applications. This new architecture provides an incremental path for applications to use supercomputers, running specialized lightweight host operating systems, that is not significantly performance-compromised.},
+	author = {Lange, John and Pedretti, Kevin and Hudson, Trammell and Dinda, Peter and Cui, Zheng and Xia, Lei and Bridges, Patrick and Gocke, Andy and Jaconette, Steven and Levenhagen, Mike and Brightwell, Ron},
+	month = may,
+	year = {2010},
+	pages = {1--12},
+}
+
+@article{landauTargetsPackageDynamic2021,
+	title = {The targets {R} package: a dynamic {Make}-like function-oriented pipeline toolkit for reproducibility and high-performance computing},
+	volume = {6},
+	issn = {2475-9066},
+	shorttitle = {The targets {R} package},
+	url = {https://joss.theoj.org/papers/10.21105/joss.02959},
+	doi = {10.21105/joss.02959},
+	abstract = {Landau, W. M., (2021). The targets R package: a dynamic Make-like function-oriented pipeline toolkit for reproducibility and high-performance computing. Journal of Open Source Software, 6(57), 2959, https://doi.org/10.21105/joss.02959},
+	language = {en},
+	number = {57},
+	urldate = {2024-04-09},
+	journal = {Journal of Open Source Software},
+	author = {Landau, William Michael},
+	month = jan,
+	year = {2021},
+	pages = {2959},
+}
+
+@article{langBatchtoolsToolsWork2017,
+	title = {batchtools: {Tools} for {R} to work on batch systems},
+	volume = {2},
+	issn = {2475-9066},
+	shorttitle = {batchtools},
+	url = {https://joss.theoj.org/papers/10.21105/joss.00135},
+	doi = {10.21105/joss.00135},
+	abstract = {Lang et al, (2017), batchtools: Tools for R to work on batch systems, Journal of Open Source Software, 2(10), 135, doi:10.21105/joss.00135},
+	language = {en},
+	number = {10},
+	urldate = {2024-04-09},
+	journal = {Journal of Open Source Software},
+	author = {Lang, Michel and Bischl, Bernd and Surmann, Dirk},
+	month = feb,
+	year = {2017},
+	pages = {135},
+}
+
+@article{kubrichIntegrationTestRUST2020,
+	title = {Integration and {Test} of {RUST} {Tool} {Support} for {MPI}},
+	url = {https://mediatum.ub.tum.de/1576727},
+	abstract = {With increasingly high performance expectations in modern computer platforms, parallel computing becomes more and more critical. However, implementing bug-free programs to compute efficiently in parallel is, in general, significantly more demanding than implementing their sequential counterpart.
+
+Parallel applications have always been complicated to implement, maintain, or inspect. The Rust programming language aims to provide static programming with zero-cost guarantees for memory-safety. This technology, used to create MPI-Tools, can significantly improve any developers' workflow creating or maintaining HPC applications.
+This thesis presents the Rust-Library Rmpi, which provides MPI access with memory safety, a framework implementation for the creation of PMPI -and QMPI-Tools for the programming language Rust, as well as an extensive performance analysis.},
+	urldate = {2024-04-04},
+	author = {Kübrich, Matthias},
+	year = {2020},
+}
+
+@inproceedings{jimenezQuihoAutomatedPerformance2018,
+	title = {quiho: {Automated} {Performance} {Regression} {Testing} {Using} {Inferred} {Resource} {Utilization} {Profiles}},
+	shorttitle = {quiho},
+	doi = {10.1145/3184407.3184422},
+	abstract = {We introduce quiho, a framework for profiling application performance that can be used in automated performance regression tests. quiho profiles an application by applying sensitivity analysis, in particular statistical regression analysis (SRA), using application-independent performance feature vectors that characterize the performance of machines. The result of the SRA, feature importance specifically, is used as a proxy to identify hardware and low-level system software behavior. The relative importance of these features serve as a performance profile of an application (termed inferred resource utilization profile or IRUP), which is used to automatically validate performance behavior across multiple revisions of an application»s code base without having to instrument code or obtain performance counters. We demonstrate that quiho can successfully discover performance regressions by showing its effectiveness in profiling application performance for synthetically introduced regressions as well as those found in real-world applications.},
+	author = {Jimenez, Ivo and Watkins, Noah and Sevilla, Michael and Lofstead, Jay and Maltzahn, Carlos},
+	month = mar,
+	year = {2018},
+	pages = {273--284},
+}
+
+@misc{gvegayonJournalOpenSource,
+	title = {Journal of {Open} {Source} {Software}: {slurmR}: {A} lightweight wrapper for {HPC} with {Slurm}},
+	url = {https://joss.theoj.org/papers/10.21105/joss.01493},
+	urldate = {2024-04-09},
+	author = {G Vega Yon, George and Marjoram, Paul},
+}
+
+@article{dongarraPerformanceInstrumentationMeasurement2003,
+	title = {Performance {Instrumentation} and {Measurement} for},
+	abstract = {As computer systems grow in size and complexity, tool support is needed to facilitate the efficient mapping of large-scale applications onto these systems. To help achieve this mapping, performance analysis tools must provide robust performance observation capabilities at all levels of the system, as well as map low-level behavior to high-level program constructs. Instrumentation and measurement strategies, developed over the last several years, must evolve together with performance analysis infrastructure to address the challenges of new scalable parallel systems.},
+	author = {Dongarra, Jack and Malony, Allen and Mucci, Phil and Shende, Sameer},
+	month = nov,
+	year = {2003},
+}
+
+@phdthesis{chenEnergyefficientElectricalSiliconphotonic2014,
+	title = {Energy-efficient electrical and silicon-photonic networks in manycore systems},
+	abstract = {During the past decade, the very large scale integration (VLSI) community has migrated towards incorporating multiple cores on a single chip to sustain the historic performance improvement in computing systems. As the core count continuously increases, the performance of network-on-chip (NoC), which is responsible for the communication between cores, caches and memory controllers, is increasingly becoming critical for sustaining the performance improvement. In this dissertation, we propose several methods to improve the energy efficiency of both electrical and silicon-photonic NoCs. Firstly, for electrical NoC, we propose a flow control technique, Express Virtual Channel with Taps (EVC-T), to transmit both broadcast and data packets efficiently in a mesh network. A low-latency notification tree network is included to maintain the order of broadcast packets. The EVC-T technique improves the NoC latency by 24\% and the system energy efficiency in terms of energy-delay product (EDP) by 13\%. In the near future, the silicon-photonic links are projected to replace the electrical links for global on-chip communication due to their lower datadependent power and higher bandwidth density, but the high laser power can more than offset these advantages. Therefore, we propose a silicon-photonic multi-bus NoC architecture and a methodology that can reduce the laser power by 49\% on average through bandwidth reconfiguration at runtime based on the variations in bandwidth requirements of applications. We also propose a technique to reduce the laser power by dynamically activating/deactivating the L2 cache banks and switching ON/OFF the corresponding silicon-photonic links in a crossbar NoC. This cache-reconfiguration based technique can save laser power by 23.8\% and improves system EDP by 5.52\% on average. In addition, we propose a methodology for placing and sharing on-chip laser sources by jointly considering the bandwidth requirements, thermal constraints and physical layout constraints. Our proposed methodology for placing and sharing of on-chip laser sources reduces laser power. In addition to reducing the laser power to improve the energy efficiency of silicon-photonic NoCs, we propose to leverage the large bandwidth provided by silicon-photonic NoC to share computing resources. The global sharing of floating-point units can save system area by 13.75\% and system power by 10\%.},
+	author = {Chen, Chao},
+	month = jan,
+	year = {2014},
+	doi = {10.13140/RG.2.1.2153.6802},
+}
+
+@misc{RustZeroCost2020,
+	title = {Rust zero cost abstractions in action},
+	url = {https://idursun.com/posts/rust_zero_cost_abstractions_in_action/},
+	abstract = {One of my colleagues was experimenting with Rust. He started by writing a sudoku solver which he has already written in C before. Once he was completed writing it in Rust, he was very disappointed because Rust version was twice as fast than the C version which was hand-optimised by pulling off all the tricks he knew to make it perform well. He eventually managed to make the C version as fast as the Rust version by removing the intrinsics.},
+	language = {en-us},
+	urldate = {2024-04-08},
+	month = feb,
+	year = {2020},
+}
+
+@misc{LearnRust,
+	title = {Learn {Rust}},
+	url = {https://www.rust-lang.org/learn},
+	abstract = {A language empowering everyone to build reliable and efficient software.},
+	language = {en-US},
+	urldate = {2024-04-08},
+}
+
+@article{amdahlsLaw,
+	series = {{AFIPS} '67 (spring)},
+	title = {Validity of the single processor approach to achieving large scale computing capabilities},
+	doi = {10.1145/1465482.1465560},
+	abstract = {For over a decade prophets have voiced the contention that the organization of a single computer has reached its limits and that truly significant advances can be made only by interconnection of a multiplicity of computers in such a manner as to permit cooperative solution. Variously the proper direction has been pointed out as general purpose computers with a generalized interconnection of memories, or as specialized computers with geometrically related memory interconnections and controlled by one or more instruction streams.},
+	journal = {Proceedings of the April 18-20, 1967, Spring Joint Computer Conference},
+	author = {Amdahl, Gene M.},
+	year = {1967},
+	note = {ISBN: 9781450378956
+Number of pages: 3
+Place: Atlantic City, New Jersey
+Place: New York, NY, USA
+Publisher: Association for Computing Machinery},
+	pages = {483--485},
+}
+
 @misc{phazer99HerePlayground2023,
 	type = {Reddit {Comment}},
 	title = {Here's [a playground…},
@@ -50,26 +254,6 @@
 	note = {Conference Name: IEEE Computational Science and Engineering},
 	keywords = {ANSI standards, Coherence, Computer architecture, Hardware, Message passing, Parallel processing, Parallel programming, Power system modeling, Scalability, Software systems},
 	pages = {46--55},
-}
-
-@phdthesis{chen_energy-efficient_2014,
-	title = {Energy-efficient electrical and silicon-photonic networks in manycore systems},
-	abstract = {During the past decade, the very large scale integration (VLSI) community has migrated towards incorporating multiple cores on a single chip to sustain the historic performance improvement in computing systems. As the core count continuously increases, the performance of network-on-chip (NoC), which is responsible for the communication between cores, caches and memory controllers, is increasingly becoming critical for sustaining the performance improvement. In this dissertation, we propose several methods to improve the energy efficiency of both electrical and silicon-photonic NoCs. Firstly, for electrical NoC, we propose a flow control technique, Express Virtual Channel with Taps (EVC-T), to transmit both broadcast and data packets efficiently in a mesh network. A low-latency notification tree network is included to maintain the order of broadcast packets. The EVC-T technique improves the NoC latency by 24\% and the system energy efficiency in terms of energy-delay product (EDP) by 13\%. In the near future, the silicon-photonic links are projected to replace the electrical links for global on-chip communication due to their lower datadependent power and higher bandwidth density, but the high laser power can more than offset these advantages. Therefore, we propose a silicon-photonic multi-bus NoC architecture and a methodology that can reduce the laser power by 49\% on average through bandwidth reconfiguration at runtime based on the variations in bandwidth requirements of applications. We also propose a technique to reduce the laser power by dynamically activating/deactivating the L2 cache banks and switching ON/OFF the corresponding silicon-photonic links in a crossbar NoC. This cache-reconfiguration based technique can save laser power by 23.8\% and improves system EDP by 5.52\% on average. In addition, we propose a methodology for placing and sharing on-chip laser sources by jointly considering the bandwidth requirements, thermal constraints and physical layout constraints. Our proposed methodology for placing and sharing of on-chip laser sources reduces laser power. In addition to reducing the laser power to improve the energy efficiency of silicon-photonic NoCs, we propose to leverage the large bandwidth provided by silicon-photonic NoC to share computing resources. The global sharing of floating-point units can save system area by 13.75\% and system power by 10\%.},
-	author = {Chen, Chao},
-	month = jan,
-	year = {2014},
-	doi = {10.13140/RG.2.1.2153.6802},
-}
-
-@misc{witkowski_moores_nodate,
-	title = {'{Moore}'s {Law}'s dead,' {Nvidia} {CEO} {Jensen} {Huang} says in justifying gaming-card price hike},
-	url = {https://www.marketwatch.com/story/moores-laws-dead-nvidia-ceo-jensen-says-in-justifying-gaming-card-price-hike-11663798618},
-	abstract = {Nvidia Corp. Chief Executive Jensen Huang on Wednesday said he thinks it's going to be "a pretty terrific Q4 for Ada," the company's next-generation chip...},
-	language = {EN-US},
-	urldate = {2024-04-05},
-	journal = {MarketWatch},
-	author = {Witkowski, Wallace},
-	note = {Section: Industries},
 }
 
 @article{theisEndMooreLaw2017,
@@ -237,36 +421,6 @@
 	pages = {103--104},
 }
 
-@article{kubrich_integration_2020,
-	title = {Integration and {Test} of {RUST} {Tool} {Support} for {MPI}},
-	url = {https://mediatum.ub.tum.de/1576727},
-	abstract = {With increasingly high performance expectations in modern computer platforms, parallel computing becomes more and more critical. However, implementing bug-free programs to compute efficiently in parallel is, in general, significantly more demanding than implementing their sequential counterpart.
-
-Parallel applications have always been complicated to implement, maintain, or inspect. The Rust programming language aims to provide static programming with zero-cost guarantees for memory-safety. This technology, used to create MPI-Tools, can significantly improve any developers' workflow creating or maintaining HPC applications.
-This thesis presents the Rust-Library Rmpi, which provides MPI access with memory safety, a framework implementation for the creation of PMPI -and QMPI-Tools for the programming language Rust, as well as an extensive performance analysis.},
-	urldate = {2024-04-04},
-	author = {Kübrich, Matthias},
-	year = {2020},
-}
-
-@inproceedings{qin_understanding_2020,
-	address = {New York, NY, USA},
-	series = {{PLDI} 2020},
-	title = {Understanding memory and thread safety practices and issues in real-world {Rust} programs},
-	isbn = {978-1-4503-7613-6},
-	url = {https://doi.org/10.1145/3385412.3386036},
-	doi = {10.1145/3385412.3386036},
-	abstract = {Rust is a young programming language designed for systems software development. It aims to provide safety guarantees like high-level languages and performance efficiency like low-level languages. The core design of Rust is a set of strict safety rules enforced by compile-time checking. To support more low-level controls, Rust allows programmers to bypass these compiler checks to write unsafe code. It is important to understand what safety issues exist in real Rust programs and how Rust safety mechanisms impact programming practices. We performed the first empirical study of Rust by close, manual inspection of 850 unsafe code usages and 170 bugs in five open-source Rust projects, five widely-used Rust libraries, two online security databases, and the Rust standard library. Our study answers three important questions: how and why do programmers write unsafe code, what memory-safety issues real Rust programs have, and what concurrency bugs Rust programmers make. Our study reveals interesting real-world Rust program behaviors and new issues Rust programmers make. Based on our study results, we propose several directions of building Rust bug detectors and built two static bug detectors, both of which revealed previously unknown bugs.},
-	urldate = {2024-04-04},
-	booktitle = {Proceedings of the 41st {ACM} {SIGPLAN} {Conference} on {Programming} {Language} {Design} and {Implementation}},
-	publisher = {Association for Computing Machinery},
-	author = {Qin, Boqin and Chen, Yilun and Yu, Zeming and Song, Linhai and Zhang, Yiying},
-	month = jun,
-	year = {2020},
-	keywords = {Bug Study, Concurrency Bug, Memory Bug, Rust},
-	pages = {763--779},
-}
-
 @article{markovLimitsFundamentalLimits2014,
 	title = {Limits on fundamental limits to computation},
 	volume = {512},
@@ -292,19 +446,6 @@ This thesis presents the Rust-Library Rmpi, which provides MPI access with memor
 	publisher = {Addison-Wesley Longman Publishing Co., Inc.},
 	author = {Clegg, Dai and Barker, Richard},
 	year = {1994},
-}
-
-@misc{noauthor_flamegraph-rsflamegraph_2024,
-	title = {flamegraph-rs/flamegraph},
-	copyright = {Apache-2.0},
-	url = {https://github.com/flamegraph-rs/flamegraph},
-	abstract = {Easy flamegraphs for Rust projects and everything else, without Perl or pipes {\textless}3},
-	urldate = {2024-03-25},
-	publisher = {flamegraph-rs},
-	month = mar,
-	year = {2024},
-	note = {original-date: 2019-03-07T16:31:30Z},
-	keywords = {flamegraphs, perf, profiling},
 }
 
 @book{beckTestDrivenDevelopment2022,
@@ -1208,28 +1349,6 @@ tex.issue\_date: June 2007},
 	year = {1987},
 	note = {Publisher: New York, Optimization Software,},
 	pages = {219 -- 220},
-}
-
-@inproceedings{jimenez_quiho_2018,
-	title = {quiho: {Automated} {Performance} {Regression} {Testing} {Using} {Inferred} {Resource} {Utilization} {Profiles}},
-	shorttitle = {quiho},
-	doi = {10.1145/3184407.3184422},
-	abstract = {We introduce quiho, a framework for profiling application performance that can be used in automated performance regression tests. quiho profiles an application by applying sensitivity analysis, in particular statistical regression analysis (SRA), using application-independent performance feature vectors that characterize the performance of machines. The result of the SRA, feature importance specifically, is used as a proxy to identify hardware and low-level system software behavior. The relative importance of these features serve as a performance profile of an application (termed inferred resource utilization profile or IRUP), which is used to automatically validate performance behavior across multiple revisions of an application»s code base without having to instrument code or obtain performance counters. We demonstrate that quiho can successfully discover performance regressions by showing its effectiveness in profiling application performance for synthetically introduced regressions as well as those found in real-world applications.},
-	author = {Jimenez, Ivo and Watkins, Noah and Sevilla, Michael and Lofstead, Jay and Maltzahn, Carlos},
-	month = mar,
-	year = {2018},
-	pages = {273--284},
-}
-
-@inproceedings{lange_palacios_2010,
-	title = {Palacios and {Kitten}: {New} high performance operating systems for scalable virtualized and native supercomputing},
-	shorttitle = {Palacios and {Kitten}},
-	doi = {10.1109/IPDPS.2010.5470482},
-	abstract = {Palacios is a new open-source VMM under development at Northwestern University and the University of New Mexico that enables applications executing in a virtualized environment to achieve scalable high performance on large machines. Palacios functions as a modularized extension to Kitten, a high performance operating system being developed at Sandia National Laboratories to support large-scale supercomputing applications. Together, Palacios and Kitten provide a thin layer over the hardware to support full-featured virtualized environments alongside Kitten's lightweight native environment. Palacios supports existing, unmodified applications and operating systems by using the hardware virtualization technologies in recent AMD and Intel processors. Additionally, Palacios leverages Kitten's simple memory management scheme to enable low-overhead pass-through of native devices to a virtualized environment. We describe the design, implementation, and integration of Palacios and Kitten. Our benchmarks show that Palacios provides near native (within 5\%), scalable performance for virtualized environments running important parallel applications. This new architecture provides an incremental path for applications to use supercomputers, running specialized lightweight host operating systems, that is not significantly performance-compromised.},
-	author = {Lange, John and Pedretti, Kevin and Hudson, Trammell and Dinda, Peter and Cui, Zheng and Xia, Lei and Bridges, Patrick and Gocke, Andy and Jaconette, Steven and Levenhagen, Mike and Brightwell, Ron},
-	month = may,
-	year = {2010},
-	pages = {1--12},
 }
 
 @article{millerEmpiricalStudyReliability1990,

@@ -2,17 +2,112 @@
 \label{ch:translation} % 4000-5000 words
 
 % In this chapter, we describe the overall design of our solution to the problem identified in \Cref{ch:introduction}, building on work described in \Cref{ch:background}.
+% TODO: Consider some kind of link from introduction
+
+In this chapter, we discuss the translation process from C++ to Rust of the selected mini-app, HPCCG. First, we introduce the implementation details of HPCCG, along with the translation methodology undertaken. Then, we present a sequence of incrementally performant translations, showing how features of and packages for the Rust language can contribute to the performance of translations of C++ codebases. Next, we discuss approaches for the critical step of program equivalence checking to guarantee comparisons are fair. Finally, we conclude with a section on lessons learned from the process, and a proposed workflow for engineers translating High-Performance C++ codebases to Rust.
+
+% Explain the goals of the effort
+The overall goal of this effort is to generate a software product -- a Rust translation of the HPCCG codebase, with strong performance running in serial, and leveraging shared and distributed memory parallelism. On top of this, we propose a approaches for equivalence checking such translations, and use them to give confidence the Rust translation of HPCCG can be used for fair performance comparisons with the reference C++ version.
+
+% Explain the difficulties of the effort
+% No-one else has done a whole mini-app, just single kernels and toy examples
+As discussed in \Cref{ch:background}, this translation effort is novel with respect to assessing High-Performance Computing for a number of reasons. Previous literature has translated only single computation kernels \cite{} with support for shared and distributed memory parallelism, or very short ``toy example'' applications of around only 150 lines \cite{} \cite{} with support for only shared memory parallelism. In contrast to this, HPCCG is a standard mini-app as part of the Mantevo suite, with the C++ version totalling 1524 lines and having support for both shared and distributed memory parallelism. This order of magnitude increase in codebase length over modern existing work \cite{}, along with support for distributed memory parallelism outside of single computation kernel contexts provides a valuable insight into the suitability of Rust in High-Performance Computing, but at the cost of significant developer effort as compared with existing work.
 
 \section{Design}
 \label{sec:translation-design} % 500 words
 
-% No-one else has done a whole mini-app, just single kernels and toy examples
+In traditional software development tasks, such as building the HPC MultiBench tool discussed in \Cref{ch:hpc-multibench}, system design is paramount to building a coherent product. However, for translation tasks the reference implementation has already been designed.
+
+
+\subsection{Differences in the Rust and C++ programming models}
+\label{sec:overview-hpccg}
+
+\subsection{Overview of HPCCG}
+\label{sec:overview-hpccg}
+% Overview of HPCCG
+
+
+\subsection{Translation methodology}
+\label{sec:translation-methodology}
+% Process of writing incrementally optimised translations
+
 
 \section{Implementation}
 \label{sec:translation-implementation} % 3000 words
 
+This section provides a description of the technical details of the translation process. Source code for each of these translations can be found in the \texttt{hpccg-rs} GitHub repository.
+
+
+\subsection{Direct translation}
+\label{sec:translation-direct}
+% Naive translation + explaining Rust ownership and borrowing
+The first translation 
+
+
+\subsection{Reworked data structure}
+\label{sec:translation-reworked-data-structure}
+% Restructured data structure
+
+\subsection{Bounds checking}
+\label{sec:translation-bounds-checking}
+% Bounds checking
+
+\subsection{Iterators}
+\label{sec:translation-iterators}
+% Iterators
+
+\subsection{Shared memory parallelism}
+\label{sec:translation-rayon}
+% Shared-memory parallelism with Rayon
+
+\subsection{Distributed memory parallelism}
+\label{sec:translation-mpi}
+% Distributed-memory parallelism with rs-mpi
+
+
 \section{Equivalence checking}
 \label{sec:equivalence-checking} % 3000 words
 
-\section{Supply-side verification}
-\label{sec:translation-supply-side-verification} % 500 words
+Equivalence checking is critical to make performance comparisons between programs fair. In order to draw conclusions about the performance of the Rust translation of HPCCG, there must be strong confidence that it provides the same functionality as the C++ version. Taking this to its logical extremes, a Rust program which immediately terminates will have a much lower total runtime than the C++ implementation of HPPCG, but it clearly would not be a fair comparison of Rust and C++. However, the usefulness of equivalence checking is not only for ensuring performance comparisons are fair. Any translation effort from existing C++ code to Rust 
+
+As a result of this, a significant part of this project is developing techniques and workflows to equivalence check
+
+\subsection{End-to-end testing}
+\label{sec:equivalence-end-to-end}
+% end-to-end testing
+
+The simplest form of equivalence checking is end-to-end testing. This refers to running programs with the same input data, and asserting that they yield the same outputs.
+
+\subsection{Formal methods}
+\label{sec:equivalence-end-to-end}
+% formal methods (and why they aren't suitable)
+
+\subsection{Assembly and IR analysis}
+\label{sec:equivalence-end-to-end}
+% LLVM analysis (and why it is hard to scale)
+
+\subsection{Unit testing}
+\label{sec:equivalence-unit-testing}
+% Unit testing
+
+\subsubsection{Test driven development}
+\label{sec:equivalence-tdd}
+
+Test-driven development refers to
+
+
+\subsection{A novel approach}
+\label{sec:equivalence-polyglotest}
+% polyglotest approach
+
+
+
+% % TODO: Could omit this, it's an interesting aside, but if stuff needs to be cut, this is it
+% \section{Supply-side verification}
+% \label{sec:translation-supply-side-verification} % 500 words
+% % Why is this important?
+% % `cargo vet`
+
+
+\section{Lessons learned and proposed workflow}
+\label{sec:translation-workflow} % 3000 words
