@@ -32,9 +32,8 @@ As discussed in the development methodology section \ref{ssec:organisation-metho
 
 When approaching the half-way point of the project and writing the progress report, I had made very strong progress towards the project objectives, having written a working implementation of the Rust translation of the HPCCG mini-app. As a result of this new information, following discussion with my supervisor, I chose to modify my project plan to include the translation of a second, larger mini-application, called MiniMD. During the Christmas break, I investigated the MiniMD codebase and build system, and found that it presented unforeseen challenges, for example a build process which involved a Makefile manually expanding C++ macros. This build process did not map well into modern build systems like CMake, nor Rust's procedural macro system. As a result of this, again following discussion with my supervisor, I chose to return to the original project plan, with the stretch goal of translating the MPI component of HPCCG. This allowed me to extend the scope of the assessment of Rust's capability as a language for High-Performance Computing, and gave me time to build the HPC MultiBench tool, which was not initially planned. These significant changes would be very difficult following a plan-based methodology, such as waterfall -- but were possible through Agile, and resulted in a better project outcome, informed by experience learnt in the process.
 
-The final version of the project timeline is shown as a Gantt chart in Figure \ref{}:
-
-% Final Gantt chart
+% The final version of the project timeline is shown as a Gantt chart in Figure \ref{}:
+% TODO: % Final Gantt chart
 
 In summary, creating and following a project plan from the start of the project, whilst being empowered to change it as required, contributed strongly to the success of this project.
 
@@ -42,7 +41,6 @@ In summary, creating and following a project plan from the start of the project,
 \label{ssec:organisation-methodology}
 
 % What is an Agile methodology
-
 In 2001, a group of seventeen leaders in the field of software engineering published ``The Manifesto for Agile Software Development'' \cite{beckManifestoAgileSoftware2001}. This proposed four key principles to consider during software development:
 
 \begin{itemize}
@@ -71,10 +69,9 @@ This decision to manage the project with an agile methodology has yielded many b
     \item Being empowered to adapt the initial plan, based on any new information and ongoing discussions during supervisor meetings
 \end{itemize}
 
-
-% Tools selected for use
 \subsection{Software tools}
 \label{ssec:software-tools}
+% Tools selected for use
 
 As planned in the \hyperref[sec:development_methodology]{development methodology} section of the specification, \texttt{git} in combination with a private GitHub repositories have been heavily leveraged in the project so far. All source code, from helper scripts to software products, are tracked in \texttt{git}. Using \texttt{git} for source control management has been helpful for syncing work across DCS, SCRPT, and personal machines, and reviewing and restoring to work done in the past.
 
@@ -85,9 +82,9 @@ A significant aspect of the project was developing software, resulting in two ma
     \item The HPC MultiBench tool -- written in Python for high-velocity development.
 \end{itemize}
 
-For this software development, followed the GitHub flow development workflow \cite{GitHubFlow} which leverages lightweight \texttt{git} branching to develop atomic features. For the software development components, I will use GitHub actions to run CI/CD workflows \cite{WhatCICD} such as linters and test harnesses to guarantee code quality and correctness.
+For this software development, followed the GitHub flow development workflow \cite{GitHubFlow} which leverages lightweight \texttt{git} branching to develop atomic features. For the software development components, I used GitHub actions to run CI/CD workflows \cite{WhatCICD} such as linters and test harnesses to guarantee code quality and correctness.
 
-% Add figure of (passing) CI run
+% TODO: Consider adding figure of (passing) CI run
 
 Long-format text was also written in \LaTeX\ using Overleaf\cite{OverleafOnlineLaTeX}, and tracked in \texttt{git} via Overleaf's integration with GitHub for linear commit histories. In addition to this, I used Zotero \cite{ZoteroYourPersonal} to manage citations, which again supports an integration with Overleaf.
 
@@ -141,7 +138,7 @@ This punctilious approach to project progression paid great dividends, with even
 
 At the start of the project, any possible legal, social, ethical, and professional issues relating to the project were identified. 
 
-Firstly, a small number of legal issues were identified as relating the project, largely relating to software licensing. Since High-Performance Computing is an active field of development in industry, some libraries or tools may have restrictive licences, so care was taken when picking and using tools to conform to the terms of their licences. Additionally, when identifying possible legal issues in the specification, it was noted that some mini-applications in the Mantevo suite are based on simulations of experiments in nuclear physics, so working with them might require special care to conform to relevant UK law. However, this issue was mitigated by selecting to examine the HPCCG mini-application \cite{herouxHPCCGSolverPackage2007}, which is instead based on methods of conjugate gradients solving linear systems \cite{hestenesMethodsConjugateGradients1952}.
+Firstly, a small number of legal issues were identified as relating to the project, largely relating to software licensing. Since High-Performance Computing is an active field of development in industry, some libraries or tools may have restrictive licences, so care was taken when picking and using tools to conform to the terms of their licences. Additionally, when identifying possible legal issues in the specification, it was noted that some mini-applications in the Mantevo suite are based on simulations of experiments in nuclear physics, so working with them might require special care to conform to relevant UK law. However, this issue was mitigated by selecting to examine the HPCCG mini-application \cite{herouxHPCCGSolverPackage2007}, which is instead based on methods of conjugate gradients solving linear systems \cite{hestenesMethodsConjugateGradients1952}.
 
 Secondly, a level of professionalism is required for all projects. This project does not necessitate any professional considerations above basic norms, such as making meaningful commit messages, or avoiding profanity in source code comments. % TODO: Change this list of basic norms
 

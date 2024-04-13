@@ -45,7 +45,10 @@ When translating from languages which allow undefined behaviour such as C++ to R
 % Overview of HPCCG
 
 % Cite yale normally being index based
-As discussed in the background to HPCCG in section \ref{ssec:hpccg}, the dominant computation kernel is an implementation of sparse matrix-vector multiplication, along with two other kernels, the vector dot product and pairwise summation of two scaled vectors. To facilitate performant implementation of these operations, HPCCG uses a non-standard, pointer based implementation of the traditionally index based Yale format to represent sparse matrices. The following example describes how HPCCG uses a pointer-based variant of the compressed row storage format to represent sparse matrices.
+As discussed in the background to HPCCG in section \ref{ssec:hpccg}, the dominant computation kernel is an implementation of sparse matrix-vector multiplication, along with two other kernels, the vector dot product and pairwise summation of two scaled vectors. To facilitate performant implementation of these operations,
+% HPCCG uses a non-standard, pointer based implementation of the traditionally index based Yale format to represent sparse matrices. % Is this actually true?
+HPCCG uses a pointer based implementation of the Yale format to represent sparse matrices, which is explained through the example matrix shown in equation \ref{eq:exampleMatrix}.
+% The following example describes how HPCCG uses a pointer-based variant of the compressed row storage format to represent sparse matrices.
 
 \begin{align}
     \begin{pmatrix}
@@ -90,15 +93,70 @@ Unfortunately, this pointer based implementation presents difficulties when tran
 \section{Implementation}
 \label{sec:translation-implementation} % 3000 words
 
-This section provides a description of the technical details of the translation process. Source code for each of these translations can be found in the \texttt{hpccg-rs} GitHub repository.
+This section provides a description of the technical details of the translation process. Source code for each of these translation versions can be found in the \texttt{hpccg-rs} GitHub repository.
 % TODO: Add process of writing incrementally optimised translations
 
 
 \subsection{Direct translation}
 \label{sec:translation-direct}
 % Naive translation + explaining Rust ownership and borrowing
-The first translation 
 
+The first translation was designed to be as direct a mapping between the program models of C++ and Rust as possible. This helped develop a strong understanding of the codebase, and gave initial confidence in program equivalence, as the only factor which could affect program functionality is the language semantics of Rust differing from C++.
+
+In C and C++, pointers for memory indirection are incredibly ubiquitous. This is especially true in High-Performance computing, where codebases often operate on multi-dimensional arrays representing meshes, which are represented in C++ by pointers. However, using pointers in this way makes programs very susceptible to bugs, for example accessing uninitialised memory as a result of faulty pointer arithmetic. As discussed in section \ref{ssec:rust-indirection}, which covered memory indirection in Rust, interaction with raw pointers in Rust is considered an \mintinline{rust}{unsafe} operation, as it is difficult to statically guarantee that it will not result in undefined behaviour. Much of the behaviour of pointers can instead be implemented through borrowing. However, the borrow checker is overly restrictive for some use cases, requiring the use of smart pointers.
+
+This presented the first significant challenge in the translation effort, as the implementation of the Yale representation of sparse matrix in HPCCG relies heavily on raw pointers and pointer arithmetic. This complicates the direct translation process, as references and smart pointers in Rust necessarily have different semantics to raw pointers, and may be less performant. This was identified as a risk during the specification phase, and was captured in the Risk Matrix \ref{tab:risk_matrix}, which is shown in \Cref{ch:project-management} in the discussion of project management. A truncated version of the data structure which implements this Yale representation in C++ is shown in Listing \ref{listing:cpp-sparse-matrix-structure}.
+
+\begin{listing}[H]
+    \begin{minted}[linenos]{rust}
+struct HPC_Sparse_Matrix_STRUCT {
+  int total_nrow;
+  long long total_nnz;
+  int  * nnz_in_row;
+  double ** ptr_to_vals_in_row;
+  int ** ptr_to_inds_in_row;
+  double ** ptr_to_diags;
+  double *list_of_vals;
+  int *list_of_inds;
+}
+    \end{minted}
+    \caption{A truncated version of the C++ data structure which implements the Yale representation of the sparse matrix in HPCCG.}
+    \label{listing:cpp-sparse-matrix-structure}
+\end{listing}
+
+This data structure is then populated to its initial state, with a snippet of the C++ implementation being shown in Listing \ref{}.
+
+This data structure is then populated to its initial state. However, this process presents a challenge, not only because it de-references raw pointers, but also it violates Rust's ownership rules, as there are concurrent mutable and immutable pointers to the data, shown in Listing \ref{}.
+
+The first key insight in the translation process is that the interior mutability pattern of smart pointers, discussed in section 15-5 of the Rust book \cite{RustProgrammingLanguage} can be used to represent this functionality. Instead of arrays of pointers such as \mintinline{c++}{int ** ptr_to_inds_in_row} as shown in Listing \ref{listing:cpp-sparse-matrix-structure}, the \mintinline{rust}{Rc<RefCell<f64>>} construct can be used to create a vector of items which allow concurrent mutable and immutable borrows. This works by presenting a safe interface to an \mintinline{rust}{unsafe} implementations which performs checks at runtime to guarantee memory safety. As such, the data structure shown in Listing \ref{listing:cpp-sparse-matrix-structure} can be re-written in Rust, as shown in Listing \ref{listing:rust-sparse-matrix-structure}.
+
+\begin{listing}[H]
+    \begin{minted}[linenos]{rust}
+#[derive(Debug)]
+pub struct SparseMatrix {
+    pub total_nrow: i32,
+    pub total_nnz: i32,
+    pub nnz_in_row: Vec<i64>,
+    pub ptr_to_vals_in_row: Vec<Rc<RefCell<f64>>>,
+    pub ptr_to_inds_in_row: Vec<Rc<RefCell<i32>>>,
+    pub list_of_vals: Vec<Rc<RefCell<f64>>>,
+    pub list_of_inds: Vec<Rc<RefCell<i32>>>,
+}
+    \end{minted}
+    \caption{A truncated version of the sparse matrix data structure, directly translated to Rust using the interior mutability pattern of smart pointers.}
+    \label{listing:rust-sparse-matrix-structure}
+\end{listing}
+
+However, using this pattern comes at a steep cost to performance, as the guarantees against undefined behaviour are deferred to runtime, meaning every pointer dereference must be bounds checked, doubling the instruction count per dereference. This can be seen in Figure \ref{fig:perf_annot_labelled}, which shows a screenshot of the \texttt{perf} performance profiler, which is introduced in more depth in \ref{ssec:perf profiler}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/3_translation/perf_annot_labelled.png}
+    \caption{An annotated screenshot of the \texttt{perf} performance profiler, showing the dominating performance impact of extra instructions checking the dereference operation.}
+    \label{fig:perf_annot_labelled}
+\end{figure}
+
+This performance cost is unacceptable for High-Performance Computing use cases, so for Rust to be viable for these purposes there must be a way to avoid incurring this cost.
 
 \subsection{Reworked data structure}
 \label{sec:translation-reworked-data-structure}
@@ -171,4 +229,4 @@ Test-driven development refers to
 
 
 \section{Lessons learned and proposed workflow}
-\label{sec:translation-workflow} % 3000 words
+\label{sec:translation-workflow}
