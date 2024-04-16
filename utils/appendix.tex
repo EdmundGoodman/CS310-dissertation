@@ -6,7 +6,7 @@
 \section{Project Requirements}
 \label{sec:project-requirements}
 
-The specification document enumerated the set of MoSCoW prioritised \cite{CaseMethodFastTrack} requirements which unambiguously define the project scope. These requirements are replicated below:
+% The specification document enumerated the set of MoSCoW prioritised \cite{CaseMethodFastTrack} requirements which unambiguously define the project scope. These requirements are replicated below:
 
 % TODO: Uncomment when word count stops being tracked
 % \begin{enumerate}
@@ -72,7 +72,7 @@ The specification document enumerated the set of MoSCoW prioritised \cite{CaseMe
 \section{Mini-app selection process}
 \label{sec:miniapp-selection}
 
-A significant component of early project planning was selecting the mini-app to perform the translation on. Since the translation process would take a significant amount of time, and could be heavily impacted by the properties of the chosen mini-app, it was vital to make an informed selection. The selection process for the mini-app is described below, broadly replicated from the progress report document:
+% A significant component of early project planning was selecting the mini-app to perform the translation on. Since the translation process would take a significant amount of time, and could be heavily impacted by the properties of the chosen mini-app, it was vital to make an informed selection. The selection process for the mini-app is described below, broadly replicated from the progress report document:
 
 % TODO: Uncomment when word count stops being tracked
 % The first objective set out in the specification was ``Select a target mini-app from ECP proxy applications or UK-MAC (\textbf{Must have})'', and all other objectives trivially have a dependency on it.
@@ -159,9 +159,33 @@ A significant component of early project planning was selecting the mini-app to 
 \section{Hardware specifications}
 \label{sec:hardware-specifications}
 
-The results of \texttt{lscpu} on the compute nodes for each of the systems are listed below.
+% The \texttt{lstopo} tool can be used to draw a graphical representation of both the hardware composing the system, and its topology. This gives a further insight into the hardware being used to run the tests, beyond the CPU model. Figures \ref{fig:athena-topology}, \ref{fig:kudu-topology} and \ref{fig:avon-topology} show the hardware topologies of the Athena, Kudu, and Avon systems respectively.
 
-% % Athena
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.75\textwidth]{images/8_appendix/athena-topology.png}
+%     \caption{A diagram of a hardware topology of Athena.}
+%     \label{fig:athena-topology}
+% \end{figure}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.85\textwidth]{images/8_appendix/kudu-topology.png}
+%     \caption{A diagram of a hardware topology of Kudu.}
+%     \label{fig:kudu-topology}
+% \end{figure}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.95\textwidth]{images/8_appendix/avon-topology.png}
+%     \caption{A diagram of a hardware topology of Avon.}
+%     \label{fig:avon-topology}
+% \end{figure}
+
+% The results of running \texttt{lscpu} on the compute nodes for each of the systems are shown below in Listings \ref{listing:athena-lscpu}, \ref{listing:kudu-lscpu}, and \ref{listing:avon-lscpu}.
+
+% \begin{listing}[H]
+%     \begin{minted}[linenos,breaklines]{text}
 % Architecture:             x86_64
 %   CPU op-mode(s):         32-bit, 64-bit
 %   Address sizes:          39 bits physical, 48 bits virtual
@@ -210,8 +234,13 @@ The results of \texttt{lscpu} on the compute nodes for each of the systems are l
 %   Spectre v2:             Mitigation; Enhanced / Automatic IBRS, IBPB conditional, RSB filling, PBRSB-eIBRS SW sequence
 %   Srbds:                  Mitigation; Microcode
 %   Tsx async abort:        Not affected
+%     \end{minted}
+%     \caption{The output of the \texttt{lscpu} command on Athena.}
+%     \label{listing:athena-lscpu}
+% \end{listing}
 
-% % Kudu
+% \begin{listing}[H]
+%     \begin{minted}[linenos,breaklines]{text}
 % Architecture:        x86_64
 % CPU op-mode(s):      32-bit, 64-bit
 % Byte Order:          Little Endian
@@ -238,9 +267,13 @@ The results of \texttt{lscpu} on the compute nodes for each of the systems are l
 % NUMA node0 CPU(s):   0-9,20-29
 % NUMA node1 CPU(s):   10-19,30-39
 % Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm cpuid_fault epb invpcid_single pti intel_ppin ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm xsaveopt cqm_llc cqm_occup_llc dtherm ida arat pln pts md_clear flush_l1d
+%     \end{minted}
+%     \caption{The output of the \texttt{lscpu} command on the Kudu compute node.}
+%     \label{listing:kudu-lscpu}
+% \end{listing}
 
-
-% % Avon
+% \begin{listing}[H]
+%     \begin{minted}[linenos,breaklines]{text}
 % Architecture:        x86_64
 % CPU op-mode(s):      32-bit, 64-bit
 % Byte Order:          Little Endian
@@ -267,3 +300,7 @@ The results of \texttt{lscpu} on the compute nodes for each of the systems are l
 % NUMA node2 CPU(s):   2,6,10,14,18,22,26,30,34,38,42,46
 % NUMA node3 CPU(s):   3,7,11,15,19,23,27,31,35,39,43,47
 % Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3 invpcid_single intel_ppin ssbd mba ibrs ibpb stibp ibrs_enhanced fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb intel_pt avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts pku ospke avx512_vnni md_clear flush_l1d arch_capabilities
+%     \end{minted}
+%     \caption{The output of the \texttt{lscpu} command on Athena.}
+%     \label{listing:avon-lscpu}
+% \end{listing}

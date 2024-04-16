@@ -17,7 +17,7 @@ The overall goal of this effort is to generate a software product -- a Rust tran
 
 % Explain the difficulties of the effort
 % No-one else has done a whole mini-app, just single kernels and toy examples
-As discussed in \Cref{ch:background}, this translation effort is novel with respect to assessing High-Performance Computing for a number of reasons. Previous literature has translated only single computation kernels \cite{} with support for shared and distributed memory parallelism, or very short ``toy example'' applications of around only 150 lines \cite{} \cite{} with support for only shared memory parallelism. In contrast to this, HPCCG is a standard mini-app as part of the Mantevo suite, with the C++ version totalling 1524 lines and having support for both shared and distributed memory parallelism. This order of magnitude increase in codebase length over modern existing work \cite{}, along with support for distributed memory parallelism outside of single computation kernel contexts provides a valuable insight into the suitability of Rust in High-Performance Computing, but at the cost of significant developer effort as compared with existing work.
+As discussed in \Cref{ch:background}, this translation effort is novel with respect to assessing High-Performance Computing for a number of reasons. Previous literature has translated only single computation kernels \cite{} with support for shared and distributed memory parallelism, or very short ``toy example'' applications of around only 150 lines \cite{} \cite{} with support for only shared memory parallelism. In contrast to this, HPCCG is a standard mini-app as part of the Mantevo suite, with the C++ version totalling 1524 lines and having support for both shared and distributed memory parallelism. This order of magnitude increase in codebase length over modern existing work \cite{moranEmergingTechnologiesRust2023} \cite{costanzoPerformanceVsProgramming2021}, along with support for distributed memory parallelism outside of single computation kernel contexts provides a valuable insight into the suitability of Rust in High-Performance Computing, but at the cost of significant developer effort as compared with existing work.
 
 \section{Design}
 \label{sec:translation-design} % 500 words
@@ -29,7 +29,7 @@ In traditional software development tasks, such as building the HPC MultiBench t
 
 Every programming language can be though of as presenting a different abstraction over the capabilities of a variety of physical computer hardware. For low-level languages such as Assembly, this abstraction directly maps to the machine code instructions executed on the bare metal. Above this, languages such as C provide abstractions for common structures such as iteration, but require manual management of properties of the machine such as memory allocation. High-level scripting languages such as Python provide abstractions over memory management as well, leaving an interface very devolved from the hardware it runs on. Across many languages, the problem of program translation is reconciling these abstractions to allow the expression of the original functionality in another language.
 
-Typically, the abstractions across programming languages are equally powerful. However, there are some caveats to this. Lambda Calculus was one of the first expressions of computation within the young field of computer science, proposed by Alonzo Church in 1933 \cite{church1932set}. Seven years later in 1940, Church proposed Simply-Typed Lambda Calculus \cite{church1940formulation}, which restricts the domain of valid programs from all programs to only well-typed ones. This is referred to as a reduction in power of the language. However, this reduction in power is beneficial to programmers, as incorrectly-typed programs are not useful. % todo: explain why/how - can't be run or internally inconsistent?
+Typically, the abstractions across programming languages are equally powerful. However, there are some caveats to this. Lambda Calculus was one of the first expressions of computation within the young field of computer science, proposed by Alonzo Church in 1933 \cite{church1932set}. Seven years later in 1940, Church proposed Simply-Typed Lambda Calculus \cite{church1940formulation}, which restricts the domain of valid programs from all programs to only well-typed ones. This is referred to as a reduction in power of the language. However, this reduction in power is beneficial to programmers, as incorrectly-typed programs are not useful. % TODO: explain why/how - can't be run or internally inconsistent?
 
 This restriction of valid programs being well-typed in Simply-Typed Lambda Calculus is mirrored by the prohibition of undefined behaviour in Rust, as shown in Figure \ref{fig:excalidraw_programs_venn}. It is beneficial to programmers, as they largely do not want to write programmers which exhibit on undefined behaviour. This is supported by the fact that programmers in other languages like C++ use dynamic and static analysis tools such as Valgrind \cite{ValgrindHome} and AddressSanitiser \cite{Sanitizers2023} to guarantee these properties outside the compiler
 
@@ -37,10 +37,8 @@ This restriction of valid programs being well-typed in Simply-Typed Lambda Calcu
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{images/3_translation/excalidraw_programs_venn.png}
-    \caption{A diagram to show the relative powers
-of increasingly restrictive program models.}
+    \caption{A diagram to show the relative powers of increasingly restrictive program models.}
     \label{fig:excalidraw_programs_venn}
-    % TODO: Check paper website for permission to reproduce
 \end{figure}
 
 When translating from languages which allow undefined behaviour such as C++ to Rust, which prohibits it my default, there are additional challenges beyond just reconciling the abstractions of the program models to express the same functionality. There are fewer safe Rust programs than C++ programs, and as a result a direct mapping to Rust may not exist if the program relies on undefined behaviour. In this case, the translation must either leverage the \mintinline{rust}{unsafe} keyword to allow such behaviour, or use a different, safe, mechanism to express the same functionality.
@@ -51,10 +49,7 @@ When translating from languages which allow undefined behaviour such as C++ to R
 % Overview of HPCCG
 
 % Cite yale normally being index based
-As discussed in the background to HPCCG in section \ref{ssec:hpccg}, the dominant computation kernel is an implementation of sparse matrix-vector multiplication, along with two other kernels, the vector dot product and pairwise summation of two scaled vectors. To facilitate performant implementation of these operations,
-% HPCCG uses a non-standard, pointer based implementation of the traditionally index based Yale format to represent sparse matrices. % Is this actually true?
-HPCCG uses a pointer based implementation of the Yale format to represent sparse matrices, which is explained through the example matrix shown in equation \ref{eq:exampleMatrix}.
-% The following example describes how HPCCG uses a pointer-based variant of the compressed row storage format to represent sparse matrices.
+As discussed in the background to HPCCG in section \ref{ssec:hpccg}, the dominant computation kernel is an implementation of sparse matrix-vector multiplication, along with two other kernels, the vector dot product and pairwise summation of two scaled vectors. To facilitate performant implementation of these operations, HPCCG uses a pointer based implementation of the Yale format to represent sparse matrices. The following example describes how HPCCG uses a pointer-based variant of the compressed row storage format to represent sparse matrices, such as the one shown in Equation \ref{eq:exampleMatrix}.
 
 \begin{align}
     \begin{pmatrix}
@@ -105,7 +100,6 @@ This section provides a description of the technical details of the translation 
 \subsection{Direct translation}
 \label{sec:translation-direct}
 % Naive translation + explaining Rust ownership and borrowing
-
 The first translation was designed to be as direct a mapping between the program models of C++ and Rust as possible. This helped develop a strong understanding of the codebase, and gave initial confidence in program equivalence, as the only factor which could affect program functionality is the language semantics of Rust differing from C++.
 
 In C and C++, pointers for memory indirection are incredibly ubiquitous. This is especially true in High-Performance computing, where codebases often operate on multi-dimensional arrays representing meshes, which are represented in C++ by pointers. However, using pointers in this way makes programs very susceptible to bugs, for example accessing uninitialised memory as a result of faulty pointer arithmetic. As discussed in section \ref{ssec:rust-indirection}, which covered memory indirection in Rust, interaction with raw pointers in Rust is considered an \mintinline{rust}{unsafe} operation, as it is difficult to statically guarantee that it will not result in undefined behaviour. Much of the behaviour of pointers can instead be implemented through borrowing. However, the borrow checker is overly restrictive for some use cases, requiring the use of smart pointers.
@@ -240,6 +234,7 @@ pub fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
     y
 }
     \end{minted}
+    enabled: False
     \caption{A direct translation to Rust of the C++ function to compute sparse matrix-vector multiplication.}
     \label{listing:rust-sparsemv-direct}
 \end{listing}
@@ -287,7 +282,6 @@ pub struct SparseMatrix {
     \label{listing:rust-sparse-matrix-structure-indexed}
 \end{listing}
 
-% TODO: Section about sparsemv
 Having adopted this index based approach to the sparse matrix data structure, the implementation of the sparse matrix-vector operation must also be modified. The updated implementation, shown in Listing \ref{listing:rust-sparsemv-indexed}, is structurally very similar to the implementation in the direct translation, shown in Listing \ref{listing:rust-sparsemv-direct}. The main differences are in how values in the sparse matrix are accessed, through a single index accessed on line 6, then re-used across lines 9 and 10, rather than two individual pointers which are then both dereferenced.
 
 \begin{listing}[H]
@@ -314,16 +308,12 @@ pub fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
 
 The implementations of the other two computational kernels, calculating a vector dot product and pairwise summation of two scaled vectors, remain unchanged -- as neither of them interact with the sparse matrix implementation.
 
-% Insert figure comparing indexed with direct translation through HPC MultiBench
-% Total wall time, and just the sparsemv and ddot kernels?
-
 Since High-Performance Computing workloads are often array or mesh based, this strategy of replacing pointers with indices still holds for the dominant computational kernels of many full applications. Where pointers cannot be substituted with indices, borrowed references should be preferred, then smart pointers such as the \mintinline{rust}{Rc<RefCell<f64>>} construct as a worst-case solution.
 
 \subsection{Bounds checking}
 \label{sec:translation-bounds-checking}
 % Bounds checking
 % Discussion of bounds checking in rust
-
 In Rust, all array indexing operations are bounds checked by default, to guarantee memory safety. This incurs a performance cost as a result of this comparison operation, and any resultant pipeline stalls as a result of it. As a result of this, the default indexing strategy in Rust is around twice as slow as in languages without these checks, such as C++. This result is explained in depth in section \ref{ssec:perf-profiler} of \Cref{ch:performance}, as part of a discussion of the \texttt{perf} performance profiler.
 
 % How to get around it
@@ -340,8 +330,15 @@ pub fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
         let cur_nnz = unsafe { *matrix.nnz_in_row.get_unchecked(i) };
         for j in 0..cur_nnz {
             sum += unsafe {
-                matrix.list_of_vals.get_unchecked(start_ind + j)
-                    * vector.get_unchecked(*matrix.list_of_inds.get_unchecked(start_ind + j))
+                matrix.list_of_vals.get_unchecked(
+                    start_ind + j
+                )
+                    *
+                vector.get_unchecked(
+                    *matrix.list_of_inds.get_unchecked(
+                        start_ind + j
+                    )
+                )
             };
         }
         result.push(sum);
@@ -353,19 +350,48 @@ pub fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
     \label{listing:rust-sparsemv-unchecked}
 \end{listing}
 
-% Figures comparing performance
-
 However, this approach nullifies Rust's beneficial property of guaranteeing memory safety. We are disabling runtime checks of indexes to gain performance, and hence regressing back to C++ with the only guarantees of memory safety being through programmer confidence. However, the Rust language provides syntax sugars in the form or zero-cost abstractions which can help avoid these unsafe operations in common use cases.
 
 \subsection{Iterators}
 \label{sec:translation-iterators}
 % Iterators
 
-A key feature of Rust is zero-cost abstractions
+Along with its rich type system, iterators are one of the places where the influence of functional languages on Rust is most clear. Functions such as \texttt{map}, \texttt{zip}, and \texttt{fold} process streams of data, taking inline functional closures as arguments to define their behaviour. This style of programming is particularly amenable to memory safety, as functions such as \texttt{map} typically operate on a single stream of data, avoiding the problem of holding multiple mutable references.
+
+A key feature of Rust is zero-cost abstractions. Ibrahim Dursun describes this as ``your flavour of code doesn’t affect the performance. It doesn’t matter if you use loops or closures, they all compile down to the same assembly'' \cite{RustZeroCost2020}. Iterators are a common example of such zero-cost abstractions, as they provide a syntactic sugar for writing common list operations in a functional way which compiles down to at least equally performant assembly as a simple loop. In fact, iterators can provide a performance benefit over looping through and individually indexing a vector. Since the iterator abstraction knows the length of the list internally, it can guarantee that its indexing operations are within bounds, so can perform \mintinline{rust}{unsafe} unchecked indexing internally whilst still providing a safe API.
+% TODO: Add assembly example to confirm correctness?
+
+Listing \ref{listing:rust-sparsemv-iterator} again shows an implementation of sparse matrix-vector multiplication, but this time leveraging iterators. This approach is structurally quite different to all previous ones, as it replaces the two nested loops by zipping two iterators together, than mapping over them. 
 
 % Using iterators for HPCCG
-
-% Figures comparing performance
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{rust}
+pub fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
+    matrix.row_start_inds.iter()
+        .zip(matrix.nnz_in_row.iter())
+        .map(|(&start_ind, &cur_nnz)| {
+                let mut sum = 0.0;
+                for j in 0..cur_nnz {
+                    sum += unsafe {
+                        matrix.list_of_vals.get_unchecked(
+                            start_ind + j
+                        )
+                            *
+                        vector.get_unchecked(
+                            *matrix.list_of_inds.get_unchecked(
+                                start_ind + j
+                            )
+                        )
+                    };
+                }
+                sum
+            }
+        ).collect()
+}
+    \end{minted}
+    \caption{A translation to Rust of the C++ function, using iterators to compute sparse matrix-vector multiplication.}
+    \label{listing:rust-sparsemv-iterator}
+\end{listing}
 
 Although in this case the use of iterators does not eliminate the need for unchecked array indexing, it reduces the number of instances of their use, which reduces the surface for possible invalid memory access within a program. It is possible to construct nested iterators such that only one unchecked index operation is required -- which cannot be removed as it is part of the data in the sparse matrix representation, and doesn't range over a known set of values. However, this was not done in this implementation to make the implementation more amenable to the use of Rayon for shared memory parallelism.
 
@@ -373,17 +399,41 @@ Although in this case the use of iterators does not eliminate the need for unche
 \label{sec:translation-rayon}
 % Shared-memory parallelism with Rayon
 
-Having modified the Rust implementation to leverage iterators, it is incredibly easy to leverage shared memory parallelism through Rayon. The only change required is replacing instances of the native Rust \texttt{iter} function with the \texttt{par\_iter} function provided by Rayon.
+\Cref{ch:background} introduces Rust's approach to ``Fearless Concurrency'' in \ref{ssec:rust-fearless-concurrency}. Having modified the Rust implementation to leverage iterators, it is incredibly easy to leverage shared memory parallelism through Rayon. The only change required is replacing instances of the native Rust \texttt{iter} function with the \texttt{par\_iter} function provided by Rayon. As such, the sparse matrix-vector multiplication kernel can be implemented as shown in Listing \ref{}.
 
-% TODO: Consider moving this to be in the background section `Fearless Parallelism`
-% Introducing rayon over thread primitives
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{rust}
+use rayon::prelude::*;
+
+pub fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
+    matrix.row_start_inds.par_iter()
+        .zip(matrix.nnz_in_row.par_iter())
+        .map(|(&start_ind, &cur_nnz)| {
+                let mut sum = 0.0;
+                for j in 0..cur_nnz {
+                    sum += unsafe {
+                        matrix.list_of_vals.get_unchecked(
+                            start_ind + j
+                        )
+                            *
+                        vector.get_unchecked(
+                            *matrix.list_of_inds.get_unchecked(
+                                start_ind + j
+                            )
+                        )
+                    };
+                }
+                sum
+            }
+        ).collect()
+}
+    \end{minted}
+    \caption{A translation to Rust of the C++ function, using Rayon to compute sparse matrix-vector multiplication using shared memory parallelism.}
+    \label{listing:rust-sparsemv-rayon}
+\end{listing}
 
 % Using iterators for HPCCG
-Listing \ref{} shows the implementation of the sparse matrix-vector multiplication kernel. This change to leveraging shared memory parallelism requires only two eight characters to be changed -- adding the \texttt{par} prefix to the two outer zipped iterators. In addition to this, as a result of the Rust compiler's static checks, there are much stronger guarantees against data races. Section \ref{ssec:shared-memory-paralellism} of \Cref{ch:background} showed how easy it is to introduce a data race using OpenMP even for a trivial example. However, the ownership constraints and scoping rules of closures for functions over iterators ensure that data cannot be concurrently accessed across threads.
-
-The combination of these two factors, ease of switching to multi-threading and guarantees of correctness, empowers developers to quickly write performant code by leveraging shared memory parallelism.
-
-% Figures comparing performance
+This change to leveraging shared memory parallelism requires only two eight characters to be changed -- adding the \texttt{par} prefix to the two outer zipped iterators. In addition to this, as a result of the Rust compiler's static checks, there are much stronger guarantees against data races. Section \ref{ssec:shared-memory-paralellism} of \Cref{ch:background} showed how easy it is to introduce a data race using OpenMP even for a trivial example. However, the ownership constraints and scoping rules of closures for functions over iterators ensure that data cannot be concurrently accessed across threads. The combination of these two factors, ease of switching to multi-threading and guarantees of correctness, empowers developers to quickly write performant code by leveraging shared memory parallelism.
 
 In summary, the use of packages such as Rayon allows developers to write multi-threaded Rust code incredibly quickly, and with confidence in its correctness. Due to the current trend in hardware design towards multi-processor architectures in machines discussed in \Cref{ch:background}, this allows developers to fully leverage the performance of commodity hardware, which is crucial in a High-Performance Computing context.
 
@@ -392,25 +442,77 @@ In summary, the use of packages such as Rayon allows developers to write multi-t
 % Distributed-memory parallelism with rs-mpi
 
 % Introducing MPI
+\Cref{ch:background} introduced MPI as a standard for distributed memory parallelism with implementations in languages such as C++, FORTRAN and Java in \ref{ssec:distributed-memory-paralellism}. Unfortunately, Rust is notable in its absence from this list of languages with MPI implementations. However, a key feature of Rust is its support for foreign function interfaces, allowing it to invoke functions implemented in other languages. This means that a Rust can bind into a C++ implementation of MPI using a foreign function interface, then provide a safe API over these bindings. The \texttt{mpi} crate \cite{RsmpiRsmpi2024} provides these bindings, along with an idiomatic, ``rustic'', interface.
 
 The process of translating the MPI aspect of HPCCG into Rust was by far the most difficult part of the translation process. It was significantly more complex than the next most difficult aspect of populating the data structure -- taking around two weeks instead of two days of dedicated work. This difficulty was broadly as a result of three key factors:
 
 \begin{enumerate}
     \item The length of the codebase to translate -- the \texttt{make\_local\_matrix.cpp} file alone is 612 lines long
     \item The imperfect mapping between the C++ MPI calls and the Rust MPI bindings
-    \item The poor documentation of the Rust MPI bindings
+    \item The minimal documentation of the Rust MPI bindings
 \end{enumerate}
 
-% Rust bindings into MPI (+ poor documentation, link to future open source work)
+% TODO: Translation effort snippets
 
-% Translation effort snippets
+In summary, it is possible to translate most existing C++ code using MPI into Rust with equivalent functionality using the \texttt{mpi} crate. However, this translation process is involved, requiring expertise which is hard to acquire due to the minimal documentation. As Rust and its ecosystem matures, this process is likely to get easier, with improved documentation and tweaks to the interface design.
 
-% Performance
+% TODO: (+ poor documentation, link to future open source work)
+
+\subsection{Performance comparison}
+\label{sec:translation-performance}
+
+In order to fairly assess the suitability of Rust for High-Performance Computing workloads, the translation of the mini-app being assessed must fully leverage the performance capabilities of Rust. As a result of this, the translation effort was driven by achieving performance, with each incremental improvement making progress towards this goal.
+
+This section presents performance measurements, using the HPC MultiBench tool introduced in \Cref{ch:hpc-multibench}, of the total and individual kernel runtimes across the translations, and discusses the impact of the techniques applied on these results.
+
+%% Rust translation improvements
+% Total time bar chart
+Figure \ref{fig:translations_total_line} provides an overall picture on how the different translations affect performance. It shows how the total wall time of each translation scales with the overall mesh size, making it clear that each incremental translation improves the performance of the mini-app as a whole, but with significant diminishing returns.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/3_translation/translations_total_line.png}
+    \caption{A diagram showing the total wall time taken across the three kernels of each translation, as the overall mesh size is varied.}
+    \label{fig:translations_total_line}
+\end{figure}
+
+
+% sparsemv only
+Having seen the overall picture, we can analyse the performance of each kernel. The dominant kernel in the HPCCG mini-app is the sparse matrix-vector multiplication operation. We can see that the data structure refactor has a profound impact on performance here. The remaining kernels have a much smaller impact, with reducing the memory bandwidth required by adopting single indexing making a small improvement, then avoiding bounds checks or using iterators having very similar improvements in performance beyond that.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/3_translation/translations_sparsemv_line.png}
+    \caption{A diagram showing the wall time taken for the waxpby kernel only of each translation, as the overall mesh size is varied.}
+    \label{fig:translations_waxpby_line}
+\end{figure}
+
+% ddot/waxpby only
+Figures \ref{fig:translations_ddot_line} and \ref{fig:translations_waxpby_line} show the wall time taken for the vector dot product and pairwise summation of two scaled vector kernels respectively. As compared with the sparse matrix-vector kernel, shown in Figure \ref{fig:translations_waxpby_line}, they are much less affected by data structure refactoring for small values, but then more affected for large values. This might be due to caching behaviours, as the direct translation requires more data to operate on, hence resulting in cache capacity misses for smaller meshes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/3_translation/translations_ddot_line.png}
+    \caption{A diagram showing the wall time taken for the ddot kernel only of each translation, as the overall mesh size is varied.}
+    \label{fig:translations_ddot_line}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/3_translation/translations_waxpby_line.png}
+    \caption{A diagram showing the wall time taken for the waxpby kernel only of each translation, as the overall mesh size is varied.}
+    \label{fig:translations_waxpby_line}
+\end{figure}
+
+
+%% Parallelism comparison
+In addition to characterising how different translations affect performance, we can also get a preliminary understanding of the efficacy of different parallelism techniques in Rust. Figure \ref{} shows the relative performance as characterised by the scaling of total wall time for serial, multi-threaded, MPI, and hybrid translations of the HPCCG mini-app.
+
+
+Here we can see that multi-threading is by far the most performant for small workloads on a single computer node. However, message passing approaches provide the capability to scale processing to clustered compute resources beyond the shared memory architecture of a single machine, and can be used in combination with multi-threaded approaches.
 
 % Summarise final result of all translation
-In summary, the translation effort resulted in a performant implementation of the HPCCG mini-app in Rust, supporting both shared-memory parallelism through Rayon, along with the stretch goal of distributed memory parallelism through the Rust MPI bindings. This demonstrates that it is possible to use Rust for High-Performance Applications, which HPCCG is representative of. However, there are still aspects of Rust which add difficulty to this process, such as the state of the documentation of the Rust bindings to MPI -- but this is likely to improve in the future as Rust and its ecosystem matures.
-
-
+In summary, the translation effort resulted in a performant implementation of the HPCCG mini-app in Rust, supporting both shared-memory parallelism through Rayon, along with the stretch goal of distributed memory parallelism through the Rust MPI bindings. This demonstrates that it is possible to use Rust for High-Performance Applications, for which HPCCG is representative workload. However, there are still aspects of Rust which add difficulty to this process, such as the state of the documentation of the Rust bindings to MPI -- but this is likely to improve in the future as Rust and its ecosystem matures.
 
 
 

@@ -19,7 +19,7 @@ Software profilers are a category of tools which are used to measure properties 
 
 Performance profilers can also be used to compare implementations of the same software in different languages. Comparing the  profiles of the programs on the same problem size can elucidate where one language loses performance over another, and give insights into key factors such as vectorisation and memory bandwidth utilisation.
 
-We choose to use a variety of performance profilers, because some profilers provide many more metrics and analysis options, but typically at the expense of the simple and ergonomic user interface. As a result of this, we used \texttt{perf} for the majority of profiling tasks, as they provide a convenient command line interface for instrumentation statistical sampling. We also used the Intel\textregistered\ oneAPI\texttrademark\ suite of tools, including Intel\textregistered\ vTune\texttrademark and Intel\textregistered\ Advisor\texttrademark, as these provide a vast array of capabilities such as roofline analysis, but with a complex graphical-only interface.
+We choose to use a variety of performance profilers, because some profilers provide many more metrics and analysis options, but typically at the expense of the simple and ergonomic user interface. As a result of this, we used \texttt{perf} for the majority of profiling tasks, as they provide a convenient command line interface for instrumentation statistical sampling. We also used the Intel\textregistered\ oneAPI\texttrademark\ suite of tools, including Intel\textregistered\ vTune\texttrademark\ and Intel\textregistered\ Advisor\texttrademark, as these provide a vast array of capabilities such as roofline analysis, but with a complex graphical-only interface.
 
 
 \subsection{The \texttt{perf} profiler}
@@ -60,11 +60,60 @@ From these figures, we can see that the the bounds checking operation dominate t
 \label{sssec:roofline-models}
 
 % Introducing roofline models
+In their seminal paper ``Roofline: an insightful visual performance model for multicore architectures'', Williams, Waterman and Patterson introduce the roofline model as a technique for simply characterising performance in complex systems \cite{williamsRooflineInsightfulVisual2009}. The model combines three metrics: Computational performance, memory bandwidth, operational intensity.
 
-% Using Intel Advisor
-% Set of commands to run the models - part of a HPC MultiBench workflow
+Computer hardware can be modelled as three components: execution units, data sources, and the interconnection between them. Computational performance measures how fast these execution units can process data in FLOP/s, and memory bandwidth measures the rate at which data can be transmitted across the interconnection in Bytes/s. As computational performance, memory bandwidth quantify hardware performance, operational intensity quantifies software performance. It refers to the average amount of data required per operation in a program, in FLOPS/byte. Rooflines are then drawn as, as shown in Figure \ref{fig:ert-roofline}, on a log-log axis, with the ``loft'' being a 45 degree line sloping up, and the ``ceiling'' a horizontal line.
 
-The Intel\textregistered\ Advisor tool is part of the Intel\textregistered\ oneAPI\texttrademark\ suite. It is ``'' \cite{}, and can be used to generate roofline plots. This is commonly done using its graphical user interface, but it is possible to also generate plots as minified HTML files from the command line. Listing \ref{listing:roofline-generation} shows the sequence of commands required to generate the roofline plots for an executable. 
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+      \pgfplotsset {
+        scale only axis,
+        axis equal image,
+        width=5in,
+        /pgf/number format/1000 sep={},
+        /tikz/maxline/.style={blue, thick, no marks},
+        /tikz/memline/.style={red, thick, no marks},
+        /tikz/maxlabel/.style={blue!40!black, right, fill=white, fill opacity=0.7, text opacity=1.0, rounded corners=2pt, inner sep=0.5pt},
+        /tikz/memlabel/.style={red!50!black, rotate=45, right, fill=white, fill opacity=0.7, text opacity=1.0, rounded corners=2pt, inner sep=0.5pt}
+      }
+    
+      \def\Xmin{1.000000e-02}
+      \def\Xmax{1.000000e+02}
+    
+      \begin{loglogaxis}[
+        grid=both,
+        grid style={black!50, densely dotted},
+        xlabel= FLOPs/Byte,
+        ylabel= GFLOPs/sec,
+        xmin=\Xmin,
+        xmax=\Xmax,
+        ymin=1.500000e+00,
+        ymax= ,
+        log ticks with fixed point
+        ]
+    
+        \node[maxlabel] at (axis cs: 1.9000000e+00,1.8448000e+01) {22.0 FP64/sec (Maximum)};
+        \node[memlabel] at (axis cs: 1.1036459e-01,2.1571047e+00) {DRAM - 24.9 GB/s};
+        \addplot[memline, domain=(\Xmin:8.8336673e-01)] {2.4950000e+01*x};
+        \addplot[maxline, domain=(8.8336673e-01:\Xmax)] {2.2040000e+01};
+    
+      \end{loglogaxis}
+    \end{tikzpicture}
+    \caption{A roofline graph, modified from the output of the Empirical Roofline Tool \cite{EmpiricalRooflineTool}.}
+    \label{fig:ert-roofline}
+\end{figure}
+
+The paper summarises the roofline model as ``set[ing] an upper bound on performance of a kernel depending on the kernel’s operational intensity. If we think of operational intensity as a column that hits the roof, either it hits the flat part of the roof, meaning performance is compute-bound, or performance is ultimately memory-bound'' \cite{williamsRooflineInsightfulVisual2009}. This allows the easy identification of where optimisations for the kernel might be possible.
+
+Later, Ilic, Pratas and Sousa proposed a modification to the roofline model to include information about cache bandwidths in their paper ``Cache-aware Roofline model: Upgrading the loft'' \cite{ilic_cache-aware_2014}. This adds multiple ``lofts'', as the memory bandwidth of caches are higher that of main memory. In addition to this, SIMD instructions can result in additional ceilings, as the peak attainable computational performance of vectorised instructions is necessarily higher.
+
+Roofline models are a powerful technique to simply characterise the bottlenecks in software. As such, tools such as the Intel\textregistered\ Advisor can be used to generate them.
+
+\subsubsection{Generating rooflines with Intel\textregistered\ Advisor}
+\label{sssec:roofline-generation-intel-advisor}
+
+The Intel\textregistered\ Advisor tool is part of the Intel\textregistered\ oneAPI\texttrademark\ suite. Intel describes it as ``a design and analysis tool for developing performant code'' \cite{DesignCodeParallelism}, and one of the functionalities it provides is generating roofline plots. This is commonly done using its graphical user interface, but it is possible to also generate plots as minified HTML files from the command line. Listing \ref{listing:roofline-generation} shows the sequence of commands required to generate the roofline plots for an executable. 
 
 \begin{listing}[H]
     \begin{minted}[linenos,breaklines]{bash}
@@ -75,18 +124,31 @@ advisor --report=roofline --project-dir=./ --report-output=./roofline.html
     \label{listing:roofline-generation}
 \end{listing}
 
-Using these plots, we can characterise whether the computational kernels are memory or compute bound in each language, which gives an insight into how their performance can be improved. Roofline plots can be applied to multi-threaded and distributed workloads, however assuming a uniform processor architecture, the degree of parallelism does not significantly impact whether the kernels are computer or memory bound. As such, roofline plots for multi-threaded and distributed workloads are not included here, as they are not relevant and often less clear. Figure \ref{} shows the roofline plot for the C++ implementation of HPCCG, and Figure \ref{} for plot for the Rust implementation.
+Using these plots, we can characterise whether the computational kernels are memory or compute bound in each language, which gives an insight into how their performance can be improved. Roofline plots can be applied to multi-threaded and distributed workloads, however assuming a uniform processor architecture, the degree of parallelism does not significantly impact whether the kernels are computer or memory bound. As such, roofline plots for multi-threaded and distributed workloads are not included here, as they are not relevant and often less clear. Figure \ref{fig:cpp-roofline} shows the roofline plot for the C++ implementation of HPCCG, and Figure \ref{fig:rust-roofline} for plot for the Rust translation.
 
-% Figure
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/5_performance/rooflines/cpp_roofline.png}
+    \caption{A roofline diagram generated by Intel\textregistered\ Advisor\ showing the performance of the C++ implementation of HPCCG.}
+    \label{fig:cpp-roofline}
+\end{figure}
 
-% Figure
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/5_performance/rooflines/rust_roofline.png}
+    \caption{A roofline diagram generated by Intel\textregistered\ Advisor\ showing the performance of the Rust translation of HPCCG.}
+    \label{fig:rust-roofline}
+\end{figure}
 
-From these plots, we can see that both the C++ and Rust implementations appear to be mostly memory bound, with the DRAM bandwidth limiting the performance of the functions.
+From these plots, we can see that both the C++ and Rust implementations appear to be mostly memory bound, with the DRAM bandwidth limiting the performance of the functions. Since these rooflines were generated on very small meshes of size $25 \times 25 \times 25$, to avoid overloading Intel\textregistered\ Advisor, we can see that some of the kernels for both implementations are within the cache section of the plot, as the mesh data is small enough to be fully included in cache memory. We can also see that the \texttt{waxpby}, shown by the upper green dot in Figure \ref{fig:cpp-roofline}, in the C++ is amenable to vectorisation, and as such is able exceed the scalar compute roofline. Finally, the locations of the kernels across the plots differ fairly significantly, indicating the different software loads have different performance characteristics across the two languages.
 
-We can see that the \texttt{waxpby} in the C++ is amenable to vectorisation, and as such is able exceed the scalar compute roofline.
+Overall, C++ has both a higher arithmetic intensity and rate of floating point operations, which indicates it is able to make better use of the compute hardware it runs on. As a result of this, we expect direct measurements of the C++ program to have slightly higher performance.
 
-C++ has both a higher arithmetic intensity and rate of floating point operations.
+In addition to using the Intel\textregistered\ Advisor, HPC MultiBench supports plotting rooflines for performance characterisation at a glance as part of larger test plans. It parses JSON data generated by the Empirical Roofline Tool \cite{EmpiricalRooflineTool} to generate the ceilings, and the Likwid toolkit \cite{RRZEHPCLikwid2024} to calculate operational intensity and performance. An example of this is shown in Figure \ref{}.
 
+% TODO: HPC MultiBench figure here
+
+This figure confirms the statement that the mini-app is memory bound, and shows that employing multi-threading techniques allows implementations to better leverage the hardware they are run on.
 
 Performance profilers provide a very powerful tool for identifying and optimising away hotspots in running programs. However, profilers are typically best suited for measuring many performance metrics in a fixed configuration, such as with a set number of processor threads and MPI ranks. To assess Rust's suitability for High-Performance Computing, we only needed a few metrics such as runtime and FLOPs, but wanted to measure how these varied across a wide range of metrics, with statistical confidence. As a result of this, we switched to a direct measurement approach driven by the HPC MultiBench tool, which was designed for this purpose.
 
@@ -137,39 +199,18 @@ This yet again shows the power of the HPC MultiBench tool beyond the example use
 
 During the course of experimentation, three different compute resources were used: Athena, the author's personal laptop; Kudu, the DCS batch compute system; and Avon, the Warwick SCRTP High-Performance Computing resource. Athena was used for the translation effort and initial testing, but not for any experimental results. However, since tests during the development process informed decisions made during the design process, its system specifications are relevant. Kudu was used for the majority of testing and the project presentation demo, as it is easy to access and has short queue times. Avon was used for later tests to confirm results, and for very large tests which exceeded Kudu's capacity.
 
-Allow for reproducibility of the reported test data, the hardware specifications for the machines used as follows, with the results of \texttt{lscpu} for the machines are listed in Appendix \ref{sec:hardware-specifications} for completeness.
+Allow for reproducibility of the reported test data, the hardware specifications for the machines used as follows, with additional information about the machines listed in Appendix \ref{sec:hardware-specifications} for completeness. For Kudu and Avon, \texttt{slurm} is used to dispatch jobs, so the commands are run from within a \texttt{slurm} job to be representative of the compute nodes rather than the login nodes of the cluster.
 
+% TODO: Convert to table?
 \begin{itemize}
     \item Athena has a \texttt{Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz} with eight logical cores.
     \item Kudu has a \texttt{Intel(R) Xeon(R) CPU E5-2660 v3 @ 2.60GHz} with 40 logical cores.
     \item Avon has a \texttt{Intel(R) Xeon(R) Platinum 8268 CPU @ 2.90GHz} with 48 logical cores.
 \end{itemize}
 
-The \texttt{lstopo} tool can be used to draw a graphical representation of both the hardware composing the system, and its topology. This gives a further insight into the hardware being used to run the tests, beyond the CPU model. Figures \ref{fig:athena-topology}, \ref{fig:kudu-topology} and \ref{fig:avon-topology} show the hardware topologies of the Athena, Kudu, and Avon systems respectively. For Kudu and Avon, \texttt{slurm} is used to dispatch jobs, so the commands are run from within a \texttt{slurm} job to be representative of the compute nodes rather than the login nodes of the cluster.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.75\textwidth]{images/5_performance/athena-topology.png}
-    \caption{A diagram of a hardware topology of Athena.}
-    \label{fig:athena-topology}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{images/5_performance/kudu-topology.png}
-    \caption{A diagram of a hardware topology of Kudu.}
-    \label{fig:kudu-topology}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{images/5_performance/avon-topology.png}
-    \caption{A diagram of a hardware topology of Avon.}
-    \label{fig:avon-topology}
-\end{figure}
-
 The software versions used for benchmarking across the three systems are enumerated in the following table:
 
+% TODO: Add compiler flags
 \begin{table}[H]
     \caption{A table showing the software versions across the three compute resources.}
     \label{table:perfTools}
@@ -184,8 +225,8 @@ The software versions used for benchmarking across the three systems are enumera
     g++              & 13.2.1                           & 9.2.0                          & 11.3.0                         \\\hline
     OpenMP           & 4.5                              & 4.5                            & 4.5                            \\\hline
     rayon            & 1.8.0                            & 1.8.0                          & 1.8.0                          \\\hline
-    Open MPI         & 5.0.2                            & 4.0.5                          & 4.1.4                          \\\hline
-    rs-mpi           & 0.7.0                            & 0.7.0                          & 0.7.0                         \\\hline
+    OpenMPI          & 5.0.2                            & 4.0.5                          & 4.1.4                          \\\hline
+    rs-mpi           & 0.7.0                            & 0.7.0                          & 0.7.0                          \\\hline
     \end{tabular}
 \end{table}
 
@@ -194,7 +235,7 @@ The software versions used for benchmarking across the three systems are enumera
 \label{ssec:strong-scaling}
 
 % What is strong scaling
-Patterson and Hennessy define strong scaling as ``measuring the speed-up [due to parallelisation] while keeping the problem size fixed'' \cite{pattersonHennessyComputerOrganisationArchitecture}. This can be measured by recording the wall clock time taken for a fixed problem, whilst varying the degree of parallelisation, given by number of threads or MPI ranks. It can be used to show how adding more computational resources to a problem effects its performance. A perfect speedup due to parallelisation would decrease execution time linearly with the number of resources added. However, programs with a serial component cannot achieve this perfect speed-up as a corollary of Amdahl's law \cite{amdahlsLaw}:
+Patterson and Hennessy define strong scaling as ``measuring the speed-up [due to parallelisation] while keeping the problem size fixed'' \cite{pattersonHennessyComputerOrganisationArchitecture}. This can be measured by recording the wall clock time taken for a fixed problem, whilst varying the degree of parallelisation, given by number of threads or MPI ranks. It can be used to show how adding more computational resources to a problem effects its performance. An ideal speedup due to parallelisation would decrease execution time linearly with the number of resources added. However, programs with a serial component cannot achieve this ideal speed-up as a corollary of Amdahl's law \cite{amdahlsLaw}:
 
 \begin{equation}
     S = \frac{1}{f + \frac{1-f}{P}}
@@ -202,19 +243,21 @@ Patterson and Hennessy define strong scaling as ``measuring the speed-up [due to
 
 Where $f$ denotes the proportion of execution time spent on the serial component, $P$ the degree of parallelisation, and $S$ the total speedup of the system as a result of parallelisation. For problems well-suited to parallelisation, we expect to see strong speedup approach the upper bound for performance following Amdahl's law.
 
+
 % Strong scaling applied to HPCCG
 In the context of HPCCG, strong scaling can be measured for single-node (multi-threading only) and multi-node (multi-threading and message passing). Figures \ref{} and \ref{} compare the results of the C++ and Rust implementations for strong scaling across single-node and multi-node approaches.
 
 % Figures
+% Separate and compare kernels or don't bother?
 
 % Summary
-In summary,
+In summary, we can see that both the C++ and Rust implementations strongly scale similarly, and close the theoretical limitation of Amdahl's law
 
 \subsection{Weak scaling}
 \label{ssec:weak-scaling}
 
 % What is weak scaling
-Patterson and Hennessy define weak scaling as ``measuring the speed-up while keeping the problem size fixed'' \cite{pattersonHennessyComputerOrganisationArchitecture}. This can be measured by recording the wall clock time taken, whilst varying the problem size at the same rate as the varying the degree of parallelisation, given by number of threads or MPI ranks. Since the workload grows with the number of resources added, perfect weak scaling is when the execution time remains constant as both factors are increased.
+Patterson and Hennessy define weak scaling as ``measuring the speed-up while keeping the problem size fixed'' \cite{pattersonHennessyComputerOrganisationArchitecture}. This can be measured by recording the wall clock time taken, whilst varying the problem size at the same rate as the varying the degree of parallelisation, given by number of threads or MPI ranks. Since the workload grows with the number of resources added, ideal weak scaling is when the execution time remains constant as both factors are increased.
 
 % Gustafson’s Law 
 Unlike strong scaling, we cannot apply Amdahl's law to characterise weak scaling, since it assumes a fixed problem size. However, this extended case of variable problem size was characterised in 1988 in Gustafson's paper ``Re-evaluating Amdahl's law'' \cite{gustafsonReevaluatingAmdahlLaw1988}. Gustafson's law estimates the speedup, $S$ as a result of parallelisation in terms of the number of processors $N$, and the fractions of time executing the parallel and serial parts of the program, $p$ and $s$ respectively:
@@ -223,6 +266,8 @@ Unlike strong scaling, we cannot apply Amdahl's law to characterise weak scaling
     S &= s + p \times N \\
       &= N + (1 - N) \times s
 \end{align}
+
+From the above equation we can see that for ideal weak scaling to occur, the serial component of the program must remain constant as the degree of parallelism is increased. In real-world applications, we expect this to not be the case, as higher degrees of parallelism often incur higher serial costs, such as handling increased communication for MPI workloads, or overhead from spawning threads for multi-threaded ones.
 
 % Weak scaling applied to HPCCG
 In the context of HPCCG, as with strong scaling, weak scaling can again be measured for single-node (multi-threading only) and multi-node (multi-threading and message passing). Figures \ref{} and \ref{} compare the results of the C++ and Rust implementations for weak scaling across single-node and multi-node approaches.
