@@ -1,8 +1,14 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% THIS CHAPTER IS NOT COMPLETE! %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \chapter{Translation}
 \label{ch:translation} % 4000-5000 words
 
 % In this chapter, we describe the overall design of our solution to the problem identified in \Cref{ch:introduction}, building on work described in \Cref{ch:background}.
 % TODO: Consider some kind of link from introduction
+
+\textbf{This chapter is not complete!}
 
 In this chapter, we discuss the translation process from C++ to Rust of the selected mini-app, HPCCG. First, we introduce the implementation details of HPCCG, along with the translation methodology undertaken. Then, we present a sequence of incrementally performant translations, showing how features of and packages for the Rust language can contribute to the performance of translations of C++ codebases. Next, we discuss approaches for the critical step of program equivalence checking to guarantee comparisons are fair. Finally, we conclude with a section on lessons learned from the process, and a proposed workflow for engineers translating High-Performance C++ codebases to Rust.
 
@@ -93,8 +99,7 @@ Unfortunately, this pointer based implementation presents difficulties when tran
 \section{Implementation}
 \label{sec:translation-implementation} % 3000 words
 
-This section provides a description of the technical details of the translation process. Source code for each of these translation versions can be found in the \texttt{hpccg-rs} GitHub repository.
-% TODO: Add process of writing incrementally optimised translations
+This section provides a description of the technical details of the translation process. In order to guarantee that the Rust implementation is performant as possible, and hence representative of the capabilities of the Rust language, a workflow of incremental improvement wsa adopted for the translation process. First, a direct translation to Rust was undertaken, matching the program model as closely as possible to provide confidence in program equivalence. Then, a number of incremental improvements to the Rust implementation were undertaken to result in a performant serial implementation of the HPCCG mini-app. Then, this serial implementation was modified to implement shared and distributed memory parallelism using Rayon and the Rust MPI bindings. Source code for each of these translation versions can be found in the \texttt{hpccg-rs} GitHub repository.
 
 
 \subsection{Direct translation}
@@ -108,7 +113,7 @@ In C and C++, pointers for memory indirection are incredibly ubiquitous. This is
 This presented the first significant challenge in the translation effort, as the implementation of the Yale representation of sparse matrix in HPCCG relies heavily on raw pointers and pointer arithmetic. This complicates the direct translation process, as references and smart pointers in Rust necessarily have different semantics to raw pointers, and may be less performant. This was identified as a risk during the specification phase, and was captured in the Risk Matrix \ref{tab:risk_matrix}, which is shown in \Cref{ch:project-management} in the discussion of project management. A truncated version of the data structure which implements this Yale representation in C++ is shown in Listing \ref{listing:cpp-sparse-matrix-structure}.
 
 \begin{listing}[H]
-    \begin{minted}[linenos]{rust}
+    \begin{minted}[linenos,breaklines]{c++}
 struct HPC_Sparse_Matrix_STRUCT {
   int total_nrow;
   long long total_nnz;
@@ -120,18 +125,59 @@ struct HPC_Sparse_Matrix_STRUCT {
   int *list_of_inds;
 }
     \end{minted}
-    \caption{A truncated version of the C++ data structure which implements the Yale representation of the sparse matrix in HPCCG.}
+    \caption{A truncated version of the C++ data structure which implements the Yale representation of the sparse matrix, from Heroux's original implementation of HPCCG \cite{MantevoHPCCG2023}.}
     \label{listing:cpp-sparse-matrix-structure}
 \end{listing}
 
-This data structure is then populated to its initial state, with a snippet of the C++ implementation being shown in Listing \ref{}.
-
-This data structure is then populated to its initial state. However, this process presents a challenge, not only because it de-references raw pointers, but also it violates Rust's ownership rules, as there are concurrent mutable and immutable pointers to the data, shown in Listing \ref{}.
-
-The first key insight in the translation process is that the interior mutability pattern of smart pointers, discussed in section 15-5 of the Rust book \cite{RustProgrammingLanguage} can be used to represent this functionality. Instead of arrays of pointers such as \mintinline{c++}{int ** ptr_to_inds_in_row} as shown in Listing \ref{listing:cpp-sparse-matrix-structure}, the \mintinline{rust}{Rc<RefCell<f64>>} construct can be used to create a vector of items which allow concurrent mutable and immutable borrows. This works by presenting a safe interface to an \mintinline{rust}{unsafe} implementations which performs checks at runtime to guarantee memory safety. As such, the data structure shown in Listing \ref{listing:cpp-sparse-matrix-structure} can be re-written in Rust, as shown in Listing \ref{listing:rust-sparse-matrix-structure}.
+This data structure must then be populated to the initial configuration of the conjugate gradient problem, with the reference C++ implementation shown in Listing \ref{listing:cpp-sparse-matrix-structure-population}. This process presents a challenge to the translation process, not only because it dereferences raw pointers, but also it violates Rust's ownership rules, as there are concurrent mutable and immutable pointers to the data, for example lines 7 and 17 in Listing \ref{listing:cpp-sparse-matrix-structure-population}.
 
 \begin{listing}[H]
-    \begin{minted}[linenos]{rust}
+    \begin{minted}[linenos,breaklines]{c++}
+for (int iz=0; iz<nz; iz++) {
+    for (int iy=0; iy<ny; iy++) {
+        for (int ix=0; ix<nx; ix++) {
+        int curlocalrow = iz*nx*ny+iy*nx+ix;
+        int currow = start_row+iz*nx*ny+iy*nx+ix;
+        int nnzrow = 0;
+        (*A)->ptr_to_vals_in_row[curlocalrow] = curvalptr;
+        (*A)->ptr_to_inds_in_row[curlocalrow] = curindptr;
+        for (int sz=-1; sz<=1; sz++) {
+            for (int sy=-1; sy<=1; sy++) {
+                for (int sx=-1; sx<=1; sx++) {
+                    int curcol = currow+sz*nx*ny+sy*nx+sx;
+                        if ((ix+sx>=0) && (ix+sx<nx) && (iy+sy>=0) && (iy+sy<ny) && (curcol>=0 && curcol<total_nrow)) {
+                            if (!use_7pt_stencil || (sz*sz+sy*sy+sx*sx<=1)) {
+                                if (curcol==currow) {
+                                    *curvalptr++ = 27.0;
+                                } else {
+                                    *curvalptr++ = -1.0;
+                                }
+                                *curindptr++ = curcol;
+                                nnzrow++;
+                            } 
+                        }
+                }
+            }
+        }
+        (*A)->nnz_in_row[curlocalrow] = nnzrow;
+        nnzglobal += nnzrow;
+        (*x)[curlocalrow] = 0.0;
+        (*b)[curlocalrow] = 27.0 - ((double) (nnzrow-1));
+        (*xexact)[curlocalrow] = 1.0;
+        }
+    }
+}
+    \end{minted}
+    \caption{A truncated version of the C++ function to populate the initial configuration of the sparse matrix, from Heroux's original implementation of HPCCG \cite{MantevoHPCCG2023}.}
+    \label{listing:cpp-sparse-matrix-structure-population}
+\end{listing}
+
+This code snippet exemplifies how HPCCG is not a single computational kernel, nor a toy example, but a mini-app representative of structural complexities in full-scale applications for High-Performance Computing.
+
+The first key insight in the translation process is that the interior mutability pattern of smart pointers, discussed in section 15-5 of the Rust book \cite{RustProgrammingLanguage} can be used to represent this functionality, despite the presence of concurrent mutable and immutable pointers to the data. Instead of arrays of pointers such as \mintinline{c++}{int ** ptr_to_inds_in_row} as shown in Listing \ref{listing:cpp-sparse-matrix-structure}, the \mintinline{rust}{Rc<RefCell<f64>>} construct can be used to create a vector of items which allow concurrent mutable and immutable borrows. This works by presenting a safe interface to an \mintinline{rust}{unsafe} implementations which performs checks at runtime to guarantee memory safety. As such, the data structure shown in Listing \ref{listing:cpp-sparse-matrix-structure} can be re-written in Rust, as shown in Listing \ref{listing:rust-sparse-matrix-structure}.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{rust}
 #[derive(Debug)]
 pub struct SparseMatrix {
     pub total_nrow: i32,
@@ -147,7 +193,60 @@ pub struct SparseMatrix {
     \label{listing:rust-sparse-matrix-structure}
 \end{listing}
 
-However, using this pattern comes at a steep cost to performance, as the guarantees against undefined behaviour are deferred to runtime, meaning every pointer dereference must be bounds checked, doubling the instruction count per dereference. This can be seen in Figure \ref{fig:perf_annot_labelled}, which shows a screenshot of the \texttt{perf} performance profiler, which is introduced in more depth in \ref{ssec:perf profiler}.
+As discussed in \Cref{ch:background}, the dominant computational kernel of HPCCG is sparse matrix-vector computation. Listing \ref{} shows how this is implemented leveraging the Yale sparse matrix representation outlined in Listing \ref{listing:cpp-sparse-matrix-structure}.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{c++}
+int HPC_sparsemv( HPC_Sparse_Matrix *A, const double * const x, double * const y) {
+  const int nrow = (const int) A->local_nrow;
+  for (int i=0; i< nrow; i++) {
+      double sum = 0.0;
+      const double * const cur_vals = 
+     (const double * const) A->ptr_to_vals_in_row[i];
+      const int    * const cur_inds = 
+     (const int    * const) A->ptr_to_inds_in_row[i];
+      const int cur_nnz = (const int) A->nnz_in_row[i];
+      for (int j=0; j< cur_nnz; j++) {
+        sum += cur_vals[j]*x[cur_inds[j]];
+      }
+      y[i] = sum;
+    }
+  return(0);
+}
+    \end{minted}
+    \caption{The C++ function to compute sparse matrix-vector multiplication, from Heroux's original implementatino of HPCCG \cite{MantevoHPCCG2023}.}
+    \label{listing:cpp-sparsemv}
+\end{listing}
+
+Having implemented the data structure leveraging the interior mutability pattern as shown in Listing \ref{listing:rust-sparse-matrix-structure}, this sparse matrix-vector kernel can be translated to Rust, as shown in Listing \ref{listing:rust-sparsemv-direct}. Here, we can see the structural similarities between the original code and the translation, but also instances where smart pointers introduce extra boilerplate, such as the \mintinline{rust}{borrow} function on lines 9 and 10.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{rust}
+pub fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
+    let nrow = matrix.local_nrow as usize;
+    let mut y = Vec::with_capacity(vector.len());
+    let mut start_index = 0;
+    for i in 0..nrow {
+        let mut sum = 0.0;
+        let cur_nnz = matrix.nnz_in_row[i] as usize;
+        for j in 0..cur_nnz {
+            let val = *matrix.list_of_vals[start_index + j].borrow();
+            let ind = *matrix.list_of_inds[start_index + j].borrow() as usize;
+            sum += val * vector[ind];
+        }
+        y.push(sum);
+        start_index += cur_nnz;
+    }
+    y
+}
+    \end{minted}
+    \caption{A direct translation to Rust of the C++ function to compute sparse matrix-vector multiplication.}
+    \label{listing:rust-sparsemv-direct}
+\end{listing}
+
+There are two other computational kernels in HPCCG: calculating a vector dot product, and pairwise summation of two scaled vectors. However, as discussed in \Cref{ch:background}, these take up a much smaller proportion of the runtime than the sparse matrix-vector multiplication. In addition to this, they present significantly less challenge with respect to translation, as they are dependent only on C++ arrays which can be implemented in Rust through the \mintinline{rust}{Vec} type, rather than a custom data structure of pointers as with the sparse matrix representation.
+
+Unfortunately, leveraging the interior mutability pattern comes at a steep cost to performance, as the guarantees against undefined behaviour are deferred to runtime, meaning every pointer dereference must be bounds checked, doubling the instruction count per dereference. This can be seen in Figure \ref{fig:perf_annot_labelled}, which shows a screenshot of the \texttt{perf} performance profiler, which is introduced in more depth in \ref{ssec:perf profiler}.
 
 \begin{figure}[H]
     \centering
@@ -156,27 +255,163 @@ However, using this pattern comes at a steep cost to performance, as the guarant
     \label{fig:perf_annot_labelled}
 \end{figure}
 
-This performance cost is unacceptable for High-Performance Computing use cases, so for Rust to be viable for these purposes there must be a way to avoid incurring this cost.
+This performance cost is unacceptable for High-Performance Computing use cases. Hence, for Rust to be viable for these purposes, there must be a way to avoid incurring this cost.
 
 \subsection{Reworked data structure}
 \label{sec:translation-reworked-data-structure}
 % Restructured data structure
 
+Having made a direct translation of HPCCG into Rust, the next step was to incrementally improve it by modifying the implementation to use a data structure more amenable to Rust's program model.
+
+In Rust, there are many constraints placed on the use of pointers, due to the difficulty to reason about them and their memory safety at compile time. In HPCCG, pointers are exclusively used to define arrays, and to point into positions in other arrays. In addition to this, there are fewer semantic restrictions on indexes in Rust than raw pointers or borrowed references, as they are restricted to the specific domain of accessing arrays, rather than the many use cases pointers support. As a result of this, it was decided to re-work the Yale representation data structure of the sparse matrix to use indexing as opposed to pointers.
+
+As part of its rich type system, the Rust language provides a data type specific to data used as indexes, called \mintinline{rust}{usize}. The amount of data stored by this type depends on the address space of the machine it is compiled on, with 32-bit architectures having the same domain as the \mintinline{rust}{u32} -- an unsigned 32 bit integer, and 64-bit architectures having the same domain as \mintinline{rust}{u64}. This guarantees that any length of array can be indexed by this type, but also differentiates data which is used as an index from other data, allowing developers to more intuitively understand the meaning of code through its type system.
+
+This switch to using and index, rather than pointer, based implementation is shown in Listing \ref{listing:rust-sparse-matrix-structure-indexed}, which contrasts the direct Rust translation shown in Listing \ref{listing:rust-sparse-matrix-structure}. This change also reduces the complexity of the implementation to populate the initial configuration of the sparse matrix. In the index based structure, only the vector \mintinline{rust}{push} and indexing operations are required, whereas the direct translation using smart pointers also requires careful use of the \mintinline{rust}{borrow_mut} and \mintinline{rust}{clone} operations. This reduces the total wall time required to run the program, which includes the time to populate the initial configurations for the mini-app.
+
+In addition to this, a second key insight is that the pointers in the \texttt{ptr\_to\_vals\_in\_row} and \texttt{ptr\_to\_inds\_in\_row} both reference the same indices, just in different arrays at different memory addresses. As a result of this, only a single vector of indices is required, rather than two arrays of pointers. This slightly reduces the memory bandwidth required to transfer the sparse matrix, which may increase performance in memory-bound workloads, as discussed in section \ref{sssec:roofline-models} of \Cref{ch:performance}.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{rust}
+#[derive(Debug)]
+pub struct SparseMatrix {
+    pub total_nrow: usize,
+    pub total_nnz: usize,
+    pub nnz_in_row: Vec<usize>,
+    pub row_start_inds: Vec<usize>,
+    pub list_of_vals: Vec<f64>,
+    pub list_of_inds: Vec<usize>,
+}
+    \end{minted}
+    \caption{A truncated version of the sparse matrix data structure, re-worked in Rust to use an index rather than pointer based implementation of the Yale representation.}
+    \label{listing:rust-sparse-matrix-structure-indexed}
+\end{listing}
+
+% TODO: Section about sparsemv
+Having adopted this index based approach to the sparse matrix data structure, the implementation of the sparse matrix-vector operation must also be modified. The updated implementation, shown in Listing \ref{listing:rust-sparsemv-indexed}, is structurally very similar to the implementation in the direct translation, shown in Listing \ref{listing:rust-sparsemv-direct}. The main differences are in how values in the sparse matrix are accessed, through a single index accessed on line 6, then re-used across lines 9 and 10, rather than two individual pointers which are then both dereferenced.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{rust}
+pub fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
+    let nrow = matrix.local_nrow;
+    let mut result = Vec::with_capacity(vector.len());
+    for i in 0..nrow {
+        let mut sum = 0.0;
+        let start_ind = matrix.row_start_inds[i];
+        let cur_nnz = matrix.nnz_in_row[i];
+        for j in 0..cur_nnz {
+            sum += matrix.list_of_vals[start_ind + j]
+                * vector[matrix.list_of_inds[start_ind + j]];
+        }
+        result.push(sum);
+    }
+    result
+}
+    \end{minted}
+    \caption{A translation to Rust of the C++ function, using a single-indexed sparse matrix representation to compute sparse matrix-vector multiplication.}
+    \label{listing:rust-sparsemv-indexed}
+\end{listing}
+
+The implementations of the other two computational kernels, calculating a vector dot product and pairwise summation of two scaled vectors, remain unchanged -- as neither of them interact with the sparse matrix implementation.
+
+% Insert figure comparing indexed with direct translation through HPC MultiBench
+% Total wall time, and just the sparsemv and ddot kernels?
+
+Since High-Performance Computing workloads are often array or mesh based, this strategy of replacing pointers with indices still holds for the dominant computational kernels of many full applications. Where pointers cannot be substituted with indices, borrowed references should be preferred, then smart pointers such as the \mintinline{rust}{Rc<RefCell<f64>>} construct as a worst-case solution.
+
 \subsection{Bounds checking}
 \label{sec:translation-bounds-checking}
 % Bounds checking
+% Discussion of bounds checking in rust
+
+In Rust, all array indexing operations are bounds checked by default, to guarantee memory safety. This incurs a performance cost as a result of this comparison operation, and any resultant pipeline stalls as a result of it. As a result of this, the default indexing strategy in Rust is around twice as slow as in languages without these checks, such as C++. This result is explained in depth in section \ref{ssec:perf-profiler} of \Cref{ch:performance}, as part of a discussion of the \texttt{perf} performance profiler.
+
+% How to get around it
+Fortunately, Rust provides a mechanism to disable these runtime checks -- the \texttt{get\_unchecked} function on vectors. However, this function is necessarily \mintinline{rust}{unsafe}, as it could result in accessing uninitialised memory if the programmer provides an index beyond the size of the vector. Listing \ref{listing:rust-sparsemv-unchecked} shows an implementation again using the indexed sparse matrix representation, but this time with unchecked indexing.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{rust}
+pub fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
+    let nrow = matrix.local_nrow;
+    let mut result = Vec::with_capacity(vector.len());
+    for i in 0..nrow {
+        let mut sum = 0.0;
+        let start_ind = unsafe { *matrix.row_start_inds.get_unchecked(i) };
+        let cur_nnz = unsafe { *matrix.nnz_in_row.get_unchecked(i) };
+        for j in 0..cur_nnz {
+            sum += unsafe {
+                matrix.list_of_vals.get_unchecked(start_ind + j)
+                    * vector.get_unchecked(*matrix.list_of_inds.get_unchecked(start_ind + j))
+            };
+        }
+        result.push(sum);
+    }
+    result
+}
+    \end{minted}
+    \caption{A translation to Rust of the C++ function, using unchecked vector indexing to compute sparse matrix-vector multiplication.}
+    \label{listing:rust-sparsemv-unchecked}
+\end{listing}
+
+% Figures comparing performance
+
+However, this approach nullifies Rust's beneficial property of guaranteeing memory safety. We are disabling runtime checks of indexes to gain performance, and hence regressing back to C++ with the only guarantees of memory safety being through programmer confidence. However, the Rust language provides syntax sugars in the form or zero-cost abstractions which can help avoid these unsafe operations in common use cases.
 
 \subsection{Iterators}
 \label{sec:translation-iterators}
 % Iterators
 
+A key feature of Rust is zero-cost abstractions
+
+% Using iterators for HPCCG
+
+% Figures comparing performance
+
+Although in this case the use of iterators does not eliminate the need for unchecked array indexing, it reduces the number of instances of their use, which reduces the surface for possible invalid memory access within a program. It is possible to construct nested iterators such that only one unchecked index operation is required -- which cannot be removed as it is part of the data in the sparse matrix representation, and doesn't range over a known set of values. However, this was not done in this implementation to make the implementation more amenable to the use of Rayon for shared memory parallelism.
+
 \subsection{Shared memory parallelism}
 \label{sec:translation-rayon}
 % Shared-memory parallelism with Rayon
 
+Having modified the Rust implementation to leverage iterators, it is incredibly easy to leverage shared memory parallelism through Rayon. The only change required is replacing instances of the native Rust \texttt{iter} function with the \texttt{par\_iter} function provided by Rayon.
+
+% TODO: Consider moving this to be in the background section `Fearless Parallelism`
+% Introducing rayon over thread primitives
+
+% Using iterators for HPCCG
+Listing \ref{} shows the implementation of the sparse matrix-vector multiplication kernel. This change to leveraging shared memory parallelism requires only two eight characters to be changed -- adding the \texttt{par} prefix to the two outer zipped iterators. In addition to this, as a result of the Rust compiler's static checks, there are much stronger guarantees against data races. Section \ref{ssec:shared-memory-paralellism} of \Cref{ch:background} showed how easy it is to introduce a data race using OpenMP even for a trivial example. However, the ownership constraints and scoping rules of closures for functions over iterators ensure that data cannot be concurrently accessed across threads.
+
+The combination of these two factors, ease of switching to multi-threading and guarantees of correctness, empowers developers to quickly write performant code by leveraging shared memory parallelism.
+
+% Figures comparing performance
+
+In summary, the use of packages such as Rayon allows developers to write multi-threaded Rust code incredibly quickly, and with confidence in its correctness. Due to the current trend in hardware design towards multi-processor architectures in machines discussed in \Cref{ch:background}, this allows developers to fully leverage the performance of commodity hardware, which is crucial in a High-Performance Computing context.
+
 \subsection{Distributed memory parallelism}
 \label{sec:translation-mpi}
 % Distributed-memory parallelism with rs-mpi
+
+% Introducing MPI
+
+The process of translating the MPI aspect of HPCCG into Rust was by far the most difficult part of the translation process. It was significantly more complex than the next most difficult aspect of populating the data structure -- taking around two weeks instead of two days of dedicated work. This difficulty was broadly as a result of three key factors:
+
+\begin{enumerate}
+    \item The length of the codebase to translate -- the \texttt{make\_local\_matrix.cpp} file alone is 612 lines long
+    \item The imperfect mapping between the C++ MPI calls and the Rust MPI bindings
+    \item The poor documentation of the Rust MPI bindings
+\end{enumerate}
+
+% Rust bindings into MPI (+ poor documentation, link to future open source work)
+
+% Translation effort snippets
+
+% Performance
+
+% Summarise final result of all translation
+In summary, the translation effort resulted in a performant implementation of the HPCCG mini-app in Rust, supporting both shared-memory parallelism through Rayon, along with the stretch goal of distributed memory parallelism through the Rust MPI bindings. This demonstrates that it is possible to use Rust for High-Performance Applications, which HPCCG is representative of. However, there are still aspects of Rust which add difficulty to this process, such as the state of the documentation of the Rust bindings to MPI -- but this is likely to improve in the future as Rust and its ecosystem matures.
+
+
+
 
 
 \section{Equivalence checking}
@@ -223,9 +458,10 @@ Test-driven development refers to
 % % `cargo vet`
 
 
-\subsection{Non-determinism in HPCCG}
-\label{sec:hpccg-race-conditions}
-% Explain uncommon bug resulting in non-deterministic results in HPCCG
+% % TODO: Could omit this, it's an interesting aside, but if stuff needs to be cut, this is it
+% \subsection{Non-determinism in HPCCG}
+% \label{sec:hpccg-race-conditions}
+% % Explain uncommon bug resulting in non-deterministic results in HPCCG
 
 
 \section{Lessons learned and proposed workflow}

@@ -1,5 +1,10 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% THIS CHAPTER IS NOT COMPLETE! %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Performance}
 \label{ch:performance} % 2000-2500 words
+
+\textbf{This chapter is not complete!}
 
 As enumerated in the objectives summary section of the introduction \ref{ch:ssec:objectives-summary}, on of the three requirements for Rust's suitability as a language for High-Performance Computing is having a comparable performance to C++, one of the most commonly used languages in current usage.
 
@@ -54,14 +59,33 @@ From these figures, we can see that the the bounds checking operation dominate t
 \subsubsection{Roofline models}
 \label{sssec:roofline-models}
 
-% TODO: HPC Multibench might only be generating advisor html files? Might need to re-arrange some stuff
-% \section{Roofline models}
-% \label{sec:roofline-models}
 % Introducing roofline models
+
 % Using Intel Advisor
-% Using HPC multibench
+% Set of commands to run the models - part of a HPC MultiBench workflow
 
+The Intel\textregistered\ Advisor tool is part of the Intel\textregistered\ oneAPI\texttrademark\ suite. It is ``'' \cite{}, and can be used to generate roofline plots. This is commonly done using its graphical user interface, but it is possible to also generate plots as minified HTML files from the command line. Listing \ref{listing:roofline-generation} shows the sequence of commands required to generate the roofline plots for an executable. 
 
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{bash}
+advisor -collect roofline -project-dir ./ -- ./test_HPCCG
+advisor --report=roofline --project-dir=./ --report-output=./roofline.html
+    \end{minted}
+    \caption{The commands required generate roofline models from the command line.}
+    \label{listing:roofline-generation}
+\end{listing}
+
+Using these plots, we can characterise whether the computational kernels are memory or compute bound in each language, which gives an insight into how their performance can be improved. Roofline plots can be applied to multi-threaded and distributed workloads, however assuming a uniform processor architecture, the degree of parallelism does not significantly impact whether the kernels are computer or memory bound. As such, roofline plots for multi-threaded and distributed workloads are not included here, as they are not relevant and often less clear. Figure \ref{} shows the roofline plot for the C++ implementation of HPCCG, and Figure \ref{} for plot for the Rust implementation.
+
+% Figure
+
+% Figure
+
+From these plots, we can see that both the C++ and Rust implementations appear to be mostly memory bound, with the DRAM bandwidth limiting the performance of the functions.
+
+We can see that the \texttt{waxpby} in the C++ is amenable to vectorisation, and as such is able exceed the scalar compute roofline.
+
+C++ has both a higher arithmetic intensity and rate of floating point operations.
 
 
 Performance profilers provide a very powerful tool for identifying and optimising away hotspots in running programs. However, profilers are typically best suited for measuring many performance metrics in a fixed configuration, such as with a set number of processor threads and MPI ranks. To assess Rust's suitability for High-Performance Computing, we only needed a few metrics such as runtime and FLOPs, but wanted to measure how these varied across a wide range of metrics, with statistical confidence. As a result of this, we switched to a direct measurement approach driven by the HPC MultiBench tool, which was designed for this purpose.
@@ -76,8 +100,11 @@ For Rust to be a suitable language for High-Performance Computing workloads, it 
 
 % In the intro to the book Performance Tuning of Scientific Applications, David Bailey suggests nine guidelines for presenting performance results without misleading the reader. Paraphrasing only slightly, these are: 
 
-Performance is measured as wall time through the UNIX \texttt{time} utility.
-% Different in-program counters exist, but this avoids problems with double counting threads, and includes setup time, which could be beneficial when assessing practical usefullness.
+The experiments are fully defined by the YAML configuration files for the HPC MultiBench tool, providing extremely strong reproducibility characteristics. The salient features this provides include driving the programs across a range of inputs and configurations, along with supporting re-runs to give statistical confidence in the results.
+
+For all experiments in this results section, the programs are run five times. The slowest run is then always discarded as an outlier, due to the possibility of machine noise or network instability for MPI workloads.
+
+The original HPCCG implementation provides a number of different timers which measure the computational kernels. These include clock ticks, resource usage, wall time, and MPI timing intrinsics. By default, resource usage is used for serial and threaded compilations, and MPI timing intrinsics when MPI is used. However, the resource usage timer records the sum of the times for each thread. As a result of this, the \texttt{-DWALL} compiler flag was set to use the wall time. This allows representative comparisons to be made, as otherwise Rust may record faster times for short runs as a result of Rayon's work-stealing threading model. Finally, the UNIX \texttt{time} utility was also used to assess the total runtime including matrix setup, rather than just computational kernel runtimes.
 
 On Kudu, 60GB of RAM was used, and on Avon 40GB was used, due to hardware limitations. During development, smaller RAM sizes were used, resulting in significantly degraded performance as a result of the mesh sizes exceeding allocated RAM, resulting in memory thrashing \cite{pattersonHennessyComputerOrganisationArchitecture}. To mitigate this, these very large RAM sizes were used, which guarantees thrashing does not occur since the mesh size does not exceed the amount of memory used, even for mesh sizes of $400 \times 400 \times 400$.
 
