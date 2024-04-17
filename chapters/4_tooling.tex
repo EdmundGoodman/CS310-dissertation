@@ -50,59 +50,47 @@ In summary, a number of tools exist as wrappers for Slurm for scientific computi
 
 % When building software tooling, it is critical to have a focussed set of goals to inform the design process. Many software tools, particularly within industry, fall victim to scope creep
 
+
+\subsection{User interface}
+\label{sec:hpc-multibench-ui}
+A key design goal of the project was providing an interactive user interface, which can run on remote machines without requiring setup such as configuring X-forwarding. This was motivated by the fact most High-Performance Computing resources are accessed over an SSH connection, which may be proxied through other servers. As a result of this, X-forwarded graphical applications can be flaky or have very high latency. As a result of this, the tool was designed to have a simple command line interface, including a mode to render results interactively in the terminal without requiring X-forwarding
+
+The HPC MultiBench command-line user interface is designed to be familiar to users of existing tools, such as the performance profiler \texttt{perf}. Much like \texttt{perf}, it provides two verb sub-commands \texttt{record} and \texttt{report}. The \texttt{record} command asynchronously dispatches experimental runs via Slurm, and the \texttt{report} command aggregates and presents an analysis of the results of this runs.
+
+In addition to these sub-commands, the \texttt{interactive}
+
+% TODO: Screenshot of UI
+
 \subsection{Configuration file}
 \label{sec:hpc-multibench-configuration-design}
-% YAML design
 The YAML schema of the HPC MultiBench is the key abstraction which drives its ergonomics and simplicity to use. Since the problem of running, aggregating metrics about, and simple analysis of programs is similar across many use cases, it is possible to create a domain-specific configuration language which expresses the majority of the functionality required. In order to maintain the simplicity, and hence usability, of this abstraction, a minority of complex functionality is not supported, but mechanisms such as exporting run data for further analysis are provided to mitigate this issue.
 
 The YAML schema is 
 
 
-\subsection{Command-line interface}
-\label{sec:hpc-multibench-cli-design}
-% CLI design
-
-% TODO: Switch most mintinline to texttt
-The HPC MultiBench command-line user interface is designed to be familiar to users of existing tools, such as the performance profiler \mintinline{bash}{perf}. Much like \mintinline{bash}{perf}, it provides two verb sub-commands \texttt{record} and \texttt{report}. The \texttt{record} command uses the 
-
-
-% \begin{listing}[H]
-%     \begin{minted}[linenos,breaklines]{text}
-% usage: __main__.py [-h] -y YAML_PATH {record,interactive,report} ...
-
-% A Swiss army knife for comparing programs on HPC resources.
-
-% positional arguments:
-%   {record,interactive,report}
-%     record              record data from running the test benches
-%     interactive         show the interactive TUI
-%     report              report analysis about completed test bench runs
-
-% options:
-%   -h, --help            show this help message and exit
-%   -y YAML_PATH, --yaml-path YAML_PATH
-%                         the path to the configuration YAML file
-%     \end{minted}
-%     \caption{A listing showing the help page of the HPC MultiBench tool, the result of running \mintinline{bash}{hpc_multibench --help}.}
-%     \label{listing:replication-study-workflow}
-% \end{listing}
-
-\subsection{Graphical user interface}
-\label{sec:hpc-multibench-gui-design}
-% GUI design
-
 \section{Implementation}
 \label{sec:hpc-multibench-implementation} % 2000 words
 
-% Approach
+\subsection{Configuration file parsing}
+\label{sec:hpc-multibench-gui-design}
 
-% Pydantic for expressive YAML parsing
+\subsection{Data flow pipeline}
+\label{sec:hpc-multibench-gui-design}
 
-% Selected fun code snippets
+% TODO: diagram of data flow
 
-% Tooling
+\subsection{Developer tooling}
+\label{sec:hpc-multibench-developer-tooling}
 
-% Documentation
+For any software development project of non-trivial size, it is critical to leverage industry best practices to maximise productivity. Using the \texttt{scc} \cite{} tool on the \texttt{src/} directory, HPC MultiBench was measured as 1572 lines of Python excluding blank space and code comments. Applying a standard COCOMO developer productivity model as discussed in \Cref{ch:background}, this is estimated to take 4.18 months to develop, and cost \$43,438 in an average industry setting.
+
+These quantitative figures make it clear that 
+
+\subsection{Documentation}
+\label{sec:hpc-multibench-documentation}
+
+% https://edmundgoodman.co.uk/hpc-multibench/
+
 
 \section{Example use case}
 \label{sec:hpc-multibench-example-use-case} % 2000 words
@@ -128,7 +116,7 @@ As a result of the focussed design goals of the HPC MultiBench tool, the workflo
 \begin{enumerate}
     \item Clone the GitHub repository containing the source code
     \item Add the HPC MultiBench tool as a submodule to the repository
-    \item Install the HPC MultiBench tool using \mintinline{bash}{poetry}
+    \item Install the HPC MultiBench tool using \texttt{poetry}
     \item Write a YAML file defining the run configurations and analysis presented in the paper
     \item Use the \texttt{record} command of the HPC MultiBench tool to run the jobs defined by the YAML file
     \item Use the \texttt{report} command of the HPC MulitBench tool to run analyse the results defined by the YAML file
@@ -136,80 +124,85 @@ As a result of the focussed design goals of the HPC MultiBench tool, the workflo
 
 Listing \ref{listing:replication-study-workflow} shows the six terminal commands required to perform these six steps.
 
+% TODO: Consider framing all listings with [linenos,breaklines,frame=single]
 \begin{listing}[H]
-    \begin{minted}[linenos,breaklines,frame=single]{bash}
+    \begin{minted}[linenos,breaklines]{bash}
 git clone https://github.com/lmoran94/eurocc_cfd
 git submodule add https://github.com/EdmundGoodman/hpc-multibench
 cd hpc_multibench && poetry install
 vim ../replication_study.yaml  # The YAML file representing the paper is written here
-poetry run python3 -m hpc_multibench -y ../replication_study.yaml record
-poetry run python3 -m hpc_multibench -y ../replication_study.yaml report
+poetry run python3 -m hpc_multibench \
+    -y generated_results/eurocc_cfd-kudu-results/_test_plans/perf_comparison.yaml \
+    record
+poetry run python3 -m hpc_multibench \
+    -y generated_results/eurocc_cfd-kudu-results/_test_plans/perf_comparison.yaml \
+    report
     \end{minted}
     \caption{A listing of the six bash commands required to run a full replication study of Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.}
     \label{listing:replication-study-workflow}
 \end{listing}
 % TODO: add command to pyproject.toml to remove the need for python3 -m
 
-The necessary complexity to represent the unique aspects of the results being replicated is encoded in the YAML file, which is shown in Listing \ref{listing:replication-study-workflow} as being written in \mintinline{bash}{vim}. This is by far the most involved part of the process, but the abstractions in the design of the YAML schema are designed to make it as simple as possible, whilst still being able to represent most common analyses done by papers.
+The necessary complexity to represent the unique aspects of the results being replicated is encoded in the YAML file, which is shown in Listing \ref{listing:replication-study-workflow} as being written in \texttt{vim}. This is by far the most involved part of the process, but the abstractions in the design of the YAML schema are designed to make it as simple as possible, whilst still being able to represent most common analyses done by papers.
 
-The first step of writing the YAML file is defining the run configurations
+% The first step of writing the YAML file is defining the run configurations
 
-\begin{listing}[H]
-    \begin{minted}[linenos,breaklines]{yaml}
-run_configurations:
-  "cpp-serial":
-    sbatch_config:
-      "nodes": 1
-      "ntasks-per-node": 1
-      "cpus-per-task": 1
-      "exclusive": "mcs"
-      "mem": 60000
-    module_loads: []
-    environment_variables: {}
-    directory: "../C-SER"
-    build_commands:
-      - "make"
-    run_command: "./cfd"
-    \end{minted}
-    \caption{A listing of the YAML configuration defining how the serial C++ version of the program is built and run.}
-    \label{listing:replication-study-workflow}
-\end{listing}
+% \begin{listing}[H]
+%     \begin{minted}[linenos,breaklines]{yaml}
+% run_configurations:
+%   "cpp-serial":
+%     sbatch_config:
+%       "nodes": 1
+%       "ntasks-per-node": 1
+%       "cpus-per-task": 1
+%       "exclusive": "mcs"
+%       "mem": 60000
+%     module_loads: []
+%     environment_variables: {}
+%     directory: "../C-SER"
+%     build_commands:
+%       - "make"
+%     run_command: "./cfd"
+%     \end{minted}
+%     \caption{A listing of the YAML configuration defining how the serial C++ version of the program is built and run.}
+%     \label{listing:replication-study-workflow}
+% \end{listing}
 
-The second step of writing the YAML file is writing the test benches
+% The second step of writing the YAML file is writing the test benches
 
-\begin{listing}[H]
-    \begin{minted}[linenos,breaklines]{yaml}
-benches:
-  "serial":
-    run_configurations:
-      - "cpp-serial"
-      - "fortran-serial"
-      - "rust-serial"
-    reruns:
-      number: 10
-      unaggregatable_metrics:
-        - "Problem size"
-    matrix:
-      args:
-        - "1 5000"
-        - "2 5000"
-        - "4 5000"
-        - "8 5000"
-        # [snip...]
-        - "128 5000"
-    analysis:
-      metrics:
-        "Problem size": "=== RUN INSTANTIATION ===\n\\{.*args: (\\d+) .*\\}"
-        "Total time (s)": "Time for\\s+\\d+ iterations was\\s+([\\d\\.eE\\-+]+)\\s+seconds"
-      line_plots:
-        - title: "Serial Implementation Comparison"
-          x: "Problem size"
-          y: "Total time (s)"
-          y_log: True
-    \end{minted}
-    \caption{A listing of the YAML configuration defining how the serial C++ version of the program is built and run.}
-    \label{listing:replication-study-workflow}
-\end{listing}
+% \begin{listing}[H]
+%     \begin{minted}[linenos,breaklines]{yaml}
+% benches:
+%   "serial":
+%     run_configurations:
+%       - "cpp-serial"
+%       - "fortran-serial"
+%       - "rust-serial"
+%     reruns:
+%       number: 10
+%       unaggregatable_metrics:
+%         - "Problem size"
+%     matrix:
+%       args:
+%         - "1 5000"
+%         - "2 5000"
+%         - "4 5000"
+%         - "8 5000"
+%         # [snip...]
+%         - "128 5000"
+%     analysis:
+%       metrics:
+%         "Problem size": "=== RUN INSTANTIATION ===\n\\{.*args: (\\d+) .*\\}"
+%         "Total time (s)": "Time for\\s+\\d+ iterations was\\s+([\\d\\.eE\\-+]+)\\s+seconds"
+%       line_plots:
+%         - title: "Serial Implementation Comparison"
+%           x: "Problem size"
+%           y: "Total time (s)"
+%           y_log: True
+%     \end{minted}
+%     \caption{A listing of the YAML configuration defining how the serial C++ version of the program is built and run.}
+%     \label{listing:replication-study-workflow}
+% \end{listing}
 
 A full listing of the YAML file for the replication study is provided in Appendix \ref{}. It is only ~225 lines long, much of which can be templated from examples in the tool documentation. This is significantly shorter in line length than the code that would be required to script running all the configurations of the programs, aggregating the results, and plotting graphs for them -- and avoids much of the time spent debugging that would be required for writing such custom scripts.
 

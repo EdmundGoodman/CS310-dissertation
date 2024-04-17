@@ -5,18 +5,12 @@
 \chapter{Translation}
 \label{ch:translation} % 4000-5000 words
 
-% In this chapter, we describe the overall design of our solution to the problem identified in \Cref{ch:introduction}, building on work described in \Cref{ch:background}.
-% TODO: Consider some kind of link from introduction
-
 \textbf{This chapter is not complete!}
 
 In this chapter, we discuss the translation process from C++ to Rust of the selected mini-app, HPCCG. First, we introduce the implementation details of HPCCG, along with the translation methodology undertaken. Then, we present a sequence of incrementally performant translations, showing how features of and packages for the Rust language can contribute to the performance of translations of C++ codebases. Next, we discuss approaches for the critical step of program equivalence checking to guarantee comparisons are fair. Finally, we conclude with a section on lessons learned from the process, and a proposed workflow for engineers translating High-Performance C++ codebases to Rust.
 
-% Explain the goals of the effort
 The overall goal of this effort is to generate a software product -- a Rust translation of the HPCCG codebase, with strong performance running in serial, and leveraging shared and distributed memory parallelism. On top of this, we propose a approaches for equivalence checking such translations, and use them to give confidence the Rust translation of HPCCG can be used for fair performance comparisons with the reference C++ version.
 
-% Explain the difficulties of the effort
-% No-one else has done a whole mini-app, just single kernels and toy examples
 As discussed in \Cref{ch:background}, this translation effort is novel with respect to assessing High-Performance Computing for a number of reasons. Previous literature has translated only single computation kernels \cite{} with support for shared and distributed memory parallelism, or very short ``toy example'' applications of around only 150 lines \cite{} \cite{} with support for only shared memory parallelism. In contrast to this, HPCCG is a standard mini-app as part of the Mantevo suite, with the C++ version totalling 1524 lines and having support for both shared and distributed memory parallelism. This order of magnitude increase in codebase length over modern existing work \cite{moranEmergingTechnologiesRust2023} \cite{costanzoPerformanceVsProgramming2021}, along with support for distributed memory parallelism outside of single computation kernel contexts provides a valuable insight into the suitability of Rust in High-Performance Computing, but at the cost of significant developer effort as compared with existing work.
 
 \section{Design}
@@ -46,9 +40,7 @@ When translating from languages which allow undefined behaviour such as C++ to R
 
 \subsection{Overview of HPCCG}
 \label{sec:overview-hpccg}
-% Overview of HPCCG
 
-% Cite yale normally being index based
 As discussed in the background to HPCCG in section \ref{ssec:hpccg}, the dominant computation kernel is an implementation of sparse matrix-vector multiplication, along with two other kernels, the vector dot product and pairwise summation of two scaled vectors. To facilitate performant implementation of these operations, HPCCG uses a pointer based implementation of the Yale format to represent sparse matrices. The following example describes how HPCCG uses a pointer-based variant of the compressed row storage format to represent sparse matrices, such as the one shown in Equation \ref{eq:exampleMatrix}.
 
 \begin{align}
@@ -99,7 +91,6 @@ This section provides a description of the technical details of the translation 
 
 \subsection{Direct translation}
 \label{sec:translation-direct}
-% Naive translation + explaining Rust ownership and borrowing
 The first translation was designed to be as direct a mapping between the program models of C++ and Rust as possible. This helped develop a strong understanding of the codebase, and gave initial confidence in program equivalence, as the only factor which could affect program functionality is the language semantics of Rust differing from C++.
 
 In C and C++, pointers for memory indirection are incredibly ubiquitous. This is especially true in High-Performance computing, where codebases often operate on multi-dimensional arrays representing meshes, which are represented in C++ by pointers. However, using pointers in this way makes programs very susceptible to bugs, for example accessing uninitialised memory as a result of faulty pointer arithmetic. As discussed in section \ref{ssec:rust-indirection}, which covered memory indirection in Rust, interaction with raw pointers in Rust is considered an \mintinline{rust}{unsafe} operation, as it is difficult to statically guarantee that it will not result in undefined behaviour. Much of the behaviour of pointers can instead be implemented through borrowing. However, the borrow checker is overly restrictive for some use cases, requiring the use of smart pointers.
@@ -254,7 +245,6 @@ This performance cost is unacceptable for High-Performance Computing use cases. 
 
 \subsection{Reworked data structure}
 \label{sec:translation-reworked-data-structure}
-% Restructured data structure
 
 Having made a direct translation of HPCCG into Rust, the next step was to incrementally improve it by modifying the implementation to use a data structure more amenable to Rust's program model.
 
@@ -312,11 +302,8 @@ Since High-Performance Computing workloads are often array or mesh based, this s
 
 \subsection{Bounds checking}
 \label{sec:translation-bounds-checking}
-% Bounds checking
-% Discussion of bounds checking in rust
 In Rust, all array indexing operations are bounds checked by default, to guarantee memory safety. This incurs a performance cost as a result of this comparison operation, and any resultant pipeline stalls as a result of it. As a result of this, the default indexing strategy in Rust is around twice as slow as in languages without these checks, such as C++. This result is explained in depth in section \ref{ssec:perf-profiler} of \Cref{ch:performance}, as part of a discussion of the \texttt{perf} performance profiler.
 
-% How to get around it
 Fortunately, Rust provides a mechanism to disable these runtime checks -- the \texttt{get\_unchecked} function on vectors. However, this function is necessarily \mintinline{rust}{unsafe}, as it could result in accessing uninitialised memory if the programmer provides an index beyond the size of the vector. Listing \ref{listing:rust-sparsemv-unchecked} shows an implementation again using the indexed sparse matrix representation, but this time with unchecked indexing.
 
 \begin{listing}[H]
@@ -354,16 +341,14 @@ However, this approach nullifies Rust's beneficial property of guaranteeing memo
 
 \subsection{Iterators}
 \label{sec:translation-iterators}
-% Iterators
 
 Along with its rich type system, iterators are one of the places where the influence of functional languages on Rust is most clear. Functions such as \texttt{map}, \texttt{zip}, and \texttt{fold} process streams of data, taking inline functional closures as arguments to define their behaviour. This style of programming is particularly amenable to memory safety, as functions such as \texttt{map} typically operate on a single stream of data, avoiding the problem of holding multiple mutable references.
 
 A key feature of Rust is zero-cost abstractions. Ibrahim Dursun describes this as ``your flavour of code doesn’t affect the performance. It doesn’t matter if you use loops or closures, they all compile down to the same assembly'' \cite{RustZeroCost2020}. Iterators are a common example of such zero-cost abstractions, as they provide a syntactic sugar for writing common list operations in a functional way which compiles down to at least equally performant assembly as a simple loop. In fact, iterators can provide a performance benefit over looping through and individually indexing a vector. Since the iterator abstraction knows the length of the list internally, it can guarantee that its indexing operations are within bounds, so can perform \mintinline{rust}{unsafe} unchecked indexing internally whilst still providing a safe API.
 % TODO: Add assembly example to confirm correctness?
 
-Listing \ref{listing:rust-sparsemv-iterator} again shows an implementation of sparse matrix-vector multiplication, but this time leveraging iterators. This approach is structurally quite different to all previous ones, as it replaces the two nested loops by zipping two iterators together, than mapping over them. 
+Listing \ref{listing:rust-sparsemv-iterator} again shows an implementation of sparse matrix-vector multiplication, but this time leveraging iterators. This approach is structurally quite different to all previous ones, as it replaces the two nested loops by zipping two iterators together, than mapping over them.
 
-% Using iterators for HPCCG
 \begin{listing}[H]
     \begin{minted}[linenos,breaklines]{rust}
 pub fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
@@ -397,7 +382,6 @@ Although in this case the use of iterators does not eliminate the need for unche
 
 \subsection{Shared memory parallelism}
 \label{sec:translation-rayon}
-% Shared-memory parallelism with Rayon
 
 \Cref{ch:background} introduces Rust's approach to ``Fearless Concurrency'' in \ref{ssec:rust-fearless-concurrency}. Having modified the Rust implementation to leverage iterators, it is incredibly easy to leverage shared memory parallelism through Rayon. The only change required is replacing instances of the native Rust \texttt{iter} function with the \texttt{par\_iter} function provided by Rayon. As such, the sparse matrix-vector multiplication kernel can be implemented as shown in Listing \ref{}.
 
@@ -432,16 +416,13 @@ pub fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
     \label{listing:rust-sparsemv-rayon}
 \end{listing}
 
-% Using iterators for HPCCG
 This change to leveraging shared memory parallelism requires only two eight characters to be changed -- adding the \texttt{par} prefix to the two outer zipped iterators. In addition to this, as a result of the Rust compiler's static checks, there are much stronger guarantees against data races. Section \ref{ssec:shared-memory-paralellism} of \Cref{ch:background} showed how easy it is to introduce a data race using OpenMP even for a trivial example. However, the ownership constraints and scoping rules of closures for functions over iterators ensure that data cannot be concurrently accessed across threads. The combination of these two factors, ease of switching to multi-threading and guarantees of correctness, empowers developers to quickly write performant code by leveraging shared memory parallelism.
 
 In summary, the use of packages such as Rayon allows developers to write multi-threaded Rust code incredibly quickly, and with confidence in its correctness. Due to the current trend in hardware design towards multi-processor architectures in machines discussed in \Cref{ch:background}, this allows developers to fully leverage the performance of commodity hardware, which is crucial in a High-Performance Computing context.
 
 \subsection{Distributed memory parallelism}
 \label{sec:translation-mpi}
-% Distributed-memory parallelism with rs-mpi
 
-% Introducing MPI
 \Cref{ch:background} introduced MPI as a standard for distributed memory parallelism with implementations in languages such as C++, FORTRAN and Java in \ref{ssec:distributed-memory-paralellism}. Unfortunately, Rust is notable in its absence from this list of languages with MPI implementations. However, a key feature of Rust is its support for foreign function interfaces, allowing it to invoke functions implemented in other languages. This means that a Rust can bind into a C++ implementation of MPI using a foreign function interface, then provide a safe API over these bindings. The \texttt{mpi} crate \cite{RsmpiRsmpi2024} provides these bindings, along with an idiomatic, ``rustic'', interface.
 
 The process of translating the MPI aspect of HPCCG into Rust was by far the most difficult part of the translation process. It was significantly more complex than the next most difficult aspect of populating the data structure -- taking around two weeks instead of two days of dedicated work. This difficulty was broadly as a result of three key factors:
@@ -465,8 +446,6 @@ In order to fairly assess the suitability of Rust for High-Performance Computing
 
 This section presents performance measurements, using the HPC MultiBench tool introduced in \Cref{ch:hpc-multibench}, of the total and individual kernel runtimes across the translations, and discusses the impact of the techniques applied on these results.
 
-%% Rust translation improvements
-% Total time bar chart
 Figure \ref{fig:translations_total_line} provides an overall picture on how the different translations affect performance. It shows how the total wall time of each translation scales with the overall mesh size, making it clear that each incremental translation improves the performance of the mini-app as a whole, but with significant diminishing returns.
 
 \begin{figure}[H]
@@ -476,8 +455,6 @@ Figure \ref{fig:translations_total_line} provides an overall picture on how the 
     \label{fig:translations_total_line}
 \end{figure}
 
-
-% sparsemv only
 Having seen the overall picture, we can analyse the performance of each kernel. The dominant kernel in the HPCCG mini-app is the sparse matrix-vector multiplication operation. We can see that the data structure refactor has a profound impact on performance here. The remaining kernels have a much smaller impact, with reducing the memory bandwidth required by adopting single indexing making a small improvement, then avoiding bounds checks or using iterators having very similar improvements in performance beyond that.
 
 \begin{figure}[H]
@@ -487,7 +464,6 @@ Having seen the overall picture, we can analyse the performance of each kernel. 
     \label{fig:translations_waxpby_line}
 \end{figure}
 
-% ddot/waxpby only
 Figures \ref{fig:translations_ddot_line} and \ref{fig:translations_waxpby_line} show the wall time taken for the vector dot product and pairwise summation of two scaled vector kernels respectively. As compared with the sparse matrix-vector kernel, shown in Figure \ref{fig:translations_waxpby_line}, they are much less affected by data structure refactoring for small values, but then more affected for large values. This might be due to caching behaviours, as the direct translation requires more data to operate on, hence resulting in cache capacity misses for smaller meshes.
 
 \begin{figure}[H]
@@ -504,14 +480,12 @@ Figures \ref{fig:translations_ddot_line} and \ref{fig:translations_waxpby_line} 
     \label{fig:translations_waxpby_line}
 \end{figure}
 
-
-%% Parallelism comparison
 In addition to characterising how different translations affect performance, we can also get a preliminary understanding of the efficacy of different parallelism techniques in Rust. Figure \ref{} shows the relative performance as characterised by the scaling of total wall time for serial, multi-threaded, MPI, and hybrid translations of the HPCCG mini-app.
 
+% TODO: Add parallelism comparison figure
 
 Here we can see that multi-threading is by far the most performant for small workloads on a single computer node. However, message passing approaches provide the capability to scale processing to clustered compute resources beyond the shared memory architecture of a single machine, and can be used in combination with multi-threaded approaches.
 
-% Summarise final result of all translation
 In summary, the translation effort resulted in a performant implementation of the HPCCG mini-app in Rust, supporting both shared-memory parallelism through Rayon, along with the stretch goal of distributed memory parallelism through the Rust MPI bindings. This demonstrates that it is possible to use Rust for High-Performance Applications, for which HPCCG is representative workload. However, there are still aspects of Rust which add difficulty to this process, such as the state of the documentation of the Rust bindings to MPI -- but this is likely to improve in the future as Rust and its ecosystem matures.
 
 
@@ -521,25 +495,35 @@ In summary, the translation effort resulted in a performant implementation of th
 
 Equivalence checking is critical to make performance comparisons between programs fair. In order to draw conclusions about the performance of the Rust translation of HPCCG, there must be strong confidence that it provides the same functionality as the C++ version. Taking this to its logical extremes, a Rust program which immediately terminates will have a much lower total runtime than the C++ implementation of HPPCG, but it clearly would not be a fair comparison of Rust and C++. However, the usefulness of equivalence checking is not only for ensuring performance comparisons are fair. Any translation effort from existing C++ code to Rust 
 
-As a result of this, a significant part of this project is developing techniques and workflows to equivalence check
+As a result of this, a significant part of this project is developing techniques and workflows to equivalence check. The following sections enumerate four possible techniques for equivalence checking 
 
 \subsection{End-to-end testing}
 \label{sec:equivalence-end-to-end}
-% end-to-end testing
 
-The simplest form of equivalence checking is end-to-end testing. This refers to running programs with the same input data, and asserting that they yield the same outputs.
+The simplest form of equivalence checking is end-to-end testing. This refers to running programs with the same input data, and asserting that they yield the same outputs. A key benefit of this approach is its simplicity -- no extra instrumentation or programming effort is required, only running the program as it would be in a production application. As a result of this, it is difficult to implement incorrectly, so can be used as a ``sanity check'' to identify issues in other more complex testing apparatus.
+
+However, end-to-end testing has a number of drawbacks, which primarily stem from its weak guarantees of test coverage. For example, a single set of input data may not fully exercise the control flow of the program, so cannot identify non-equivalent code in these areas which are not executed. The impact of this depends on the structure of the program, as single inputs to programs with many different conditional branches will only exercise a small proportion of the program, but for programs with only a single path of execution would exercise all of them.
+
+During the development of the Rust translation of HPCCG, end-to-end testing was used to quickly test that minor changes to implementation did not obviously break program equivalence. This was broadly effective, as HPCCG has few conditional branches, so end-to-end testing provides high code coverage. This was then complemented by applying further verification techniques at less frequent intervals.
+
+In summary, end-to-end testing can be effectively leveraged as part of an equivalence checking methodologies, with its simplicity encouraging developers to regularly check for obvious signs of broken equivalence. However, it is does not provide strong guarantees of equivalence, especially for highly branching code, so is best used in combination with other verification techniques.
 
 \subsection{Formal methods}
-\label{sec:equivalence-end-to-end}
-% formal methods (and why they aren't suitable)
+\label{sec:equivalence-formal-methods}
 
-\subsection{Assembly and IR analysis}
-\label{sec:equivalence-end-to-end}
-% LLVM analysis (and why it is hard to scale)
+Another approach to equivalence checking is formal methods. R. Butler defines such approaches as ``mathematically rigorous techniques and tools for the specification, design and verification of software and hardware systems'' \cite{LangleyFormalMethods}. These approaches are most commonly applied to critical components in hardware design, where a single error could break a silicon tape-out, each of which cost in the order of millions of pounds.
+
+One of the earliest applications of formal methods to proving program correctness was Hoare logic \cite{hoareAxiomaticBasisComputer1969}. Hoare logic is a sequence of triples representing atomic steps in programming execution and their pre and post conditions, along with inference rules to express constructs in imperative programs. By the application inference rules, theorems about properties of programs can be proven. Such approaches are desirable as they provide strong guarantees of correctness, but unfortunately they are exceedingly difficult to apply to non-trivial programs.
+
+Unfortunately, traditional formal methods are not well suited to checking equivalence between programs in different languages. This is because proofs exist within the formal system, but rely on a process to convert programs into these systems. The difference in program semantics between languages means that building a conversion algorithm which is consistent across two languages is almost impossible.
+
+\subsection{Assembly and IR comparison}
+\label{sec:equivalence-ir-comparison}
+
+A further approach to equivalence checking is the analysis of assembly or intermediate representation emitted by the compiler.
 
 \subsection{Unit testing}
 \label{sec:equivalence-unit-testing}
-% Unit testing
 
 \subsubsection{Test driven development}
 \label{sec:equivalence-tdd}
@@ -565,6 +549,36 @@ Test-driven development refers to
 % \label{sec:hpccg-race-conditions}
 % % Explain uncommon bug resulting in non-deterministic results in HPCCG
 
+
+\section{Developer productivity}
+\label{sec:developer-productivity}
+
+As discussed in the literature review, Diehl et al. use a COCOMO model to estimate the developer effort across languages to implement the same functionality \cite{diehlBenchmarkingParallel1D2023}. They conclude that Rust requires slightly less developer effort by comparing the quantitative results of this model.
+
+The \texttt{scc} tool counts lines of code, and uses a COCOMO model to quantitatively estimate developer effort. Table \ref{tab:scc-language-comparison} shows the results of running this tool on the source directories of the Rust and C++ implementations, both leveraging shared and distributed memory parallelism.
+
+\begin{table}[H]
+    \centering
+    \caption{The results of running the \texttt{scc} on the C++ and Rust implementations of HPCCG, quantitatively assessing developer productivity. For all metrics, smaller is better.}
+    \label{tab:scc-language-comparison}
+    \begin{tabular}{|l||l|l|l|}
+    \hline
+    \textbf{Metric}             & \textbf{Rust} & \textbf{C++} & \textbf{Rust scale factor} \\ \hline\hline
+    Lines of code               & 999           & 1595         & 62.6\%                     \\ \hline
+    Estimated complexity        & 116           & 224          & 51.8\%                     \\ \hline
+    Estimated schedule (months) & 3.49          & 4.20         & 83.1\%                     \\ \hline
+    Estimated cost (\$)         & 26986         & 44105        & 61.2\%                     \\ \hline
+    \end{tabular}
+\end{table}
+
+
+% TODO: Decide whether this is funny/appropriate/too close to the bone...
+Under the crushing weight of capitalism, developer productivity can be most effectively assessed by the generation of shareholder value, that is to say estimates of developer cost for a fixed set of functionality. By the quantitative estimate of this metric shown in Table \ref{tab:scc-language-comparison}, Rust can be assessed as $1.5 \times$ more productive than C++. This contrasts Diehl et al.'s results of a very small impact in developer effort. Two possible reasons for this discrepancy is that the HPCCG is approximately five times larger in lines of code, and Diehl et al do not consider MPI, for which the Rust bindings provide a terse API in comparison with the more verbose C++ specification implementation.
+% From this table, we can see both the line count and estimated total cost of Rust implementation are approximately two thirds of that of the C++ implementation. This contrasts Diehl et al.'s results of a very small impact in developer effort. Two possible reasons for this discrepancy is that the HPCCG is approximately five times larger in lines of code, and Diehl et al do not consider MPI, for which the Rust bindings provide a terse API in comparison with the more verbose C++ specification implementation.
+
+Beyond estimating costs by counting lines of code and applying complexity metrics, there are other tangible impacts on developer productivity provided by the Rust language. As discussed in \Cref{ch:background}, one example of this is Rust's guarantees of memory and concurrency safety, which significantly reduces the time spent debugging flaky bugs as such errors are moved from runtime to compile time. A further example is Rust's robust toolchain, with \texttt{cargo} providing built tooling, package management, auto-formatting, and linting, all in a single convenient command. During the development process, a significant amount of time was spent migrating the C++ implementation build tooling from a Makefile to CMake in order to use the Kokkos performance portability package, which would take only a single command using the Rust toolchain.
+
+% TODO: Could plot a graph of performance vs programming effort
 
 \section{Lessons learned and proposed workflow}
 \label{sec:translation-workflow}
