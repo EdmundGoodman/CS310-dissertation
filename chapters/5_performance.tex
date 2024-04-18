@@ -234,7 +234,6 @@ The software versions used for benchmarking across the three systems are enumera
 \subsection{Strong scaling}
 \label{ssec:strong-scaling}
 
-% What is strong scaling
 Patterson and Hennessy define strong scaling as ``measuring the speed-up [due to parallelisation] while keeping the problem size fixed'' \cite{pattersonHennessyComputerOrganisationArchitecture}. This can be measured by recording the wall clock time taken for a fixed problem, whilst varying the degree of parallelisation, given by number of threads or MPI ranks. It can be used to show how adding more computational resources to a problem effects its performance. An ideal speedup due to parallelisation would decrease execution time linearly with the number of resources added. However, programs with a serial component cannot achieve this ideal speed-up as a corollary of Amdahl's law \cite{amdahlsLaw}:
 
 \begin{equation}
@@ -243,23 +242,50 @@ Patterson and Hennessy define strong scaling as ``measuring the speed-up [due to
 
 Where $f$ denotes the proportion of execution time spent on the serial component, $P$ the degree of parallelisation, and $S$ the total speedup of the system as a result of parallelisation. For problems well-suited to parallelisation, we expect to see strong speedup approach the upper bound for performance following Amdahl's law.
 
+In the context of the HPCCG mini-app, strong scaling can be measured for each of the two parallelism approaches, shared memory with multi-threading and distributed memory with MPI. Comparing the scaling properties of these approaches between the C++ implementation and Rust translation can then yield insight into how the application may perform for very large workloads. Figures \ref{fig:strong_scaling_threaded} and \ref{fig:strong_scaling_mpi} compare the strong scaling characteristics of the total runtimes of the C++ and Rust implementations. The mesh sizes for these benchmarks taken from testing scripts for strong scaling in the original HPCCG repository, ranging from $64 \times 64 \times 1024$ to $64 \times 64 \times 32$ reducing exponentially on the z axis. These mesh sizes are comparatively small, which can be seen in the high impact of serial overhead in these results.
 
-% Strong scaling applied to HPCCG
-In the context of HPCCG, strong scaling can be measured for single-node (multi-threading only) and multi-node (multi-threading and message passing). Figures \ref{} and \ref{} compare the results of the C++ and Rust implementations for strong scaling across single-node and multi-node approaches.
+% TODO: Could cut raw runtime plots if they aren't interesting?
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_threaded.png}
+    \caption{A line plot comparing the strong scaling runtimes of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
+    \label{fig:strong_scaling_threaded}
+\end{figure}
 
-% Figures
-% Separate and compare kernels or don't bother?
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_mpi.png}
+    \caption{A line plot comparing the strong scaling speedups of the C++ and Rust implementations of HPCCG using distributed memory parallelism.}
+    \label{fig:strong_scaling_mpi}
+\end{figure}
 
-% Summary
-In summary, we can see that both the C++ and Rust implementations strongly scale similarly, and close the theoretical limitation of Amdahl's law
+Leveraging the HPC MultiBench framework we can also easily plot the speedup of the two approaches, rather than the raw runtimes. The speedup plots for the C++ and Rust implementations are shown in Figures \ref{fig:strong_scaling_speedup_threaded} and \ref{fig:strong_scaling_speedup_mpi} respectively.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_speedup_threaded.png}
+    \caption{A line plot comparing the strong scaling speedups of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
+    \label{fig:strong_scaling_speedup_threaded}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_speedup_mpi.png}
+    \caption{A line plot comparing the strong scaling runtimes of the C++ and Rust implementations of HPCCG using distributed memory parallelism.}
+    \label{fig:strong_scaling_speedup_mpi}
+\end{figure}
+
+% TODO: Could easily separate and compare kernels, but already over the word count...
+
+Examining the plots showing speedup rather than raw runtime allow better understanding of the trends in program performance. From these speedup plots, we can see that for the small meshes tested Rust's threading model through Rayon of work stealing appears to scale less well than OpenMP, outside of the range of experimental error. However, this is likely due to significant impact the serial overhead of setting up the thread pool has on the total execution time for such small workloads. For MPI, we can see an almost ideal strong scaling speedup of two very straight lines. Again, the speedup of Rust is slightly lower, which is likely due to overhead incurred in invoking the MPI bindings.
+
+In summary, we can see that both the C++ and Rust implementations strongly scale similarly, with both being close the theoretical limitation of Amdahl's law. This evidence of similar strong scalability provides confidence in the suitability of Rust for High-Performance Computing workloads, which require this property to effectively leverage clustered compute resources.
 
 \subsection{Weak scaling}
 \label{ssec:weak-scaling}
 
-% What is weak scaling
 Patterson and Hennessy define weak scaling as ``measuring the speed-up while keeping the problem size fixed'' \cite{pattersonHennessyComputerOrganisationArchitecture}. This can be measured by recording the wall clock time taken, whilst varying the problem size at the same rate as the varying the degree of parallelisation, given by number of threads or MPI ranks. Since the workload grows with the number of resources added, ideal weak scaling is when the execution time remains constant as both factors are increased.
 
-% Gustafson’s Law 
 Unlike strong scaling, we cannot apply Amdahl's law to characterise weak scaling, since it assumes a fixed problem size. However, this extended case of variable problem size was characterised in 1988 in Gustafson's paper ``Re-evaluating Amdahl's law'' \cite{gustafsonReevaluatingAmdahlLaw1988}. Gustafson's law estimates the speedup, $S$ as a result of parallelisation in terms of the number of processors $N$, and the fractions of time executing the parallel and serial parts of the program, $p$ and $s$ respectively:
 
 \begin{align}
@@ -272,16 +298,49 @@ From the above equation we can see that for ideal weak scaling to occur, the ser
 % Weak scaling applied to HPCCG
 In the context of HPCCG, as with strong scaling, weak scaling can again be measured for single-node (multi-threading only) and multi-node (multi-threading and message passing). Figures \ref{} and \ref{} compare the results of the C++ and Rust implementations for weak scaling across single-node and multi-node approaches.
 
-% Figures
+As with strong scaling, weak scaling can be assessed for both parallelism approaches in the context of the HPCCG mini-app. Figures \ref{fig:weak_scaling_threaded} and \ref{fig:weak_scaling_mpi} compare the strong scaling characteristics of the total runtimes of the C++ and Rust implementations. The mesh sizes for these benchmarks are again taken from testing scripts for weak scaling in the original HPCCG repository, with the problem size fixed as $64 \times 64 \times 64$, which is again comparatively small.
+% NOTE: This sounds weird to have the problem size fixed, but is consistent with the testing scripts (https://github.com/Mantevo/HPCCG/blob/master/weakScalingRunScript), and exhibits the expected behaviour???
 
-% Summary
-In summary,
+% TODO: Could cut raw runtime plots if they aren't interesting?
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_threaded.png}
+    \caption{A line plot comparing the weak scaling runtimes of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
+    \label{fig:weak_scaling_threaded}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_mpi.png}
+    \caption{A line plot comparing the weak scaling speedups of the C++ and Rust implementations of HPCCG using distributed memory parallelism.}
+    \label{fig:weak_scaling_mpi}
+\end{figure}
+
+Again, we can leverage the HPC MultiBench framework to plot the speedup of the two approaches, rather than the raw runtimes. The speedup plots for the C++ and Rust implementations are shown in Figures \ref{fig:weak_scaling_speedup_threaded} and \ref{fig:weak_scaling_speedup_mpi} respectively.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_speedup_threaded.png}
+    \caption{A line plot comparing the weak scaling speedups of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
+    \label{fig:weak_scaling_speedup_threaded}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_speedup_mpi.png}
+    \caption{A line plot comparing the weak scaling runtimes of the C++ and Rust implementations of HPCCG using distributed memory parallelism.}
+    \label{fig:weak_scaling_speedup_mpi}
+\end{figure}
+
+As with strong scaling, the speedup plots most effectively show the trends in program performance. The weak scaling trends of the multi-threaded approach are surprising, as the ideal result is a flat line, as seen in the message passing approach. This is likely because the serial overhead of setting up threading for very small thread counts dominates the runtime for small meshes, as a corrolary of Amdahl's law. In addition to this, the speedup trends back down for high thread counts, which could be due to the mesh being insufficiently large to effectively divide work between the threads. The weak scaling speedup of the message passing approach is very consistent across the two languages, with the Rust and C++ implementations being within experimental uncertainty of each other. This is likely because Rust is invoking the same MPI implementation that C++ uses, albeit through bindings.
+
+In summary, we can see that both the C++ and Rust implementations weakly scale similarly, with both parallelism approaches following the same trends across the languages. This evidence of similar weak scalability again provides confidence in the suitability of Rust for High-Performance Computing workloads, which require this property to effectively leverage clustered compute resources.
 
 
 \subsection{Parallelism approaches}
 \label{ssec:parallelism-approaches}
 
-% TODO: cite
+% TODO: cite (same as background)
 In modern High-Performance Computing systems, the majority of performance is achieved through parallelism. As a result of this, for Rust to be suitable for use in High-Performance Computing workloads, it must be able to achieve parallel compute performance similar to that of currently used languages, like C++. This section provides an empirical analysis of the performance of Rust as compared with C++ for increasingly parallel workloads, from serial as a reference to shared memory parallelism through multi-threading and distributed memory parallelism through message passing.
 
 \subsection{Serial execution}

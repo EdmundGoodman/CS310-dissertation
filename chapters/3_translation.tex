@@ -433,7 +433,7 @@ The process of translating the MPI aspect of HPCCG into Rust was by far the most
     \item The minimal documentation of the Rust MPI bindings
 \end{enumerate}
 
-% TODO: Translation effort snippets
+% TODO: MPI translation effort snippets
 
 In summary, it is possible to translate most existing C++ code using MPI into Rust with equivalent functionality using the \texttt{mpi} crate. However, this translation process is involved, requiring expertise which is hard to acquire due to the minimal documentation. As Rust and its ecosystem matures, this process is likely to get easier, with improved documentation and tweaks to the interface design.
 
@@ -517,23 +517,129 @@ One of the earliest applications of formal methods to proving program correctnes
 
 Unfortunately, traditional formal methods are not well suited to checking equivalence between programs in different languages. This is because proofs exist within the formal system, but rely on a process to convert programs into these systems. The difference in program semantics between languages means that building a conversion algorithm which is consistent across two languages is almost impossible.
 
-\subsection{Assembly and IR comparison}
+\subsection{Intermediate representation comparison}
 \label{sec:equivalence-ir-comparison}
 
-A further approach to equivalence checking is the analysis of assembly or intermediate representation emitted by the compiler.
+A further possible approach to equivalence checking is the comparison of assembly or intermediate representation emitted by the compiler. LLVM is a modular framework for compilation originally presented by Latner and Adve in 2004 \cite{lattner2004llvm}, which has since gained popularity, in part due to its ability to generate optimised code irrespective of language. First, language-specific front-end converts the semantics of the program into LLVM IR. Then, LLVM's language independent middle-end applies transformations passes to the optimise the LLVM IR, which is structured to be amenable to this process. Finally, LLVM's hardware-specific back-end converts LLVM IR into appropriate machine code.
+
+Since both C++ and Rust have compilers which use the LLVM framework, \texttt{clang} and \texttt{rustc} respectively, the HPCCG codebases can both converted into LLVM IR. If the programs are equivalent, these generated intermediate representations express the same functionality. As such, the intermediate representation may be similar. This process was attempted for a simple kernel, calculating the vector dot product, using the commands shown in Listing \ref{}, which both generate \texttt{ddot.ll} files containing the LLVM IR.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{bash}
+rustc --emit=llvm-ir --crate-type=lib ddot.rs
+clang++ -cc1 ddot.cpp -emit-llvm
+    \end{minted}
+    \caption{The \texttt{rustc} and \texttt{clang++} invocations to generated LLVM IR for the vector dot product kernel in HPCCG.}
+    \label{listing:rust-sparsemv-rayon}
+\end{listing}
+
+Unfortunately, the program models of Rust and C++ appear to generate quite different intermediate representations, even for simple kernels. For example, Rust's approach to bounded iteration leverages iterators, which results in quite different intermediate representation to C++'s loops which directly increment a mutable variable.
+
+This methodology for equivalence checking may be possible, but would be an involved process to develop tooling to support this. As such, it was decided that comparison of intermediate representation was out of scope for this project, allowing the author to focus on more attainable tooling development, such as the HPC MultiBench tool.
 
 \subsection{Unit testing}
 \label{sec:equivalence-unit-testing}
 
-\subsubsection{Test driven development}
-\label{sec:equivalence-tdd}
+Unit testing refers to testing small components of the overall codebase, such as individual functions, to ensure they have the desired functionality. Since these tests are small in size typically many tests are written, then they are all executed together automatically \cite{archiveddocsTestEarlyOften2012}. A common design pattern for unit tests is the ``Arrange-Act-Assert'', where the data to drive the unit is set up, the unit is executed, and finally the output of the unit is checked. Code coverage of unit tests refers to the proportion of lines in the codebase which are executed across all the tests.
 
-Test-driven development refers to
+The original C++ version of HPCCG does not provide unit tests. As such, a set of unit tests for the C++ version had to be written before they could be leveraged for equivalence checking. The C++ Catch2 \cite{CatchorgCatch22024} framework was used to implement these tests, for example for the vector dot product kernel shown in Listing \ref{listing:cpp-ddot-unit-test}, as it is lightweight and simple to install.
 
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{c++}
+#include <catch2/catch_test_macros.hpp>
+#include "../src/ddot.hpp"
+
+TEST_CASE("Test dot product implementation") {
+    int width = 3;
+    double lhs[] = {1.0, 2.0, 3.0};
+    double rhs[] = {3.0, 2.0, 1.0};
+    double result;
+    double time_allreduce = 0.0;
+    SECTION("Test differing lhs and rhs") {
+        ddot(width, lhs, rhs, &result, time_allreduce);
+        REQUIRE(result == 10.0);
+    }
+    SECTION("Test same lhs and rhs") {
+        ddot(width, lhs, lhs, &result, time_allreduce);
+        REQUIRE(result == 14.0);
+    }
+}
+    \end{minted}
+    \caption{A C++ implementation of unit tests for the vector dot product kernel, using the Catch2 test framework.}
+    \label{listing:cpp-ddot-unit-test}
+\end{listing}
+
+Translated code often has a similar internal structure to the reference implementation, for example internal methods which have the same functionality and provide the same functionality. As a result of this, having written the bank of C++ unit tests, they could be translated to Rust alongside the functions they drive, as the structure remains similar. For example, Listing \ref{listing:rust-ddot-unit-test} shows a Rust translation of the C++ unit test shown in Listing \ref{listing:cpp-ddot-unit-test}, having the same arrange and assert phases, but with the act phase driving the Rust and C++ functions respectively.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,breaklines]{rust}
+#[test]
+fn test_ddot() {
+    let width = 3;
+    let lhs = vec![1.0, 2.0, 3.0];
+    let rhs = vec![3.0, 2.0, 1.0];
+    let result = ddot(width, &lhs, &rhs);
+    assert_eq!(result, 10.0);
+    let result = ddot(width, &lhs, &lhs);
+    assert_eq!(result, 14.0);
+}
+    \end{minted}
+    \caption{A Rust implementation of unit tests for the vector dot product kernel.}
+    \label{listing:rust-ddot-unit-test}
+\end{listing}
+
+By driving code units which should be equivalent across translations with the same arrangement of data, then asserting they produce the same results, strong guarantees of unit equivalence can be achieved. In addition to this, using the \texttt{tarpaulin} crate \cite{xd009642Xd009642Tarpaulin2024} to measure code coverage of the Rust unit tests, we can see that they provide full coverage over all functions excluding timing code and the main function which dispatches the solver. 
+
+This combination of full code coverage and guarantees of equivalence for the tested properties of each unit gives strong confidence in the overall equivalence of the program. However, the process of translating the unit tests is manual, and as such can be susceptible to human error.
 
 \subsection{A novel approach}
 \label{sec:equivalence-polyglotest}
-% polyglotest approach
+
+% The need for tooling to help automate this process
+
+% Autocxx
+
+% A methodology for doing this
+
+% Test-driven development refers to
+
+% How this methodology enables ``pure'' test driven development
+
+
+\section{Developer productivity}
+\label{sec:developer-productivity}
+
+As discussed in the literature review, Diehl et al. use a COCOMO model to estimate the developer effort across languages to implement the same functionality \cite{diehlBenchmarkingParallel1D2023}. They conclude that Rust requires slightly less developer effort by comparing the quantitative results of this model.
+
+The \texttt{scc} tool counts lines of code, and uses a COCOMO model to quantitatively estimate developer effort. Table \ref{tab:scc-language-comparison} shows the results of running this tool on the source directories of the Rust and C++ implementations, both leveraging shared and distributed memory parallelism. For all metrics shown in the table, smaller is better.
+
+\begin{table}[H]
+    \centering
+    \caption{The results of running the \texttt{scc} on the C++ and Rust implementations of HPCCG, quantitatively assessing developer productivity.}
+    \label{tab:scc-language-comparison}
+    \begin{tabular}{|l||l|l|l|}
+    \hline
+    \textbf{Metric}             & \textbf{Rust} & \textbf{C++} & \textbf{Rust scale factor} \\ \hline\hline
+    Lines of code               & 999           & 1595         & 62.6\%                     \\ \hline
+    Estimated complexity        & 116           & 224          & 51.8\%                     \\ \hline
+    Estimated schedule (months) & 3.49          & 4.20         & 83.1\%                     \\ \hline
+    Estimated cost (\$)         & 26986         & 44105        & 61.2\%                     \\ \hline
+    \end{tabular}
+\end{table}
+
+
+% TODO: Decide whether this is funny/appropriate/too close to the bone...
+Under the crushing weight of capitalism, developer productivity can be most effectively assessed by the generation of shareholder value -- that is to say estimates of development cost for a fixed set of functionality. By the quantitative estimate of development cost shown in Table \ref{tab:scc-language-comparison}, Rust can be assessed as $1.5 \times$ more productive than C++. This contrasts Diehl et al.'s results of a very small impact in developer effort. Two possible reasons for this discrepancy is that the HPCCG is approximately five times larger in lines of code, and Diehl et al do not consider MPI, for which the Rust bindings provide a terse API in comparison with the more verbose C++ specification implementation.
+% Developer productivity can be assessed as the generation of value for stakeholders -- that is to say estimates of development cost for a fixed set of functionality. By the quantitative estimate of development cost shown in Table \ref{tab:scc-language-comparison}, Rust can be assessed as $1.5 \times$ more productive than C++. This contrasts Diehl et al.'s results of a very small impact in developer effort. Two possible reasons for this discrepancy is that the HPCCG is approximately five times larger in lines of code, and Diehl et al do not consider MPI, for which the Rust bindings provide a terse API in comparison with the more verbose C++ specification implementation.
+
+Beyond estimating costs by counting lines of code and applying complexity metrics, there are other tangible impacts on developer productivity provided by the Rust language. As discussed in \Cref{ch:background}, one example of this is Rust's guarantees of memory and concurrency safety, which significantly reduces the time spent debugging flaky bugs as such errors are moved from runtime to compile time. A further example is Rust's robust toolchain, with \texttt{cargo} providing built tooling, package management, auto-formatting, and linting, all in a single convenient command. During the development process, a significant amount of time was spent migrating the C++ implementation build tooling from a Makefile to CMake in order to use the Kokkos performance portability package, which would take only a single command using the Rust toolchain.
+
+% TODO: Could plot a graph of performance vs programming effort
+
+\section{Lessons learned and proposed workflow} 
+\label{sec:translation-workflow}
+
+
 
 
 
@@ -548,37 +654,3 @@ Test-driven development refers to
 % \subsection{Non-determinism in HPCCG}
 % \label{sec:hpccg-race-conditions}
 % % Explain uncommon bug resulting in non-deterministic results in HPCCG
-
-
-\section{Developer productivity}
-\label{sec:developer-productivity}
-
-As discussed in the literature review, Diehl et al. use a COCOMO model to estimate the developer effort across languages to implement the same functionality \cite{diehlBenchmarkingParallel1D2023}. They conclude that Rust requires slightly less developer effort by comparing the quantitative results of this model.
-
-The \texttt{scc} tool counts lines of code, and uses a COCOMO model to quantitatively estimate developer effort. Table \ref{tab:scc-language-comparison} shows the results of running this tool on the source directories of the Rust and C++ implementations, both leveraging shared and distributed memory parallelism.
-
-\begin{table}[H]
-    \centering
-    \caption{The results of running the \texttt{scc} on the C++ and Rust implementations of HPCCG, quantitatively assessing developer productivity. For all metrics, smaller is better.}
-    \label{tab:scc-language-comparison}
-    \begin{tabular}{|l||l|l|l|}
-    \hline
-    \textbf{Metric}             & \textbf{Rust} & \textbf{C++} & \textbf{Rust scale factor} \\ \hline\hline
-    Lines of code               & 999           & 1595         & 62.6\%                     \\ \hline
-    Estimated complexity        & 116           & 224          & 51.8\%                     \\ \hline
-    Estimated schedule (months) & 3.49          & 4.20         & 83.1\%                     \\ \hline
-    Estimated cost (\$)         & 26986         & 44105        & 61.2\%                     \\ \hline
-    \end{tabular}
-\end{table}
-
-
-% TODO: Decide whether this is funny/appropriate/too close to the bone...
-Under the crushing weight of capitalism, developer productivity can be most effectively assessed by the generation of shareholder value, that is to say estimates of developer cost for a fixed set of functionality. By the quantitative estimate of this metric shown in Table \ref{tab:scc-language-comparison}, Rust can be assessed as $1.5 \times$ more productive than C++. This contrasts Diehl et al.'s results of a very small impact in developer effort. Two possible reasons for this discrepancy is that the HPCCG is approximately five times larger in lines of code, and Diehl et al do not consider MPI, for which the Rust bindings provide a terse API in comparison with the more verbose C++ specification implementation.
-% From this table, we can see both the line count and estimated total cost of Rust implementation are approximately two thirds of that of the C++ implementation. This contrasts Diehl et al.'s results of a very small impact in developer effort. Two possible reasons for this discrepancy is that the HPCCG is approximately five times larger in lines of code, and Diehl et al do not consider MPI, for which the Rust bindings provide a terse API in comparison with the more verbose C++ specification implementation.
-
-Beyond estimating costs by counting lines of code and applying complexity metrics, there are other tangible impacts on developer productivity provided by the Rust language. As discussed in \Cref{ch:background}, one example of this is Rust's guarantees of memory and concurrency safety, which significantly reduces the time spent debugging flaky bugs as such errors are moved from runtime to compile time. A further example is Rust's robust toolchain, with \texttt{cargo} providing built tooling, package management, auto-formatting, and linting, all in a single convenient command. During the development process, a significant amount of time was spent migrating the C++ implementation build tooling from a Makefile to CMake in order to use the Kokkos performance portability package, which would take only a single command using the Rust toolchain.
-
-% TODO: Could plot a graph of performance vs programming effort
-
-\section{Lessons learned and proposed workflow}
-\label{sec:translation-workflow}
