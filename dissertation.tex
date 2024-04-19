@@ -11,28 +11,30 @@
 
 %%%%%%%%%%%%%%%%%%%%
 
+% https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/format/
+% https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/marking/technical
+% https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/marking/communication
+
 \begin{document}
 
+%TC:ignore
 \input{utils/titlepage.tex}
-
 \pagestyle{plain}
 
 \input{chapters/0_abstract.tex}
 
 % TODO: Add acknowledgements
-% Supervisor for insightful discussions
-% Family/friends 
-% Open source community for building tools
-
-\tableofcontents
-% https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/format/
-% https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/marking/technical
-% https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/marking/communication
+% - Supervisor for insightful discussions
+% - Family/friends 
+% - IBM
+% - Open source community for building tools
 
 % TODO: Make the way figures/tables are captioned consistent, e.g. not starting with ``a figure that shows?''
+\tableofcontents
 \listoffigures
 \listoftables
 \listoflistings
+%TC:endignore
 
 % TODO: Consider switching to include for performance?
 % https://tex.stackexchange.com/questions/246/when-should-i-use-input-vs-include
@@ -46,9 +48,12 @@
 \input{chapters/6_project_management.tex}
 \input{chapters/7_conclusions.tex}
 
+
+%TC:ignore
 \bibliographystyle{IEEEtran}
 \bibliography{bibliography}
 
 \input{utils/appendix}
+%TC:endignore
 
 \end{document}

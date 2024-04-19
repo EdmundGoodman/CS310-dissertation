@@ -643,18 +643,16 @@ The \texttt{scc} tool counts lines of code, and uses a COCOMO model to quantitat
 
 
 % TODO: Decide whether this is funny/appropriate/too close to the bone...
-Under the crushing weight of capitalism, developer productivity can be most effectively assessed by the generation of shareholder value -- that is to say estimates of development cost for a fixed set of functionality. By the quantitative estimate of development cost shown in Table \ref{tab:scc-language-comparison}, Rust can be assessed as $1.5 \times$ more productive than C++. This contrasts Diehl et al.'s results of a very small impact in developer effort. Two possible reasons for this discrepancy is that the HPCCG is approximately five times larger in lines of code, and Diehl et al do not consider MPI, for which the Rust bindings provide a terse API in comparison with the more verbose C++ specification implementation.
-% Developer productivity can be assessed as the generation of value for stakeholders -- that is to say estimates of development cost for a fixed set of functionality. By the quantitative estimate of development cost shown in Table \ref{tab:scc-language-comparison}, Rust can be assessed as $1.5 \times$ more productive than C++. This contrasts Diehl et al.'s results of a very small impact in developer effort. Two possible reasons for this discrepancy is that the HPCCG is approximately five times larger in lines of code, and Diehl et al do not consider MPI, for which the Rust bindings provide a terse API in comparison with the more verbose C++ specification implementation.
+% Under the crushing weight of capitalism, developer productivity can be most effectively assessed by the generation of shareholder value -- that is to say estimates of development cost for a fixed set of functionality. By the quantitative estimate of development cost shown in Table \ref{tab:scc-language-comparison}, Rust can be assessed as $1.5 \times$ more productive than C++. This contrasts Diehl et al.'s results of a very small impact in developer effort. Two possible reasons for this discrepancy is that the HPCCG is approximately five times larger in lines of code, and Diehl et al do not consider MPI, for which the Rust bindings provide a terse API in comparison with the more verbose C++ specification implementation.
+Developer productivity can be assessed as the generation of value for stakeholders -- that is to say estimates of development cost for a fixed set of functionality. By the quantitative estimate of development cost shown in Table \ref{tab:scc-language-comparison}, Rust can be assessed as $1.5 \times$ more productive than C++. This contrasts Diehl et al.'s results of a very small impact in developer effort. Two possible reasons for this discrepancy is that the HPCCG is approximately five times larger in lines of code, and Diehl et al do not consider MPI, for which the Rust bindings provide a terse API in comparison with the more verbose C++ specification implementation.
 
 Beyond estimating costs by counting lines of code and applying complexity metrics, there are other tangible impacts on developer productivity provided by the Rust language. As discussed in \Cref{ch:background}, one example of this is Rust's guarantees of memory and concurrency safety, which significantly reduces the time spent debugging flaky bugs as such errors are moved from runtime to compile time. A further example is Rust's robust toolchain, with \texttt{cargo} providing built tooling, package management, auto-formatting, and linting, all in a single convenient command. During the development process, a significant amount of time was spent migrating the C++ implementation build tooling from a Makefile to CMake in order to use the Kokkos performance portability package, which would take only a single command using the Rust toolchain.
 
 % TODO: Could plot a graph of performance vs programming effort
 
-\section{Lessons learned and proposed workflow} 
-\label{sec:translation-workflow}
-
-
-
+% % TODO: How important is this section?
+% \section{Lessons learned and proposed workflow} 
+% \label{sec:translation-workflow}
 
 
 % % TODO: Could omit this, it's an interesting aside, but if stuff needs to be cut, this is it
