@@ -1,0 +1,98 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{darkslategray38}{RGB}{38,38,38}
+\definecolor{lavender234234242}{RGB}{234,234,242}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{peru22113282}{RGB}{221,132,82}
+\definecolor{steelblue76114176}{RGB}{76,114,176}
+
+\begin{axis}[
+axis background/.style={fill=lavender234234242},
+axis line style={white},
+height=0.3\textheight,
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  draw=lightgray204,
+  fill=lavender234234242
+},
+tick align=outside,
+title={Message Passing Weak Scaling Speedup Plot},
+width=\textwidth,
+x grid style={white},
+xlabel=\textcolor{darkslategray38}{Parallelisation degree},
+xmajorgrids,
+xmajorticks=false,
+xmin=0.25, xmax=16.75,
+xtick style={color=darkslategray38},
+y grid style={white},
+ylabel=\textcolor{darkslategray38}{Total speedup},
+ymajorgrids,
+ymajorticks=false,
+ymin=0.9, ymax=1.1,
+ytick style={color=darkslategray38}
+]
+\path [draw=black, semithick]
+(axis cs:1,1)
+--(axis cs:1,1);
+
+\path [draw=black, semithick]
+(axis cs:2,0.995147517413405)
+--(axis cs:2,1.00772304007729);
+
+\path [draw=black, semithick]
+(axis cs:4,0.996232272058601)
+--(axis cs:4,1.01139208176299);
+
+\path [draw=black, semithick]
+(axis cs:8,0.993228403052343)
+--(axis cs:8,1.00610422235706);
+
+\path [draw=black, semithick]
+(axis cs:16,0.994418379065732)
+--(axis cs:16,1.00906425137842);
+
+\path [draw=black, semithick]
+(axis cs:1,1)
+--(axis cs:1,1);
+
+\path [draw=black, semithick]
+(axis cs:2,0.996063052909887)
+--(axis cs:2,1.0030668346747);
+
+\path [draw=black, semithick]
+(axis cs:4,0.996841727322463)
+--(axis cs:4,1.00082931519654);
+
+\path [draw=black, semithick]
+(axis cs:8,0.996532844145171)
+--(axis cs:8,1.000874592011);
+
+\path [draw=black, semithick]
+(axis cs:16,0.999379959252298)
+--(axis cs:16,1.00889269494295);
+
+\addplot [semithick, steelblue76114176, mark=x, mark size=3, mark options={solid}]
+table {%
+1 1
+2 1.00143527984619
+4 1.00381219387054
+8 0.999666333198547
+16 1.00174129009247
+};
+\addlegendentry{rust-mpi, Mesh x size=64}
+\addplot [semithick, peru22113282, mark=x, mark size=3, mark options={solid}]
+table {%
+1 1
+2 0.99956488609314
+4 0.998835563659668
+8 0.998703718185425
+16 1.00413632392883
+};
+\addlegendentry{rust-mpi, Mesh x size=64}
+\end{axis}
+
+\end{tikzpicture}

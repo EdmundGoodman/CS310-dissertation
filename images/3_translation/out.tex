@@ -1,0 +1,136 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{lightgray204}{RGB}{204,204,204}
+
+\begin{axis}[
+height=0.45\textheight,
+legend cell align={left},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1, draw=lightgray204},
+tick align=outside,
+tick pos=left,
+title={Performance / Productivity},
+width=\textwidth,
+x grid style={darkgray176},
+xlabel={Estimated cost of development [\$]},
+xmin=10161.2, xmax=47182.8,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={Total runtime for \(\displaystyle 200 	imes 200 	imes 200\) mesh [s]},
+ymin=6.4475, ymax=71.4025,
+ytick style={color=black}
+]
+\addplot [
+  draw=white,
+  forget plot,
+  mark=*,
+  only marks,
+  scatter,
+  scatter/@post marker code/.code={%
+  \endscope
+},
+  scatter/@pre marker code/.code={%
+  \expanded{%
+  \noexpand\definecolor{thispointdrawcolor}{RGB}{\drawcolor}%
+  \noexpand\definecolor{thispointfillcolor}{RGB}{\fillcolor}%
+  }%
+  \scope[draw=thispointdrawcolor, fill=thispointfillcolor]%
+},
+  visualization depends on={value \thisrow{draw} \as \drawcolor},
+  visualization depends on={value \thisrow{fill} \as \fillcolor}
+]
+table{%
+x  y  fill
+11844 58.1 31,119,180
+11980 11.77 31,119,180
+27553 58.28 31,119,180
+27723 68.26 31,119,180
+31665 43.6 255,127,14
+31970 9.8 255,127,14
+45180 48.68 255,127,14
+45500 35.87 255,127,14
+};
+\path [draw=black, semithick]
+(axis cs:11844,57.5)
+--(axis cs:11844,58.7);
+
+\path [draw=black, semithick]
+(axis cs:11980,11.73)
+--(axis cs:11980,11.81);
+
+\path [draw=black, semithick]
+(axis cs:27553,58.23)
+--(axis cs:27553,58.33);
+
+\path [draw=black, semithick]
+(axis cs:27723,68.07)
+--(axis cs:27723,68.45);
+
+\path [draw=black, semithick]
+(axis cs:31665,43)
+--(axis cs:31665,44.2);
+
+\path [draw=black, semithick]
+(axis cs:31970,9.4)
+--(axis cs:31970,10.2);
+
+\path [draw=black, semithick]
+(axis cs:45180,48.63)
+--(axis cs:45180,48.73);
+
+\path [draw=black, semithick]
+(axis cs:45500,35.7)
+--(axis cs:45500,36.04);
+
+\draw (axis cs:11944,58.1) node[
+  scale=0.4165,
+  anchor=base west,
+  text=black,
+  rotate=0.0
+]{serial};
+\draw (axis cs:12080,11.77) node[
+  scale=0.4165,
+  anchor=base west,
+  text=black,
+  rotate=0.0
+]{rayon};
+\draw (axis cs:27653,58.28) node[
+  scale=0.4165,
+  anchor=base west,
+  text=black,
+  rotate=0.0
+]{mpi};
+\draw (axis cs:27823,68.26) node[
+  scale=0.4165,
+  anchor=base west,
+  text=black,
+  rotate=0.0
+]{hybrid};
+\draw (axis cs:31765,43.6) node[
+  scale=0.4165,
+  anchor=base west,
+  text=black,
+  rotate=0.0
+]{serial};
+\draw (axis cs:32070,9.8) node[
+  scale=0.4165,
+  anchor=base west,
+  text=black,
+  rotate=0.0
+]{openmp};
+\draw (axis cs:45280,48.68) node[
+  scale=0.4165,
+  anchor=base west,
+  text=black,
+  rotate=0.0
+]{mpi};
+\draw (axis cs:45600,35.87) node[
+  scale=0.4165,
+  anchor=base west,
+  text=black,
+  rotate=0.0
+]{hybrid};
+\end{axis}
+
+\end{tikzpicture}

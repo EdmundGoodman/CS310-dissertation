@@ -142,6 +142,57 @@ After a manual comparison process on the aspects shown above, the decision was m
 
 
 
+\chapter{HPCCG collateral}
+\label{ch:hpccg-appendix}
+
+\section{HPCCG sparse matrix format}
+\label{sec:hpccg-sparse-matrix-appendix}
+
+The following example describes how HPCCG uses a pointer-based variant of the compressed row storage format to represent sparse matrices, such as the one shown in Equation \ref{eq:exampleMatrix}.
+
+\begin{align}
+    \begin{pmatrix}
+        0 & 1 & 0 & 2 \\
+        0 & 0 & 5 & 0 \\
+        0 & 4 & 6 & 0 \\
+        3 & 0 & 0 & 0
+    \end{pmatrix}
+    \label{eq:exampleMatrix}
+\end{align}
+
+A sparse matrix can then be represented as two nested lists -- one containing the non-zero values in each row, and the other the indices of those non-zero values in that row. This means the sparse matrix in (\ref{eq:exampleMatrix}) can be written as:
+
+\begin{verbatim}
+list_of_vals = [   [1, 2]  ,  [5]  ,  [4, 6]  ,  [3]   ]
+list_of_inds = [   [1, 3]  ,  [2]  ,  [1, 2]  ,  [0]   ]
+\end{verbatim}
+% \begin{align}
+%     \verb!list_of_vals = [   [1, 2]  ,  [5]  ,  [4, 6]  ,  [3]   ]! \\
+%     \verb!list_of_inds = [   [1, 3]  ,  [2]  ,  [1, 2]  ,  [0]   ]!
+%     \label{eq:exampleMatrixRepr}
+% \end{align}
+
+This structure uses much less memory, but has the drawback that the inner lists for each row are of variable length, making the outer list non-homogenous. HPCCG's data structure is a flattening of the above structure to use single-dimensional arrays rather than nested ones for \texttt{list\_of\_vals} and \texttt{list\_of\_inds}. This then requires a mechanism to distinguish rows, so it uses auxiliary data structures for the lengths of each row (an array of integers called \texttt{nnz\_in\_row}), along with pointers to the start of each row in the values and indices arrays (two arrays of pointers called \texttt{ptr\_to\_vals\_in\_row} and \texttt{ptr\_to\_inds\_in\_row} respectively). Finally, the number of rows (an integer called \texttt{total\_nrow}) is also needed. Hence, HPCCG would represent the sparse matrix in (\ref{eq:exampleMatrix}) as follows:
+
+\begin{verbatim}
+total_nrow          = 4
+nnz_in_row          = [ 2 ,     1 , 2 ,     1 ]
+list_of_vals        = [ 1 , 2 , 5 , 4 , 6 , 3 ]
+ptr_to_vals_in_row  = [ ↑ ,     ↑ , ↑,      ↑ ]
+list_of_inds        = [ 1 , 3 , 2 , 1 , 2 , 0 ]
+ptr_to_inds_in_row  = [ ↑ ,     ↑ , ↑,      ↑ ]
+\end{verbatim}
+
+To traverse the values in a row $i$ of this data structure, first retrieve the pointer to the starting point in the list of values from \texttt{ptr\_to\_vals\_in\_row[i]}. Then, traverse through the list of values for the number of non-zeroes, \texttt{nnz\_in\_row[i]}. This same process applies to traversing indices in a row.
+
+This data structure provides significant performance improvements over a full matrix representation for the sparse matrix-vector multiplication operation. This is because it minimises both the memory bandwidth and arithmetic operations required, by omitting the zero-values which would not contribute to the product.
+
+
+
+
+
+
+
 
 
 \chapter{HPC MultiBench}
@@ -151,198 +202,198 @@ After a manual comparison process on the aspects shown above, the decision was m
 \label{sec:tooling-replication-yaml}
 
 \begin{listing}[H]
-%     \begin{minted}[linenos,breaklines]{yaml}
-% run_configurations:
-%   "cpp-serial":
-%     sbatch_config:
-%       "nodes": 1
-%       "ntasks-per-node": 1
-%       "cpus-per-task": 1
-%       "exclusive": "mcs"
-%       "mem": 60000
-%     module_loads: []
-%     environment_variables: {}
-%     directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/C-SER"
-%     build_commands:
-%       - "make"
-%     run_command: "./cfd"
+    \begin{minted}[linenos,breaklines]{yaml}
+run_configurations:
+  "cpp-serial":
+    sbatch_config:
+      "nodes": 1
+      "ntasks-per-node": 1
+      "cpus-per-task": 1
+      "exclusive": "mcs"
+      "mem": 60000
+    module_loads: []
+    environment_variables: {}
+    directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/C-SER"
+    build_commands:
+      - "make"
+    run_command: "./cfd"
 
-%   "fortran-serial":
-%     sbatch_config:
-%       "nodes": 1
-%       "ntasks-per-node": 1
-%       "cpus-per-task": 1
-%       "exclusive": "mcs"
-%       "mem": 60000
-%     module_loads: []
-%     environment_variables: {}
-%     directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/F-SER"
-%     build_commands:
-%       - "make"
-%     run_command: "./cfd"
+  "fortran-serial":
+    sbatch_config:
+      "nodes": 1
+      "ntasks-per-node": 1
+      "cpus-per-task": 1
+      "exclusive": "mcs"
+      "mem": 60000
+    module_loads: []
+    environment_variables: {}
+    directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/F-SER"
+    build_commands:
+      - "make"
+    run_command: "./cfd"
 
-%   "rust-serial":
-%     sbatch_config:
-%       "nodes": 1
-%       "ntasks-per-node": 1
-%       "cpus-per-task": 1
-%       "exclusive": "mcs"
-%       "mem": 60000
-%     module_loads: []
-%     environment_variables: {}
-%     directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/cfd"
-%     build_commands:
-%       - "cargo build --release"
-%     run_command: "./target/release/cfd"
+  "rust-serial":
+    sbatch_config:
+      "nodes": 1
+      "ntasks-per-node": 1
+      "cpus-per-task": 1
+      "exclusive": "mcs"
+      "mem": 60000
+    module_loads: []
+    environment_variables: {}
+    directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/cfd"
+    build_commands:
+      - "cargo build --release"
+    run_command: "./target/release/cfd"
 
-%   "cpp-openmp":
-%     sbatch_config:
-%       "nodes": 1
-%       "ntasks-per-node": 1
-%       "cpus-per-task": 32
-%       "exclusive": "mcs"
-%       "mem": 60000
-%     module_loads: []
-%     environment_variables: {}
-%     directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/C-OMP"
-%     build_commands:
-%       - "make"
-%     run_command: "./cfd"
+  "cpp-openmp":
+    sbatch_config:
+      "nodes": 1
+      "ntasks-per-node": 1
+      "cpus-per-task": 32
+      "exclusive": "mcs"
+      "mem": 60000
+    module_loads: []
+    environment_variables: {}
+    directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/C-OMP"
+    build_commands:
+      - "make"
+    run_command: "./cfd"
 
-%   "fortran-openmp":
-%     sbatch_config:
-%       "nodes": 1
-%       "ntasks-per-node": 1
-%       "cpus-per-task": 32
-%       "exclusive": "mcs"
-%       "mem": 60000
-%     module_loads: []
-%     environment_variables: {}
-%     directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/F-OMP"
-%     build_commands:
-%       - "make"
-%     run_command: "./cfd"
+  "fortran-openmp":
+    sbatch_config:
+      "nodes": 1
+      "ntasks-per-node": 1
+      "cpus-per-task": 32
+      "exclusive": "mcs"
+      "mem": 60000
+    module_loads: []
+    environment_variables: {}
+    directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/F-OMP"
+    build_commands:
+      - "make"
+    run_command: "./cfd"
 
-%   "rust-rayon":
-%     sbatch_config:
-%       "nodes": 1
-%       "ntasks-per-node": 1
-%       "cpus-per-task": 32
-%       "exclusive": "mcs"
-%       "mem": 60000
-%     module_loads: []
-%     environment_variables: {}
-%     directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/cfd_rayon"
-%     build_commands:
-%       - "cargo build --release"
-%     run_command: "./target/release/cfd"
+  "rust-rayon":
+    sbatch_config:
+      "nodes": 1
+      "ntasks-per-node": 1
+      "cpus-per-task": 32
+      "exclusive": "mcs"
+      "mem": 60000
+    module_loads: []
+    environment_variables: {}
+    directory: "./generated_results/eurocc_cfd-kudu-results/eurocc_cfd/cfd_rayon"
+    build_commands:
+      - "cargo build --release"
+    run_command: "./target/release/cfd"
 
-% benches:
-%   "serial":
-%     run_configurations:
-%       - "rust-serial"
-%       - "cpp-serial"
-%       - "fortran-serial"
-%     reruns:
-%       number: 5
-%       unaggregatable_metrics:
-%         - "Scale factor"
-%         - "Iterations"
-%         - "Grid x size"
-%         - "Problem size"
-%     matrix:
-%       args:
-%         - "1 5000"
-%         - "2 5000"
-%         - "4 5000"
-%         - "8 5000"
-%         - "16 5000"
-%         - "32 5000"
-%         - "64 5000"
-%         - "128 5000"
-%     analysis:
-%       metrics:
-%         "Scale factor": "Scale [F|f]actor =\\s+(\\d+),"
-%         "Iterations": ", iterations =\\s+(\\d+)"
-%         "Grid x size": "Running CFD on\\s+(\\d+) x\\s+\\d+ grid"
-%         "Problem size": "=== RUN INSTANTIATION ===\n\\{.*args: (\\d+) .*\\}"
-%         "Total time (s)": "Time for\\s+\\d+ iterations was\\s+([\\d\\.eE\\-+]+)\\s+seconds"
-%         "Iteration time (s)": "Each i?n?d?i?v?i?d?u?a?l? ?iteration took\\s+([\\d\\.eE\\-+]+)\\s+seconds"
-%       derived_metrics:
-%         "Iterations per second": "1 / metrics['Iteration time (s)']"
-%         "Execution time relative to C++": "metrics['Iteration time (s)'] / _corresponding_metrics['cpp-serial']['Iteration time (s)']"
-%       line_plots:
-%         - title: "Serial Implementation Comparison"
-%           x: "Problem size"
-%           y: "Total time (s)"
-%           y_log: True
-%         - title: "Relative execution times to C++"
-%           x: "Problem size"
-%           y: "Execution time relative to C++"
-%           y_lim: [0.6, 2.2]
+benches:
+  "serial":
+    run_configurations:
+      - "rust-serial"
+      - "cpp-serial"
+      - "fortran-serial"
+    reruns:
+      number: 5
+      unaggregatable_metrics:
+        - "Scale factor"
+        - "Iterations"
+        - "Grid x size"
+        - "Problem size"
+    matrix:
+      args:
+        - "1 5000"
+        - "2 5000"
+        - "4 5000"
+        - "8 5000"
+        - "16 5000"
+        - "32 5000"
+        - "64 5000"
+        - "128 5000"
+    analysis:
+      metrics:
+        "Scale factor": "Scale [F|f]actor =\\s+(\\d+),"
+        "Iterations": ", iterations =\\s+(\\d+)"
+        "Grid x size": "Running CFD on\\s+(\\d+) x\\s+\\d+ grid"
+        "Problem size": "=== RUN INSTANTIATION ===\n\\{.*args: (\\d+) .*\\}"
+        "Total time (s)": "Time for\\s+\\d+ iterations was\\s+([\\d\\.eE\\-+]+)\\s+seconds"
+        "Iteration time (s)": "Each i?n?d?i?v?i?d?u?a?l? ?iteration took\\s+([\\d\\.eE\\-+]+)\\s+seconds"
+      derived_metrics:
+        "Iterations per second": "1 / metrics['Iteration time (s)']"
+        "Execution time relative to C++": "metrics['Iteration time (s)'] / _corresponding_metrics['cpp-serial']['Iteration time (s)']"
+      line_plots:
+        - title: "Serial Implementation Comparison"
+          x: "Problem size"
+          y: "Total time (s)"
+          y_log: True
+        - title: "Relative execution times to C++"
+          x: "Problem size"
+          y: "Execution time relative to C++"
+          y_lim: [0.6, 2.2]
 
-%   "parallel":
-%     run_configurations:
-%       - "rust-rayon"
-%       - "cpp-openmp"
-%       - "fortran-openmp"
-%     reruns:
-%       number: 5
-%       unaggregatable_metrics:
-%         - "Scale factor"
-%         - "Iterations"
-%         - "Grid x size"
-%         - "Problem size"
-%         - "Thread count"
-%     matrix:
-%       args:
-%         - "1 5000"
-%         - "2 5000"
-%         - "4 5000"
-%         - "8 5000"
-%         - "16 5000"
-%         - "32 5000"
-%         - "64 5000"
-%         - "128 5000"
-%       environment_variables:
-%         - { "OMP_NUM_THREADS": 1, "RAYON_NUM_THREADS": 1 }
-%         - { "OMP_NUM_THREADS": 2, "RAYON_NUM_THREADS": 2 }
-%         - { "OMP_NUM_THREADS": 4, "RAYON_NUM_THREADS": 4 }
-%         - { "OMP_NUM_THREADS": 8, "RAYON_NUM_THREADS": 8 }
-%         - { "OMP_NUM_THREADS": 16, "RAYON_NUM_THREADS": 16 }
-%         - { "OMP_NUM_THREADS": 32, "RAYON_NUM_THREADS": 32 }
-%     analysis:
-%       metrics:
-%         "Scale factor": "Scale [F|f]actor =\\s+(\\d+),"
-%         "Iterations": ", iterations =\\s+(\\d+)"
-%         "Grid x size": "Running CFD on\\s+(\\d+) x\\s+\\d+ grid"
-%         "Problem size": "=== RUN INSTANTIATION ===\n\\{.*args: (\\d+) .*\\}"
-%         "Total time (s)": "Time for\\s+\\d+ iterations was\\s+([\\d\\.eE\\-+]+)\\s+seconds"
-%         "Iteration time (s)": "Each i?n?d?i?v?i?d?u?a?l? ?iteration took\\s+([\\d\\.eE\\-+]+)\\s+seconds"
-%         "Thread count": "=== RUN INSTANTIATION ===\n\\{.*environment_variables: \\{.*OMP_NUM_THREADS: (\\d+),.*\\}"
-%       derived_metrics:
-%         "Iterations per second": "1 / metrics['Iteration time (s)']"
-%         "Execution time relative to C++": "metrics['Iteration time (s)'] / _corresponding_metrics['cpp-openmp']['Iteration time (s)']"
-%       line_plots:
-%         - title: "Iterations per second scaling with number of threads"
-%           x: "Thread count"
-%           y: "Iterations per second"
-%           y_log: True
-%           fix_metrics:
-%             "Problem size": "1"
-%         - title: "Iterations per second scaling with number of threads"
-%           x: "Thread count"
-%           y: "Iterations per second"
-%           y_log: True
-%           fix_metrics:
-%             "Problem size": "16"
-%         - title: "Iterations per second scaling with number of threads"
-%           x: "Thread count"
-%           y: "Iterations per second"
-%           y_log: True
-%           fix_metrics:
-%             "Problem size": "128"
-%     \end{minted}
+  "parallel":
+    run_configurations:
+      - "rust-rayon"
+      - "cpp-openmp"
+      - "fortran-openmp"
+    reruns:
+      number: 5
+      unaggregatable_metrics:
+        - "Scale factor"
+        - "Iterations"
+        - "Grid x size"
+        - "Problem size"
+        - "Thread count"
+    matrix:
+      args:
+        - "1 5000"
+        - "2 5000"
+        - "4 5000"
+        - "8 5000"
+        - "16 5000"
+        - "32 5000"
+        - "64 5000"
+        - "128 5000"
+      environment_variables:
+        - { "OMP_NUM_THREADS": 1, "RAYON_NUM_THREADS": 1 }
+        - { "OMP_NUM_THREADS": 2, "RAYON_NUM_THREADS": 2 }
+        - { "OMP_NUM_THREADS": 4, "RAYON_NUM_THREADS": 4 }
+        - { "OMP_NUM_THREADS": 8, "RAYON_NUM_THREADS": 8 }
+        - { "OMP_NUM_THREADS": 16, "RAYON_NUM_THREADS": 16 }
+        - { "OMP_NUM_THREADS": 32, "RAYON_NUM_THREADS": 32 }
+    analysis:
+      metrics:
+        "Scale factor": "Scale [F|f]actor =\\s+(\\d+),"
+        "Iterations": ", iterations =\\s+(\\d+)"
+        "Grid x size": "Running CFD on\\s+(\\d+) x\\s+\\d+ grid"
+        "Problem size": "=== RUN INSTANTIATION ===\n\\{.*args: (\\d+) .*\\}"
+        "Total time (s)": "Time for\\s+\\d+ iterations was\\s+([\\d\\.eE\\-+]+)\\s+seconds"
+        "Iteration time (s)": "Each i?n?d?i?v?i?d?u?a?l? ?iteration took\\s+([\\d\\.eE\\-+]+)\\s+seconds"
+        "Thread count": "=== RUN INSTANTIATION ===\n\\{.*environment_variables: \\{.*OMP_NUM_THREADS: (\\d+),.*\\}"
+      derived_metrics:
+        "Iterations per second": "1 / metrics['Iteration time (s)']"
+        "Execution time relative to C++": "metrics['Iteration time (s)'] / _corresponding_metrics['cpp-openmp']['Iteration time (s)']"
+      line_plots:
+        - title: "Iterations per second scaling with number of threads"
+          x: "Thread count"
+          y: "Iterations per second"
+          y_log: True
+          fix_metrics:
+            "Problem size": "1"
+        - title: "Iterations per second scaling with number of threads"
+          x: "Thread count"
+          y: "Iterations per second"
+          y_log: True
+          fix_metrics:
+            "Problem size": "16"
+        - title: "Iterations per second scaling with number of threads"
+          x: "Thread count"
+          y: "Iterations per second"
+          y_log: True
+          fix_metrics:
+            "Problem size": "128"
+    \end{minted}
     \caption{The YAML file defining the reproducibility study of Moran and Bull's paper ``Emerging Technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.}
     \label{listing:athena-lscpu}
 \end{listing}

@@ -29,7 +29,25 @@
 % \usepackage[toc,page]{appendix}
 \usepackage{tikz}
 \usepackage{pgfplots}
+% https://github.com/nschloe/tikzplotlib
+\DeclareUnicodeCharacter{2212}{−}
+\usepgfplotslibrary{groupplots,dateplot}
+\usetikzlibrary{patterns,shapes.arrows}
+\pgfplotsset{compat=newest}
 
+% https://tex.stackexchange.com/a/53540
+\usepackage{caption}
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\setminted{  
+% frame=lines,
+% framesep=2mm,
+% baselinestretch=1.2,
+% bgcolor=lightergray,
+% fontsize=\footnotesize,
+linenos,
+breaklines,
+autogobble
+}  
 
 \hypersetup{
 	colorlinks=true,

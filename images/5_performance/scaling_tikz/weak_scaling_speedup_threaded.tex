@@ -1,0 +1,110 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{darkslategray38}{RGB}{38,38,38}
+\definecolor{lavender234234242}{RGB}{234,234,242}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{peru22113282}{RGB}{221,132,82}
+\definecolor{steelblue76114176}{RGB}{76,114,176}
+
+\begin{axis}[
+axis background/.style={fill=lavender234234242},
+axis line style={white},
+height=0.3\textheight,
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.03)},
+  anchor=south west,
+  draw=lightgray204,
+  fill=lavender234234242
+},
+tick align=outside,
+title={Multi-threaded Weak Scaling Speedup Plot},
+width=\textwidth,
+x grid style={white},
+xlabel=\textcolor{darkslategray38}{Parallelisation degree},
+xmajorgrids,
+xmajorticks=false,
+xmin=-0.55, xmax=33.55,
+xtick style={color=darkslategray38},
+y grid style={white},
+ylabel=\textcolor{darkslategray38}{Total speedup},
+ymajorgrids,
+ymajorticks=false,
+ymin=0, ymax=3.95739220158455,
+ytick style={color=darkslategray38}
+]
+\path [draw=black, semithick]
+(axis cs:1,1)
+--(axis cs:1,1);
+
+\path [draw=black, semithick]
+(axis cs:2,1.79175187821461)
+--(axis cs:2,1.94976184556382);
+
+\path [draw=black, semithick]
+(axis cs:4,2.47404798404419)
+--(axis cs:4,2.69465521766648);
+
+\path [draw=black, semithick]
+(axis cs:8,2.99442959552332)
+--(axis cs:8,3.25909725024797);
+
+\path [draw=black, semithick]
+(axis cs:16,3.28021521050717)
+--(axis cs:16,3.56946769090078);
+
+\path [draw=black, semithick]
+(axis cs:32,2.80345922910994)
+--(axis cs:32,3.05425726227466);
+
+\path [draw=black, semithick]
+(axis cs:1,1)
+--(axis cs:1,1);
+
+\path [draw=black, semithick]
+(axis cs:2,1.47929800414883)
+--(axis cs:2,1.70150513942027);
+
+\path [draw=black, semithick]
+(axis cs:4,1.8850407871372)
+--(axis cs:4,2.24493681365922);
+
+\path [draw=black, semithick]
+(axis cs:8,2.3783530404398)
+--(axis cs:8,3.30144843990076);
+
+\path [draw=black, semithick]
+(axis cs:16,3.45125599192132)
+--(axis cs:16,3.8165640015091);
+
+\path [draw=black, semithick]
+(axis cs:32,3.03354699492063)
+--(axis cs:32,3.3344675875133);
+
+\addplot [semithick, steelblue76114176, mark=x, mark size=3, mark options={solid}]
+table {%
+1 1
+2 1.87075686454773
+4 2.58435153961182
+8 3.12676334381104
+16 3.42484140396118
+32 2.92885828018188
+};
+\addlegendentry{rust-rayon, Mesh x size=64}
+\addplot [semithick, peru22113282, mark=x, mark size=3, mark options={solid}]
+table {%
+1 1
+2 1.59040153026581
+4 2.06498885154724
+8 2.83990073204041
+16 3.6339099407196
+32 3.18400740623474
+};
+\addlegendentry{rust-rayon, Mesh x size=64}
+\end{axis}
+
+\end{tikzpicture}

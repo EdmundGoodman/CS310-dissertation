@@ -1,22 +1,22 @@
 \chapter{Performance}
-\label{ch:performance} % 2000-2500 words
+\label{ch:performance}
 
 \textbf{This chapter is now complete - but wasn't in the first three chapter draft submission!}
 
-As enumerated in the objectives summary section of the introduction \ref{ch:ssec:objectives-summary}, on of the three requirements for Rust's suitability as a language for High-Performance Computing is having a comparable performance to C++, one of the most commonly used languages in current usage.
+As enumerated in the objectives summary section of the introduction, one of the three requirements for Rust's suitability as a language for High-Performance Computing is having a comparable performance to C++, one of the most commonly used languages in current usage.
 
-This chapter provides an empirical assessment of the performance of the Rust translation of the HPCCG mini-app. As discussed in the background section introducing HPCCG \ref{ssec:hpccg}, this is representative of High-Performance Computing workloads, due to the design goals of Mantevo Suite mini-apps being representative of full applications to facilitate hardware-software co-design. We leverage this property to instead assess the Rust language's suitability for such workloads by comparing the performance of the Rust translation to the original C++ implementation.
+This chapter provides an empirical assessment of the performance of the Rust translation of the HPCCG mini-app. As discussed in the background section \ref{ssec:hpccg} introducing HPCCG, this is representative of High-Performance Computing workloads as a result of the design goals of Mantevo Suite to facilitate hardware-software co-design. We leverage this property to instead assess the Rust language's suitability for such workloads by comparing the performance of the Rust translation to the original C++ implementation.
 
-This performance profiling will begin with the use of instrumentation tooling to identify hot-spots in source code, characterising the bottlenecks in the Rust and C++ compiled executables. This allows a direct comparison of compiled assembly, yielding a clear picture of ways in which the Rust language differs from C++. Then, the HPC MultiBench tool will be used to run and analyse direct measurements of the Rust and C++ codebases. This allows the characterisation and comparison of performance for strong and weak scaling, and parallelism approaches, along with the generation of roofline models.
+This performance profiling will begin with the use of performance profiling tools to identify hot-spots and hardware under-utilisation in source code. These tools also allow direct comparisons of compiled assembly, yielding a clear picture of ways in which the Rust language differs from C++. Then, the HPC MultiBench tool will be used to run and analyse direct measurements of the Rust and C++ codebases. This allows the characterisation and comparison of performance for strong and weak scaling, and parallelism approaches.
 
 \section{Profiling tools}
-\label{sec:profiling-tools} % 500 words
+\label{sec:profiling-tools}
 
-Software profilers are a category of tools which are used to measure properties of running programs. They differ from static analysis tools, as they analyse programs dynamically as they run, usually through instrumentation inserted at compile time, rather than using the source code itself. Profilers are most often used to characterise the performance and memory usage of programs, and through instrumentation can identify ``hotspots'' -- code sections in the program which account for a disproportionate amount of the metric, such as overall runtime. This makes profilers useful for guiding optimisations, as engineering effort can be targeted at the portion of program which impacts performance most greatly.
+Software profilers are a category of tools which are used to measure properties of running programs. This is in contrast to static analysis tools, which use only the source code itself. Profilers are most often used to characterise the performance and memory usage of programs, and through instrumentation can identify ``hotspots'' -- code sections in the program which account for a disproportionate amount of the metric, such as overall runtime. This makes profilers useful for guiding optimisations, as engineering effort can be targeted at the portion of program which impacts performance most greatly.
 
 Performance profilers can also be used to compare implementations of the same software in different languages. Comparing the  profiles of the programs on the same problem size can elucidate where one language loses performance over another, and give insights into key factors such as vectorisation and memory bandwidth utilisation.
 
-We choose to use a variety of performance profilers, because some profilers provide many more metrics and analysis options, but typically at the expense of the simple and ergonomic user interface. As a result of this, we used \texttt{perf} for the majority of profiling tasks, as they provide a convenient command line interface for instrumentation statistical sampling. We also used the Intel\textregistered\ oneAPI\texttrademark\ suite of tools, including Intel\textregistered\ vTune\texttrademark\ and Intel\textregistered\ Advisor\texttrademark, as these provide a vast array of capabilities such as roofline analysis, but with a complex graphical-only interface.
+% We choose to use a variety of performance profilers, because some profilers provide many more metrics and analysis options, but typically at the expense of the simple and ergonomic user interface. As a result of this, we used \texttt{perf} for the majority of profiling tasks, as they provide a convenient command line interface for instrumentation statistical sampling. We also used the Intel\textsuperscript{\textregistered}\ oneAPI\texttrademark\ suite of tools, including Intel\textsuperscript{\textregistered}\ vTune\texttrademark\ and Intel\textsuperscript{\textregistered}\ Advisor\texttrademark, as these provide a vast array of capabilities such as roofline analysis, but with a complex graphical-only interface.
 
 
 \subsection{The \texttt{perf} profiler}
@@ -26,7 +26,7 @@ We choose to use a variety of performance profilers, because some profilers prov
 
 The \texttt{perf} profiler was used throughout the translation process to identify hotspots in the code. The benefit of this process was two-fold. Firstly, it allowed manual performance-guided optimisation, allowing prioritisation of engineering effort to ensure the Rust implementation was a fair representation of the full extent of the languages capabilities when comparing it to C++. Secondly, the hotspots identified provided a strong insight into the parts of Rust programs that fall short of C++, which informs the assessment of the suitability of Rust for High-Performance computing applications.
 
-% As discussed in the introduction
+% TODO: Assess overlap here with translation section
 The Rust programming language places a strong focus on the prevention of undefined behaviour, including enforcing memory and thread safety. The key insight of the language was that many of these guarantees against undefined behaviour can be made at compile time, through the ownership model enforced by the borrow checker. However, there is not enough information at compile time to fully guarantee these characteristics. For example, creating a vector of a length provided by user input at run time is a common operation within many programs. However, if the programmer accesses this vector by a fixed index in the source code, the compiler cannot guarantee the indexing operation is within the bounds of this vector, since its size is not known until runtime. To avoid undefined behaviour, Rust checks the bounds of every indexing operations to guarantee that the index is not out of range, but this incurs a performance cost -- roughly doubling the time taken for vector indexing. To avoid this check in performance critical applications when the bounds are already guaranteed, Rust provides the \mintinline{rust}{get_unchecked} function, which does not perform the bound check. This performance cost can be seen through comparing \texttt{perf} reports when using the default bounds checked indexing in Figure \ref{fig:perf-checked}, against unchecked indexing in Figure \ref{fig:perf-unchecked}.
 
 \begin{figure}[H]
@@ -45,10 +45,7 @@ The Rust programming language places a strong focus on the prevention of undefin
 
 From these figures, we can see that the the bounds checking operation dominate the total runtime of the program, with $23.83 + 5.79 = 29.62$ percent of the runtime being taken up by the \mintinline{rust}{vector[matrix.list_of_inds[start_ind + j]]} operation in the bounds checked version, but only $4.17 + 2.67 + 3.66 = 10.5$ percent in the version without bounds checking. The empirical result of a $2.82\times$ speed-up for array indexing, a very common operation in High-Performance computing workloads, demonstrates the utmost importance of understanding and leveraging the full extent of the Rust language to be able to write performant software.
 
-% Zero-cost abstractions
-% iterators as a zero-cost abstraction? are they?
-
-\subsection{The Intel\textregistered\ oneAPI\texttrademark\ suite}
+\subsection{The Intel\textsuperscript{\textregistered}\ oneAPI\texttrademark\ suite}
 \label{ssec:intel-advisor-profiler}
 % Intel vTune Advisor
 % Roofline model
@@ -56,10 +53,10 @@ From these figures, we can see that the the bounds checking operation dominate t
 \subsubsection{Roofline models}
 \label{sssec:roofline-models}
 
-% Introducing roofline models
 In their seminal paper ``Roofline: an insightful visual performance model for multicore architectures'', Williams, Waterman and Patterson introduce the roofline model as a technique for simply characterising performance in complex systems \cite{williamsRooflineInsightfulVisual2009}. The model combines three metrics: Computational performance, memory bandwidth, operational intensity.
 
-Computer hardware can be modelled as three components: execution units, data sources, and the interconnection between them. Computational performance measures how fast these execution units can process data in FLOP/s, and memory bandwidth measures the rate at which data can be transmitted across the interconnection in Bytes/s. As computational performance, memory bandwidth quantify hardware performance, operational intensity quantifies software performance. It refers to the average amount of data required per operation in a program, in FLOPS/byte. Rooflines are then drawn as, as shown in Figure \ref{fig:ert-roofline}, on a log-log axis, with the ``loft'' being a 45 degree line sloping up, and the ``ceiling'' a horizontal line.
+Computer hardware can be modelled as three components: execution units, data sources, and the interconnection between them. Computational performance measures how fast these execution units can process data in FLOP/s, and memory bandwidth measures the rate at which data can be transmitted across the interconnection in Bytes/s. As computational performance, memory bandwidth quantify hardware performance, operational intensity quantifies software performance. It refers to the average amount of data required per operation in a program, in FLOPS/byte. Rooflines are then drawn, as shown in Figure \ref{fig:ert-roofline}, on a log-log axis, with the ``loft'' being a 45 degree line sloping up, and the ``ceiling'' a horizontal line.
+% TODO: Improve this explanation
 
 \begin{figure}[H]
     \centering
@@ -101,16 +98,16 @@ Computer hardware can be modelled as three components: execution units, data sou
     \label{fig:ert-roofline}
 \end{figure}
 
-The paper summarises the roofline model as ``set[ing] an upper bound on performance of a kernel depending on the kernel’s operational intensity. If we think of operational intensity as a column that hits the roof, either it hits the flat part of the roof, meaning performance is compute-bound, or performance is ultimately memory-bound'' \cite{williamsRooflineInsightfulVisual2009}. This allows the easy identification of where optimisations for the kernel might be possible.
+The paper summarises the roofline model as ``set[ing] an upper bound on performance of a kernel depending on the kernel’s operational intensity. If we think of operational intensity as a column that hits the roof, either it hits the flat part of the roof, meaning performance is compute-bound, or performance is ultimately memory-bound'' \cite{williamsRooflineInsightfulVisual2009}. This allows the easy identification of where optimisations for the kernel might be possible, based on its position with respect to the roofline. Finally, the paper explains how SIMD instructions can be represented as additional ceilings, as the peak attainable computational performance of such vectorised instructions is necessarily higher.
 
-Later, Ilic, Pratas and Sousa proposed a modification to the roofline model to include information about cache bandwidths in their paper ``Cache-aware Roofline model: Upgrading the loft'' \cite{ilic_cache-aware_2014}. This adds multiple ``lofts'', as the memory bandwidth of caches are higher that of main memory. In addition to this, SIMD instructions can result in additional ceilings, as the peak attainable computational performance of vectorised instructions is necessarily higher.
+% Later, Ilic, Pratas and Sousa proposed a modification to the roofline model to include information about cache bandwidths in their paper ``Cache-aware Roofline model: Upgrading the loft'' \cite{ilic_cache-aware_2014}. This adds multiple ``lofts'', as the memory bandwidth of caches are higher that of main memory. In addition to this, SIMD instructions can result in additional ceilings, as the peak attainable computational performance of vectorised instructions is necessarily higher.
 
-Roofline models are a powerful technique to simply characterise the bottlenecks in software. As such, tools such as the Intel\textregistered\ Advisor can be used to generate them.
+Roofline models are a powerful technique to simply characterise the bottlenecks in software. As such, tools such as the Intel\textsuperscript{\textregistered}\ Advisor can be used to generate them.
 
-\subsubsection{Generating rooflines with Intel\textregistered\ Advisor}
+\subsubsection{Generating rooflines with Intel\textsuperscript{\textregistered}\ Advisor}
 \label{sssec:roofline-generation-intel-advisor}
 
-The Intel\textregistered\ Advisor tool is part of the Intel\textregistered\ oneAPI\texttrademark\ suite. Intel describes it as ``a design and analysis tool for developing performant code'' \cite{DesignCodeParallelism}, and one of the functionalities it provides is generating roofline plots. This is commonly done using its graphical user interface, but it is possible to also generate plots as minified HTML files from the command line. Listing \ref{listing:roofline-generation} shows the sequence of commands required to generate the roofline plots for an executable. 
+The Intel\textsuperscript{\textregistered}\ Advisor tool is part of the Intel\textsuperscript{\textregistered}\ oneAPI\texttrademark\ suite. Intel describes it as ``a design and analysis tool for developing performant code'' \cite{DesignCodeParallelism}, and one of the functionalities it provides is generating roofline plots. This is commonly done using its graphical user interface, but it is possible to also generate plots as minified HTML files from the command line. Listing \ref{listing:roofline-generation} shows the sequence of commands required to generate the roofline plots for an executable. 
 
 \begin{listing}[H]
     \begin{minted}[linenos,breaklines]{bash}
@@ -121,38 +118,45 @@ advisor --report=roofline --project-dir=./ --report-output=./roofline.html
     \label{listing:roofline-generation}
 \end{listing}
 
-Using these plots, we can characterise whether the computational kernels are memory or compute bound in each language, which gives an insight into how their performance can be improved. Roofline plots can be applied to multi-threaded and distributed workloads, however assuming a uniform processor architecture, the degree of parallelism does not significantly impact whether the kernels are computer or memory bound. As such, roofline plots for multi-threaded and distributed workloads are not included here, as they are not relevant and often less clear. Figure \ref{fig:cpp-roofline} shows the roofline plot for the C++ implementation of HPCCG, and Figure \ref{fig:rust-roofline} for plot for the Rust translation.
+Using these plots, we can characterise whether the computational kernels are memory or compute bound in each language, which gives an insight into how their performance can be improved.
+
+Roofline plots can be applied to multi-threaded and distributed workloads, however assuming a uniform processor architecture, the degree of parallelism does not significantly impact whether the kernels are computer or memory bound. As such, roofline plots for multi-threaded and distributed workloads are not included here, as they are not relevant and often less clear. Figure \ref{fig:cpp-roofline} shows the roofline plot for the C++ implementation of HPCCG, and Figure \ref{fig:rust-roofline} for plot for the Rust translation.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/rooflines/cpp_roofline.png}
-    \caption{A roofline diagram generated by Intel\textregistered\ Advisor\ showing the performance of the C++ implementation of HPCCG.}
+    \caption{A roofline diagram generated by Intel\textsuperscript{\textregistered}\ Advisor\ showing the performance of the C++ implementation of HPCCG.}
     \label{fig:cpp-roofline}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/rooflines/rust_roofline.png}
-    \caption{A roofline diagram generated by Intel\textregistered\ Advisor\ showing the performance of the Rust translation of HPCCG.}
+    \caption{A roofline diagram generated by Intel\textsuperscript{\textregistered}\ Advisor\ showing the performance of the Rust translation of HPCCG.}
     \label{fig:rust-roofline}
 \end{figure}
 
-From these plots, we can see that both the C++ and Rust implementations appear to be mostly memory bound, with the DRAM bandwidth limiting the performance of the functions. Since these rooflines were generated on very small meshes of size $25 \times 25 \times 25$, to avoid overloading Intel\textregistered\ Advisor, we can see that some of the kernels for both implementations are within the cache section of the plot, as the mesh data is small enough to be fully included in cache memory. We can also see that the \texttt{waxpby}, shown by the upper green dot in Figure \ref{fig:cpp-roofline}, in the C++ is amenable to vectorisation, and as such is able exceed the scalar compute roofline. Finally, the locations of the kernels across the plots differ fairly significantly, indicating the different software loads have different performance characteristics across the two languages.
+From these plots, we can see that both the C++ and Rust implementations appear to be mostly memory bound, with the DRAM bandwidth limiting the performance of the functions. Since these rooflines were generated on very small meshes of size $25 \times 25 \times 25$, to avoid overloading Intel\textsuperscript{\textregistered}\ Advisor with data samples, we can see that some of the kernels for both implementations are within the cache section of the plot. This is because the mesh data is small enough to be fully included in cache memory. We can also see that the \texttt{waxpby}, shown by the upper green dot in Figure \ref{fig:cpp-roofline}, in the C++ is amenable to vectorisation, and as such is able exceed the scalar compute roofline. Finally, the locations of the kernels across the plots differ fairly significantly, indicating the different software loads have different performance characteristics across the two languages.
 
 Overall, C++ has both a higher arithmetic intensity and rate of floating point operations, which indicates it is able to make better use of the compute hardware it runs on. As a result of this, we expect direct measurements of the C++ program to have slightly higher performance.
 
-In addition to using the Intel\textregistered\ Advisor, HPC MultiBench supports plotting rooflines for performance characterisation at a glance as part of larger test plans. It parses JSON data generated by the Empirical Roofline Tool \cite{EmpiricalRooflineTool} to generate the ceilings, and the Likwid toolkit \cite{RRZEHPCLikwid2024} to calculate operational intensity and performance. An example of this is shown in Figure \ref{}.
+In addition to using the Intel\textsuperscript{\textregistered}\ Advisor, HPC MultiBench supports plotting rooflines for performance characterisation at a glance as part of larger test plans. It parses JSON data generated by the Empirical Roofline Tool \cite{EmpiricalRooflineTool} to generate the ceilings, and the Likwid toolkit \cite{RRZEHPCLikwid2024} to calculate operational intensity and performance. An example of this capability is shown in Figure \ref{fig:hpc-multibench-roofline}, which is able to render multiple different exectubles on the same plot for comparison.
 
-% TODO: HPC MultiBench figure here
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/4_tooling/interactive_screenshots/hpc-multibench-roofline-matplotlib.png}
+    \caption{A roofline diagram generated by HPC MultiBench comparing the performance characteristics of the C++ and Rust versions of HPCCG.}
+    \label{fig:hpc-multibench-roofline}
+\end{figure}
 
 This figure confirms the statement that the mini-app is memory bound, and shows that employing multi-threading techniques allows implementations to better leverage the hardware they are run on.
 
-Performance profilers provide a very powerful tool for identifying and optimising away hotspots in running programs. However, profilers are typically best suited for measuring many performance metrics in a fixed configuration, such as with a set number of processor threads and MPI ranks. To assess Rust's suitability for High-Performance Computing, we only needed a few metrics such as runtime and FLOPs, but wanted to measure how these varied across a wide range of metrics, with statistical confidence. As a result of this, we switched to a direct measurement approach driven by the HPC MultiBench tool, which was designed for this purpose.
+Performance profilers provide a very powerful tool for identifying and optimising away hotspots in running programs. However, profilers are typically best suited for measuring many performance metrics in a fixed configuration, such as with a set number of processor threads or MPI ranks. To assess Rust's suitability for High-Performance Computing, we only needed a few metrics such as runtime and FLOPs, but wanted to measure how these varied across a wide range of metrics, with statistical confidence. As a result of this, we switched to a direct measurement approach driven by the HPC MultiBench tool, which was designed for this purpose.
 
 \section{Direct measurement}
 \label{sec:direct-measurement} % 2000 words
 
-For Rust to be a suitable language for High-Performance Computing workloads, it must have a comparable performance across both a range of parallelism approaches, from serial execution to multi-threading and message passing across a compute cluster, and for large data volumes. To assess this, we used a wall clock approach to time the original C++ and the translated Rust implementations of HPCCG across a variety of problem sizes, and with a variety of thread counts and MPI sizes.
+For Rust to be a suitable language for High-Performance Computing workloads, it must have a comparable performance across both a range of parallelism approaches, from serial execution to multi-threading and message passing across a compute cluster, and for large data volumes. To assess this, measured the execution time of the original C++ and translated Rust implementations of HPCCG across a variety of problem sizes, and a variety of thread counts and MPI sizes.
 
 \subsection{Experimental methodology}
 \label{ssec:experimental-methodology}
@@ -163,28 +167,23 @@ The experiments are fully defined by the YAML configuration files for the HPC Mu
 
 For all experiments in this results section, the programs are run five times. The slowest run is then always discarded as an outlier, due to the possibility of machine noise or network instability for MPI workloads.
 
-The original HPCCG implementation provides a number of different timers which measure the computational kernels. These include clock ticks, resource usage, wall time, and MPI timing intrinsics. By default, resource usage is used for serial and threaded compilations, and MPI timing intrinsics when MPI is used. However, the resource usage timer records the sum of the times for each thread. As a result of this, the \texttt{-DWALL} compiler flag was set to use the wall time. This allows representative comparisons to be made, as otherwise Rust may record faster times for short runs as a result of Rayon's work-stealing threading model. Finally, the UNIX \texttt{time} utility was also used to assess the total runtime including matrix setup, rather than just computational kernel runtimes.
+The original HPCCG implementation provides a number of different timers which measure the computational kernels. These include clock ticks, resource usage, wall time, and MPI timing intrinsics. By default, resource usage is used for serial and threaded compilations, and MPI timing intrinsics when MPI is used. However, the resource usage timer records the sum of the times for each thread. As a result of this, the \texttt{-DWALL} compiler flag was set to use the wall time. This allows representative comparisons to be made, as otherwise Rust may record faster times for short runs as a result of Rayon's work-stealing threading model. Finally, the UNIX \texttt{time} utility was also used to measure the total runtime including matrix setup, rather than just computational kernel runtimes.
 
-On Kudu, 60GB of RAM was used, and on Avon 40GB was used, due to hardware limitations. During development, smaller RAM sizes were used, resulting in significantly degraded performance as a result of the mesh sizes exceeding allocated RAM, resulting in memory thrashing \cite{pattersonHennessyComputerOrganisationArchitecture}. To mitigate this, these very large RAM sizes were used, which guarantees thrashing does not occur since the mesh size does not exceed the amount of memory used, even for mesh sizes of $400 \times 400 \times 400$.
+On Kudu, 60GB of RAM was used, and on Avon 40GB was used, the maximum available memory for their respective compute nodes. During development, smaller RAM sizes were used, resulting in significantly degraded performance as a result of the mesh sizes exceeding allocated RAM, resulting in memory thrashing \cite{pattersonHennessyComputerOrganisationArchitecture}. To mitigate this, these very large RAM sizes were used, which guarantees thrashing does not occur since the mesh size does not exceed the amount of memory used, even for the largest mesh sizes of $400 \times 400 \times 400$.
 
 
 \subsubsection{Reproducibility}
 \label{sssec:parallelism-approaches-reproducibility}
 
-The raw data files and test plan YAML files for the results are available in the base and \texttt{\_test\_plan} directories of the \texttt{hpccg-rs-kudu-results} and \texttt{hpccg-rs-avon-results} repositories for the two compute systems respectively. Listing \ref{listing:serial-data-interactive} shows the command to launch the interactive user interface for the Kudu and Avon test plans respectively. When run locally, this allows the aggregation and analysis of the generated results to be viewed. If run on the appropriate batch computer system, the test benches can be re-run with the ``Run Test Plan'' button.
+The raw data files and test plan YAML files for the results are available in the base and \texttt{\_test\_plan} directories of the \texttt{hpccg-rs-kudu-results} and \texttt{hpccg-rs\\-avon-results} repositories for the two compute systems respectively. Listing \ref{listing:serial-data-interactive} shows the command to launch the interactive user interface for the Kudu and Avon test plans respectively. When run locally, this allows the aggregation and analysis of the generated results to be viewed. If run on the appropriate batch computer system, the test benches can be re-run with the ``Run Test Plan'' button.
 
 \begin{listing}[H]
-    \begin{minted}[linenos]{bash}
-# For the DCS Kudu batch compute system
-poetry run python3 -m hpc_multibench \
-    -y generated_results/hpccg-rs-kudu-results/_test_plans/parallelism.yaml \
-    interactive
-# For the SCRTP Avon batch compute system
-poetry run python3 -m hpc_multibench \
-    -y generated_results/hpccg-rs-avon-results/_test_plans/parallelism.yaml \
+    \begin{minted}[linenos, breaklines]{bash}
+poetry run hpc_multibench \
+    -y generated_results/hpccg-rs-kudu-results/ _test_plans/parallelism.yaml \
     interactive
     \end{minted}
-    \caption{The commands required to interactively view and re-run the performance experiments for the parallelism approaches test benches.}
+    \caption{The commands required to interactively view and re-run the performance experiments for the parallelism approaches test benches on the Kudu batch compute system.}
     \label{listing:serial-data-interactive}
 \end{listing}
 
@@ -194,20 +193,24 @@ This yet again shows the power of the HPC MultiBench tool beyond the example use
 \subsubsection{System specifications}
 \label{sssec:system-specifications}
 
-During the course of experimentation, three different compute resources were used: Athena, the author's personal laptop; Kudu, the DCS batch compute system; and Avon, the Warwick SCRTP High-Performance Computing resource. Athena was used for the translation effort and initial testing, but not for any experimental results. However, since tests during the development process informed decisions made during the design process, its system specifications are relevant. Kudu was used for the majority of testing and the project presentation demo, as it is easy to access and has short queue times. Avon was used for later tests to confirm results, and for very large tests which exceeded Kudu's capacity.
+During the course of experimentation, three different compute resources were used: Athena, the author's personal laptop; Kudu, the DCS batch compute system; and Avon, the Warwick SCRTP High-Performance Computing resource. Athena was used for the translation effort and initial testing, but not for any experimental results. However, since tests during the development process informed design decisions, its system specifications are relevant. Kudu was used for the majority of testing and the project presentation demo, as it is easy to access and has short queue times. Avon was used for later tests to confirm results, and for very large tests which exceeded Kudu's nodal capacity.
 
-Allow for reproducibility of the reported test data, the hardware specifications for the machines used as follows, with additional information about the machines listed in Appendix \ref{sec:hardware-specifications} for completeness. For Kudu and Avon, \texttt{slurm} is used to dispatch jobs, so the commands are run from within a \texttt{slurm} job to be representative of the compute nodes rather than the login nodes of the cluster.
+To best allow for reproducibility of the reported test data, the hardware specifications for the machines used as follows, with additional information about the machines listed in Appendix \ref{sec:hardware-specifications} for completeness. For Kudu and Avon, \texttt{slurm} is used to dispatch jobs, so the commands are run from within a \texttt{slurm} job to be representative of the compute nodes rather than the login nodes of the cluster.
 
-% TODO: Convert to table?
-\begin{itemize}
-    \item Athena has a \texttt{Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz} with eight logical cores.
-    \item Kudu has a \texttt{Intel(R) Xeon(R) CPU E5-2660 v3 @ 2.60GHz} with 40 logical cores.
-    \item Avon has a \texttt{Intel(R) Xeon(R) Platinum 8268 CPU @ 2.90GHz} with 48 logical cores.
-\end{itemize}
+\begin{table}[H]
+    \caption{A table showing the software versions across the three compute resources.}
+    \label{table:perfTools}
+    \begin{tabular}{|p{0.15\linewidth}||p{0.7\linewidth}|p{0.15\linewidth}|}
+    \hline
+    \textbf{Resource} & \textbf{CPU}                                            & \textbf{Logical cores} \\ \hline\hline
+    \textit{Athena}   & \texttt{Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz}     & 8                      \\ \hline
+    \textit{Kudu}     & \texttt{Intel(R) Xeon(R) CPU E5-2660 v3 @ 2.60GHz}    & 40                     \\ \hline
+    \textit{Avon}     & \texttt{Intel(R) Xeon(R) Platinum 8268 CPU @ 2.90GHz} & 48                     \\ \hline
+    \end{tabular}
+\end{table}
 
 The software versions used for benchmarking across the three systems are enumerated in the following table:
 
-% TODO: Add compiler flags
 \begin{table}[H]
     \caption{A table showing the software versions across the three compute resources.}
     \label{table:perfTools}
@@ -215,23 +218,24 @@ The software versions used for benchmarking across the three systems are enumera
     \hline
     \textbf{Software name} & \textbf{Athena} & \textbf{Kudu} & \textbf{Avon} \\
     \hline\hline
-    Operating system & EndeavourOS 2023.03.26 & Rocky Linux 8.9                & CentOS Linux 8.4.2105          \\\hline
-    Linux kernel     & 6.6.24-1-lts                     & 4.18.0-513.18.1. el8\_9.x86\_64 & 4.18.0-305.88.1. el8\_4.x86\_64 \\\hline
-    rustc            & 1.73.0                           & 1.75.0                         & 1.75.0                         \\\hline
-    clang            & 17.0.6                           & 16.0.6                         & 13.0.1                         \\\hline
-    g++              & 13.2.1                           & 9.2.0                          & 11.3.0                         \\\hline
-    OpenMP           & 4.5                              & 4.5                            & 4.5                            \\\hline
-    rayon            & 1.8.0                            & 1.8.0                          & 1.8.0                          \\\hline
-    OpenMPI          & 5.0.2                            & 4.0.5                          & 4.1.4                          \\\hline
-    rs-mpi           & 0.7.0                            & 0.7.0                          & 0.7.0                          \\\hline
+    \textit{Operating system} & EndeavourOS 2023.03.26 & Rocky Linux 8.9                & CentOS Linux 8.4.2105          \\\hline
+    \textit{Linux kernel}     & 6.6.24-1-lts                     & 4.18.0-513.18.1. el8\_9.x86\_64 & 4.18.0-305.88.1. el8\_4.x86\_64 \\\hline
+    \texttt{rustc}            & 1.73.0                           & 1.75.0                         & 1.75.0                         \\\hline
+    \texttt{clang}            & 17.0.6                           & 16.0.6                         & 13.0.1                         \\\hline
+    \texttt{g++}              & 13.2.1                           & 9.2.0                          & 11.3.0                         \\\hline
+    \textit{OpenMP}           & 4.5                              & 4.5                            & 4.5                            \\\hline
+    \texttt{rayon}            & 1.8.0                            & 1.8.0                          & 1.8.0                          \\\hline
+    \textit{OpenMPI}          & 5.0.2                            & 4.0.5                          & 4.1.4                          \\\hline
+    \texttt{rs-mpi}           & 0.7.0                            & 0.7.0                          & 0.7.0                          \\\hline
     \end{tabular}
 \end{table}
 
+As a result of using the HPC MultiBench tool, all other notable characteristics, such as compiler flags, can be found and are transparently re-used through the pinned version of the submodule to be tested.
 
 \subsection{Strong scaling}
 \label{ssec:strong-scaling}
 
-Patterson and Hennessy define strong scaling as ``measuring the speed-up [due to parallelisation] while keeping the problem size fixed'' \cite{pattersonHennessyComputerOrganisationArchitecture}. This can be measured by recording the wall clock time taken for a fixed problem, whilst varying the degree of parallelisation, given by number of threads or MPI ranks. It can be used to show how adding more computational resources to a problem effects its performance. An ideal speedup due to parallelisation would decrease execution time linearly with the number of resources added. However, programs with a serial component cannot achieve this ideal speed-up as a corollary of Amdahl's law \cite{amdahlsLaw}:
+In their seminal book ``Computer Organisation and Architecture: The Hardware/Software Interface'', Patterson and Hennessy define strong scaling as ``measuring the speed-up [due to parallelisation] while keeping the problem size fixed'' \cite{pattersonHennessyComputerOrganisationArchitecture}. This can be measured by recording the wall clock time taken for a fixed problem, whilst varying the degree of parallelisation. It can be used to show how adding more computational resources to a problem effects its performance. An ideal speedup due to parallelisation would decrease execution time linearly with the number of resources added. However, programs with a serial component cannot achieve this ideal speed-up as a corollary of Amdahl's law \cite{amdahlsLaw}, which can be expressed as:
 
 \begin{equation}
     S = \frac{1}{f + \frac{1-f}{P}}
@@ -239,24 +243,26 @@ Patterson and Hennessy define strong scaling as ``measuring the speed-up [due to
 
 Where $f$ denotes the proportion of execution time spent on the serial component, $P$ the degree of parallelisation, and $S$ the total speedup of the system as a result of parallelisation. For problems well-suited to parallelisation, we expect to see strong speedup approach the upper bound for performance following Amdahl's law.
 
-In the context of the HPCCG mini-app, strong scaling can be measured for each of the two parallelism approaches, shared memory with multi-threading and distributed memory with MPI. Comparing the scaling properties of these approaches between the C++ implementation and Rust translation can then yield insight into how the application may perform for very large workloads. Figures \ref{fig:strong_scaling_threaded} and \ref{fig:strong_scaling_mpi} compare the strong scaling characteristics of the total runtimes of the C++ and Rust implementations. The mesh sizes for these benchmarks taken from testing scripts for strong scaling in the original HPCCG repository, ranging from $64 \times 64 \times 1024$ to $64 \times 64 \times 32$ reducing exponentially on the z axis. These mesh sizes are comparatively small, which can be seen in the high impact of serial overhead in these results.
+In the context of the HPCCG mini-app, strong scaling can be measured for each of the two parallelism approaches, shared memory with multi-threading and distributed memory with MPI. Comparing the scaling properties of these approaches between the C++ implementation and Rust translation can then yield insight into how the application may perform for very large workloads. Figures \ref{fig:strong_scaling_threaded} and \ref{fig:strong_scaling_mpi} compare the strong scaling characteristics of the total runtimes of the C++ and Rust implementations. The mesh sizes for these benchmarks are derived from testing scripts for strong scaling in the original HPCCG repository, ranging from $64 \times 64 \times 1024$ to $64 \times 64 \times 32$ reducing exponentially on the z axis. Since these mesh sizes are small, the serial components of the computational kernels have a high impact on total performance %These mesh sizes are comparatively small, which can be seen in the high impact of serial overhead in these results.
 
 % TODO: Could cut raw runtime plots if they aren't interesting?
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_threaded.png}
+    \include{images/5_performance/scaling_tikz/strong_scaling_threaded}
+    % \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_threaded.png}
     \caption{A line plot comparing the strong scaling runtimes of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
     \label{fig:strong_scaling_threaded}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_mpi.png}
+    \include{images/5_performance/scaling_tikz/strong_scaling_mpi}
+    % \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_mpi.png}
     \caption{A line plot comparing the strong scaling speedups of the C++ and Rust implementations of HPCCG using distributed memory parallelism.}
     \label{fig:strong_scaling_mpi}
 \end{figure}
 
-Leveraging the HPC MultiBench framework we can also easily plot the speedup of the two approaches, rather than the raw runtimes. The speedup plots for the C++ and Rust implementations are shown in Figures \ref{fig:strong_scaling_speedup_threaded} and \ref{fig:strong_scaling_speedup_mpi} respectively.
+Leveraging the HPC MultiBench framework we can also easily plot the speedup of the two approaches, rather than the runtimes. The speedup plots for the C++ and Rust implementations are shown in Figures \ref{fig:strong_scaling_speedup_threaded} and \ref{fig:strong_scaling_speedup_mpi} respectively.
 
 \begin{figure}[H]
     \centering
@@ -272,18 +278,16 @@ Leveraging the HPC MultiBench framework we can also easily plot the speedup of t
     \label{fig:strong_scaling_speedup_mpi}
 \end{figure}
 
-% TODO: Could easily separate and compare kernels, but already over the word count...
-
-Examining the plots showing speedup rather than raw runtime allow better understanding of the trends in program performance. From these speedup plots, we can see that for the small meshes tested Rust's threading model through Rayon of work stealing appears to scale less well than OpenMP, outside of the range of experimental error. However, this is likely due to significant impact the serial overhead of setting up the thread pool has on the total execution time for such small workloads. For MPI, we can see an almost ideal strong scaling speedup of two very straight lines. Again, the speedup of Rust is slightly lower, which is likely due to overhead incurred in invoking the MPI bindings.
+Examining the plots showing speedup rather than runtime allow better understanding of the trends in program performance. From these speedup plots, we can see that for the small meshes tested Rust's threading model through Rayon of work stealing appears to scale less well than OpenMP, outside of the range of experimental error. However, this is likely due to significant impact the serial overhead of setting up the thread pool has on the total execution time for such small workloads. For MPI, we can see an almost ideal strong scaling speedup of two very straight lines. Again, the speedup of Rust is slightly lower, which is likely due to overhead incurred in invoking the MPI bindings.
 
 In summary, we can see that both the C++ and Rust implementations strongly scale similarly, with both being close the theoretical limitation of Amdahl's law. This evidence of similar strong scalability provides confidence in the suitability of Rust for High-Performance Computing workloads, which require this property to effectively leverage clustered compute resources.
 
 \subsection{Weak scaling}
 \label{ssec:weak-scaling}
 
-Patterson and Hennessy define weak scaling as ``measuring the speed-up while keeping the problem size fixed'' \cite{pattersonHennessyComputerOrganisationArchitecture}. This can be measured by recording the wall clock time taken, whilst varying the problem size at the same rate as the varying the degree of parallelisation, given by number of threads or MPI ranks. Since the workload grows with the number of resources added, ideal weak scaling is when the execution time remains constant as both factors are increased.
+Patterson and Hennessy define weak scaling as ``measuring the speed-up while keeping the problem size fixed'' \cite{pattersonHennessyComputerOrganisationArchitecture}. This can be characterised by recording the wall clock time taken, whilst varying the problem size at the same rate as the varying the degree of parallelisation. Since the workload grows with the number of resources added, ideal weak scaling is when the execution time remains constant as both factors are increased.
 
-Unlike strong scaling, we cannot apply Amdahl's law to characterise weak scaling, since it assumes a fixed problem size. However, this extended case of variable problem size was characterised in 1988 in Gustafson's paper ``Re-evaluating Amdahl's law'' \cite{gustafsonReevaluatingAmdahlLaw1988}. Gustafson's law estimates the speedup, $S$ as a result of parallelisation in terms of the number of processors $N$, and the fractions of time executing the parallel and serial parts of the program, $p$ and $s$ respectively:
+Unlike strong scaling, we cannot apply Amdahl's law to characterise weak scaling, since it assumes a fixed problem size. However, this extended case of variable problem size was characterised in Gustafson's 1988 paper ``Re-evaluating Amdahl's law'' \cite{gustafsonReevaluatingAmdahlLaw1988}. Gustafson's law estimates the speedup, $S$ as a result of parallelisation in terms of the number of processors $N$, and the fractions of time executing the parallel and serial parts of the program, $p$ and $s$ respectively:
 
 \begin{align}
     S &= s + p \times N \\
@@ -292,10 +296,7 @@ Unlike strong scaling, we cannot apply Amdahl's law to characterise weak scaling
 
 From the above equation we can see that for ideal weak scaling to occur, the serial component of the program must remain constant as the degree of parallelism is increased. In real-world applications, we expect this to not be the case, as higher degrees of parallelism often incur higher serial costs, such as handling increased communication for MPI workloads, or overhead from spawning threads for multi-threaded ones.
 
-% Weak scaling applied to HPCCG
-In the context of HPCCG, as with strong scaling, weak scaling can again be measured for single-node (multi-threading only) and multi-node (multi-threading and message passing). Figures \ref{} and \ref{} compare the results of the C++ and Rust implementations for weak scaling across single-node and multi-node approaches.
-
-As with strong scaling, weak scaling can be assessed for both parallelism approaches in the context of the HPCCG mini-app. Figures \ref{fig:weak_scaling_threaded} and \ref{fig:weak_scaling_mpi} compare the strong scaling characteristics of the total runtimes of the C++ and Rust implementations. The mesh sizes for these benchmarks are again taken from testing scripts for weak scaling in the original HPCCG repository, with the problem size fixed as $64 \times 64 \times 64$, which is again comparatively small.
+As with strong scaling, weak scaling can be assessed for both parallelism approaches in the context of the HPCCG mini-app. Figures \ref{fig:weak_scaling_threaded} and \ref{fig:weak_scaling_mpi} compare the weak scaling characteristics of the total runtimes of the C++ and Rust implementations. The mesh sizes for these benchmarks are again derived from testing scripts for weak scaling in the original HPCCG repository, with the problem size fixed as $64 \times 64 \times 64$.
 % NOTE: This sounds weird to have the problem size fixed, but is consistent with the testing scripts (https://github.com/Mantevo/HPCCG/blob/master/weakScalingRunScript), and exhibits the expected behaviour???
 
 % TODO: Could cut raw runtime plots if they aren't interesting?
@@ -313,7 +314,7 @@ As with strong scaling, weak scaling can be assessed for both parallelism approa
     \label{fig:weak_scaling_mpi}
 \end{figure}
 
-Again, we can leverage the HPC MultiBench framework to plot the speedup of the two approaches, rather than the raw runtimes. The speedup plots for the C++ and Rust implementations are shown in Figures \ref{fig:weak_scaling_speedup_threaded} and \ref{fig:weak_scaling_speedup_mpi} respectively.
+Again, we can leverage the HPC MultiBench framework to plot the speedup of the two approaches, rather than the runtimes. The speedup plots for the C++ and Rust implementations are shown in Figures \ref{fig:weak_scaling_speedup_threaded} and \ref{fig:weak_scaling_speedup_mpi} respectively.
 
 \begin{figure}[H]
     \centering
@@ -329,7 +330,11 @@ Again, we can leverage the HPC MultiBench framework to plot the speedup of the t
     \label{fig:weak_scaling_speedup_mpi}
 \end{figure}
 
-As with strong scaling, the speedup plots most effectively show the trends in program performance. The weak scaling trends of the multi-threaded approach are surprising, as the ideal result is a flat line, as seen in the message passing approach. This is likely because the serial overhead of setting up threading for very small thread counts dominates the runtime for small meshes, as a corrolary of Amdahl's law. In addition to this, the speedup trends back down for high thread counts, which could be due to the mesh being insufficiently large to effectively divide work between the threads. The weak scaling speedup of the message passing approach is very consistent across the two languages, with the Rust and C++ implementations being within experimental uncertainty of each other. This is likely because Rust is invoking the same MPI implementation that C++ uses, albeit through bindings.
+As with strong scaling, the speedup plots most effectively show the trends in program performance.
+
+The weak scaling trends of the multi-threaded approach are surprising, as the ideal result is a flat line, as seen in the message passing approach. The initial upwards trend in speedup for the multi-threaded approach is likely because the serial overhead of setting up threading for very small thread counts dominates the runtime for small meshes, as a corrolary of Amdahl's law. The speedup then trends back down for high thread counts, which could be due to the mesh being insufficiently large to effectively divide work between the threads.
+
+The weak scaling speedup of the message passing approach is very consistent across the two languages, with the Rust and C++ implementations being within experimental uncertainty of each other. This is likely because Rust is invoking the same MPI implementation that C++ uses, albeit through foreign-function interface bindings.
 
 In summary, we can see that both the C++ and Rust implementations weakly scale similarly, with both parallelism approaches following the same trends across the languages. This evidence of similar weak scalability again provides confidence in the suitability of Rust for High-Performance Computing workloads, which require this property to effectively leverage clustered compute resources.
 
@@ -340,40 +345,40 @@ In summary, we can see that both the C++ and Rust implementations weakly scale s
 \label{ssec:parallelism-approaches}
 
 % TODO: cite (same as background)
-In modern High-Performance Computing systems, the majority of performance is achieved through parallelism. As a result of this, for Rust to be suitable for use in High-Performance Computing workloads, it must be able to achieve parallel compute performance similar to that of currently used languages, like C++. This section provides an empirical analysis of the performance of Rust as compared with C++ for increasingly parallel workloads, from serial as a reference to shared memory parallelism through multi-threading and distributed memory parallelism through message passing.
+In modern High-Performance Computing systems, the majority of performance is achieved through parallelism, as predicted by the Mantevo Suite paper \cite{heroux2013mantevo}. As a result of this, for Rust to be suitable for use in High-Performance Computing workloads, it must be able to achieve parallel compute performance similar to that of currently used languages such as C++. This section provides an empirical analysis of the performance of Rust as compared with C++ for increasingly parallel workloads, from serial as a reference to shared memory parallelism through multi-threading and distributed memory parallelism through message passing.
 
 \subsection{Serial execution}
 \label{ssec:multi-threaded}
 
-Before exploring various parallelism approaches, it is important to measure a point of reference, in the form of serial execution of the program. In addition to just being a point of reference, the performance serial execution itself is an important metric. Almost program leveraging parallelism will have serial sections, and even if these are very short they can take up a significant proportion of a programs runtime for highly parallel programs, by Amdahl's law \cite{amdahlsLaw}. As a result of this, an empirical assessment comparing the performance of Rust with C++ workloads is highly relevant to the suitability of Rust for High-Performance Computing.
+For many workloads overall performance is bottlenecked by their serial components. This is because almost any program leveraging parallelism will have serial sections, and even if these are very short they can take up a significant proportion of a programs runtime for highly parallel programs, as a corollary of Amdahl's law \cite{amdahlsLaw}. As such, measuring serial performance is a critical component of the overall assessment of Rust's performance in High-Performance Computing applications.
 
-To assess serial performance, we ran the C++ and Rust executables over a range of mesh sizes, from $100 \times 100 \times 100$ to $300 \times 300 \times 300$, incrementing each axis size by $50$ each time. We expect the performance to scale with the total size of the mesh, which is the cube of the edge size. For the serial tests, all runs were conducted on a single node in the compute cluster, with a single task per node, and exclusive use of that node to reduce machine noise from other processes. As with all tests, 60GB of RAM was used on Kudu, and 40GB was used on Avon, to avoid memory thrashing for large mesh sizes, and performance is measured as wall time through the UNIX \texttt{time} utility. The results of these experiments are shown in Figures \ref{fig:1_serial_line} and \ref{fig:2_serial_line_relative} for Kudu, and \ref{fig:2_serial_line_relative_avon} on Avon.
+To assess serial performance, we ran the C++ and Rust executables over a range of mesh sizes, from $100 \times 100 \times 100$ to $300 \times 300 \times 300$, incrementing each axis size by $50$ each time. We expect the performance to scale with the total size of the mesh, which is the produce of the edge sizes. In addition to the experimental methodology discussed in section \ref{ssec:experimental-methodology}, all serial runs were conducted on a single node in the compute cluster, with a single task per node, and exclusive use of that node to reduce machine noise from other processes.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/parallelism/1_serial_line.png}
-    \caption{A line plot comparing the total wall times for the Rust and C++ implementations of HPCCG, on the Kudu batch compute system.}
+    \caption{A line plot comparing the total wall times for serial Rust and C++ implementations of HPCCG, on the Kudu batch compute system.}
     \label{fig:1_serial_line}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/parallelism/2_serial_line_relative.png}
-    \caption{A line plot comparing the total wall times relative to the C++ implementation of HPCCG, on the Kudu batch compute system.}
+    \caption{A line plot comparing the total wall times relative to the serial C++ implementation of HPCCG, on the Kudu batch compute system.}
     \label{fig:2_serial_line_relative}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/parallelism/1_serial_line_avon.png}
-    \caption{A line plot comparing the total wall times across all computational kernels for the Rust and C++ implementations of HPCCG, on the Avon batch compute system.}
+    \caption{A line plot comparing the total wall times across all computational kernels for serial Rust and C++ implementations of HPCCG, on the Avon batch compute system.}
     \label{fig:1_serial_line_avon}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/parallelism/2_serial_line_relative_avon.png}
-    \caption{A line plot comparing the total wall times relative to the C++ implementation of HPCCG, on the Avon batch compute system.}
+    \caption{A line plot comparing the total wall times relative to the serial C++ implementation of HPCCG, on the Avon batch compute system.}
     \label{fig:2_serial_line_relative_avon}
 \end{figure}
 
@@ -386,21 +391,22 @@ Finally, we can see that tests run on Avon and Kudu have very similar performanc
 \subsection{Multi-threading}
 \label{ssec:multi-threaded}
 
-Having evaluated serial execution, the next parallelisation strategy to consider is shared memory parallelism through multi-threading. This is typically used for parallelism within a single machine, but it can also be used in combination with MPI for nodes in a cluster, as discussed in section \ref{multi-node-mpi}. As it is such a ubiquitous mechanism of parallelisation, along with frameworks such as OpenMP and Rayon which provide convenient abstractions over it, multi-threading is a critical aspect of writing performant code in High-Performance Computing.
+Having evaluated serial execution, the next parallelisation strategy to consider is shared memory parallelism through multi-threading. This is typically used for parallelism within a single machine, but it can also be used in combination with MPI for nodes in a cluster.
+% As it is such a ubiquitous mechanism of parallelisation, along with frameworks such as OpenMP and Rayon which provide convenient abstractions over it, multi-threading is a critical aspect of writing performant code in High-Performance Computing.
 
-To assess multi-threaded performance, we ran the C++ and Rust executables over both a range of mesh sizes, from $100 \times 100 \times 100$ to $400 \times 400 \times 400$, incrementing each axis size by $50$ each time, and a range of thread counts, from $1$ to $32$, doubling each time. For the parallel tests, all runs were conducted on a single node in the compute cluster, with a single task per node, and 32 threads allocated per task, along with exclusive use of that node to reduce machine noise from other processes. As discussed in the previous section, only runs from the Kudu batch compute system will be shown for brevity, unless the results on Avon notably differ. The results of these experiments are shown in Figures \ref{fig:5_parallel_line_all} and \ref{fig:7_parallel_line_relative}.
+To assess multi-threaded performance, we ran the C++ and Rust executables over both a range of mesh sizes, from $100 \times 100 \times 100$ to $400 \times 400 \times 400$, incrementing each axis size by $50$ each time, and a range of thread counts, from $1$ to $32$, doubling each time. In addition to the experimental methodology discussed in section \ref{ssec:experimental-methodology}, all parallel runs were conducted on a single node in the compute cluster, with a single task per node, and 32 threads allocated per task, along with exclusive use of that node to reduce machine noise from other processes. As discussed in the previous section, only runs from the Kudu batch compute system will be shown for brevity, unless the results on Avon notably differ. The results of these experiments are shown in Figures \ref{fig:5_parallel_line_all} and \ref{fig:7_parallel_line_relative}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/parallelism/5_parallel_line_all.png}
-    \caption{.}
+    \caption{A line plot comparing the total wall times across all computational kernels for multi-threaded Rust and C++ implementations of HPCCG.}
     \label{fig:5_parallel_line_all}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/parallelism/7_parallel_line_relative.png}
-    \caption{.}
+    \caption{A line plot comparing the total wall times relative to the multi-threaded C++ implementation of HPCCG.}
     \label{fig:7_parallel_line_relative}
 \end{figure}
 
@@ -413,23 +419,26 @@ In summary, Rust remains performant in multi-threading workloads, but trails C++
 \subsection{MPI}
 \label{ssec:mpi}
 
-Shared memory parallelism is a very powerful technique for enhancing program performance. However, its efficacy is upper bounded by being constrained to a single machine with a shared memory architecture. In order to scale beyond this, distributed memory parallelism must be leveraged. This is required for many High-Performance Computing applications, as the largest supercomputers are all composed of clusters of many machines \cite{HomeTOP500}. As discussed in the translation section \ref{}, Rust provides MPI bindings which facilitate this.
+Shared memory parallelism is a very powerful technique for enhancing program performance. However, its efficacy is upper bounded by being constrained to a single machine with a shared memory architecture. In order to scale beyond this, distributed memory parallelism must be leveraged. This is required for many High-Performance Computing applications, as the largest supercomputers are all composed of clusters of many machines \cite{HomeTOP500}.
+% As discussed in the translation section \ref{}, Rust provides MPI bindings which facilitate this.
 
-To assess performance using MPI for message passing, we ran the C++ and Rust executables over both a range of mesh sizes, from $25 \times 25 \times 25$ to $250 \times 250 \times 250$, incrementing each axis size first by $25$, then by $50$ each time, and a range of nodes $1$, $2$, and $4$, with one task per node. For the MPI implementation, mesh size is constrained by the reference implementation constant value \mintinline{c++}{const int max_external = 100000;}. As a result of this, experiments ran only up to $250 \times 250 \times 250$ rather than $400 \times 400 \times 400$ for parallel implementations. Future work could include increasing this value and fixing any associated bugs, then running HPCCG across many nodes on a much larger mesh. 
+To assess Rust's performance using MPI for message passing, we ran the C++ and Rust executables over both a range of mesh sizes, from $25 \times 25 \times 25$ to $250 \times 250 \times 250$, incrementing each axis size first by $25$, then by $50$ each time, and a range of nodes $1$, $2$, and $4$, with one task per node., in addition to the experimental methodology discussed in section \ref{ssec:experimental-methodology}.
+% For the original MPI implementation, mesh size is constrained by the reference implementation constant value \mintinline{c++}{const int max_external = 100000;}.
+% As a result of this, experiments ran only up to $250 \times 250 \times 250$ rather than $400 \times 400 \times 400$ for parallel implementations. Future work could include increasing this value and fixing any associated bugs, then running HPCCG across many nodes on a much larger mesh. 
 % TODO: large run with this turned up, then reference it here.
 The results of these experiments are shown in Figures \ref{fig:9_mpi_line} and \ref{fig:10_mpi_line_relative}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/parallelism/9_mpi_line.png}
-    \caption{.}
+    \caption{A line plot comparing the total wall times across all computational kernels for MPI Rust and C++ implementations of HPCCG.}
     \label{fig:9_mpi_line}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/parallelism/10_mpi_line_relative.png}
-    \caption{.}
+    \caption{A line plot comparing the total wall times relative to the MPI C++ implementation of HPCCG.}
     \label{fig:10_mpi_line_relative}
 \end{figure}
 
@@ -479,14 +488,14 @@ This assessment compares the Rust, Kokkos, and C++ executables performance over 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/parallelism/16_kokkos_line.png}
-    \caption{.}
+    \caption{A line plot comparing the total wall times across all computational kernels for multi-threaded Kokkos, Rust, and C++ implementations of HPCCG.}
     \label{fig:16_kokkos_line}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/5_performance/parallelism/17_kokkos_line_relative.png}
-    \caption{.}
+    \caption{A line plot comparing the Rust and Kokkos total wall times relative to the multi-threaded C++ implementation of HPCCG.}
     \label{fig:17_kokkos_line_relative}
 \end{figure}
 
