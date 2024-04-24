@@ -31,14 +31,14 @@ The Rust programming language places a strong focus on the prevention of undefin
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{images/5_performance/perf_checked_op.png}
+    \includegraphics[width=0.95\textwidth]{images/5_performance/perf/perf_checked_op.png}
     \caption{A screenshot of the \text{perf} report of a Rust translation of HPCCG using the default checked indexing.}
     \label{fig:perf-checked}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{images/5_performance/perf_unchecked_op.png}
+    \includegraphics[width=0.95\textwidth]{images/5_performance/perf/perf_unchecked_op.png}
     \caption{A screenshot of the \text{perf} report of a Rust translation of HPCCG using the unchecked indexing.}
     \label{fig:perf-unchecked}
 \end{figure}
@@ -248,7 +248,7 @@ In the context of the HPCCG mini-app, strong scaling can be measured for each of
 % TODO: Could cut raw runtime plots if they aren't interesting?
 \begin{figure}[H]
     \centering
-    \include{images/5_performance/scaling_tikz/strong_scaling_threaded}
+    \include{images/5_performance/scaling/strong_scaling_threaded.tex}
     % \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_threaded.png}
     \caption{A line plot comparing the strong scaling runtimes of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
     \label{fig:strong_scaling_threaded}
@@ -256,7 +256,7 @@ In the context of the HPCCG mini-app, strong scaling can be measured for each of
 
 \begin{figure}[H]
     \centering
-    \include{images/5_performance/scaling_tikz/strong_scaling_mpi}
+    \include{images/5_performance/scaling/strong_scaling_mpi.tex}
     % \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_mpi.png}
     \caption{A line plot comparing the strong scaling speedups of the C++ and Rust implementations of HPCCG using distributed memory parallelism.}
     \label{fig:strong_scaling_mpi}
@@ -266,14 +266,16 @@ Leveraging the HPC MultiBench framework we can also easily plot the speedup of t
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_speedup_threaded.png}
+    \include{images/5_performance/scaling/strong_scaling_speedup_threaded.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_speedup_threaded.png}
     \caption{A line plot comparing the strong scaling speedups of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
     \label{fig:strong_scaling_speedup_threaded}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_speedup_mpi.png}
+    \include{images/5_performance/scaling/strong_scaling_speedup_mpi.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_speedup_mpi.png}
     \caption{A line plot comparing the strong scaling runtimes of the C++ and Rust implementations of HPCCG using distributed memory parallelism.}
     \label{fig:strong_scaling_speedup_mpi}
 \end{figure}
@@ -302,14 +304,16 @@ As with strong scaling, weak scaling can be assessed for both parallelism approa
 % TODO: Could cut raw runtime plots if they aren't interesting?
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_threaded.png}
+    \include{images/5_performance/scaling/weak_scaling_threaded.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_threaded.png}
     \caption{A line plot comparing the weak scaling runtimes of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
     \label{fig:weak_scaling_threaded}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_mpi.png}
+    \include{images/5_performance/scaling/weak_scaling_mpi.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_mpi.png}
     \caption{A line plot comparing the weak scaling speedups of the C++ and Rust implementations of HPCCG using distributed memory parallelism.}
     \label{fig:weak_scaling_mpi}
 \end{figure}
@@ -318,14 +322,16 @@ Again, we can leverage the HPC MultiBench framework to plot the speedup of the t
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_speedup_threaded.png}
+    \include{images/5_performance/scaling/weak_scaling_speedup_threaded.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_speedup_threaded.png}
     \caption{A line plot comparing the weak scaling speedups of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
     \label{fig:weak_scaling_speedup_threaded}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_speedup_mpi.png}
+    \include{images/5_performance/scaling/weak_scaling_speedup_mpi.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/scaling/weak_scaling_speedup_mpi.png}
     \caption{A line plot comparing the weak scaling runtimes of the C++ and Rust implementations of HPCCG using distributed memory parallelism.}
     \label{fig:weak_scaling_speedup_mpi}
 \end{figure}
@@ -356,28 +362,32 @@ To assess serial performance, we ran the C++ and Rust executables over a range o
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/parallelism/1_serial_line.png}
+    \include{images/5_performance/parallelism/1_serial_line.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/parallelism/1_serial_line.png}
     \caption{A line plot comparing the total wall times for serial Rust and C++ implementations of HPCCG, on the Kudu batch compute system.}
     \label{fig:1_serial_line}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/parallelism/2_serial_line_relative.png}
+    \include{images/5_performance/parallelism/2_serial_line_relative.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/parallelism/2_serial_line_relative.png}
     \caption{A line plot comparing the total wall times relative to the serial C++ implementation of HPCCG, on the Kudu batch compute system.}
     \label{fig:2_serial_line_relative}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/parallelism/1_serial_line_avon.png}
+    \include{images/5_performance/parallelism/1_serial_line_avon.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/parallelism/1_serial_line_avon.png}
     \caption{A line plot comparing the total wall times across all computational kernels for serial Rust and C++ implementations of HPCCG, on the Avon batch compute system.}
     \label{fig:1_serial_line_avon}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/parallelism/2_serial_line_relative_avon.png}
+    \include{images/5_performance/parallelism/2_serial_line_relative_avon.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/parallelism/2_serial_line_relative_avon.png}
     \caption{A line plot comparing the total wall times relative to the serial C++ implementation of HPCCG, on the Avon batch compute system.}
     \label{fig:2_serial_line_relative_avon}
 \end{figure}
@@ -398,17 +408,21 @@ To assess multi-threaded performance, we ran the C++ and Rust executables over b
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/parallelism/5_parallel_line_all.png}
+    \include{images/5_performance/parallelism/5_parallel_line.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/parallelism/5_parallel_line_all.png}
     \caption{A line plot comparing the total wall times across all computational kernels for multi-threaded Rust and C++ implementations of HPCCG.}
     \label{fig:5_parallel_line_all}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/parallelism/7_parallel_line_relative.png}
+    \include{images/5_performance/parallelism/7_parallel_line_relative.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/parallelism/7_parallel_line_relative.png}
     \caption{A line plot comparing the total wall times relative to the multi-threaded C++ implementation of HPCCG.}
     \label{fig:7_parallel_line_relative}
 \end{figure}
+
+% TODO: Add note about high error bars due to machine noise, amplified by inverse operation
 
 From Figure \ref{fig:7_parallel_line_relative} which shows execution time relative to C++, we can see that for small meshes Rust with Rayon outperforms C++ with OpenMP increasingly with higher thread counts. For $100 \times 100 \times 100$ meshes with 32 threads, Rust takes $0.66 \pm 0.08 \times$ less runtime. This is likely because Rayon uses a work-stealing thread scheduling methodology, which means it avoids the overhead of allocating many threads for tasks too small to fully leverage them.
 
@@ -430,17 +444,21 @@ The results of these experiments are shown in Figures \ref{fig:9_mpi_line} and \
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/parallelism/9_mpi_line.png}
+    \include{images/5_performance/parallelism/9_mpi_line.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/parallelism/9_mpi_line.png}
     \caption{A line plot comparing the total wall times across all computational kernels for MPI Rust and C++ implementations of HPCCG.}
     \label{fig:9_mpi_line}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/parallelism/10_mpi_line_relative.png}
+    \include{images/5_performance/parallelism/10_mpi_line_relative.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/parallelism/10_mpi_line_relative.png}
     \caption{A line plot comparing the total wall times relative to the MPI C++ implementation of HPCCG.}
     \label{fig:10_mpi_line_relative}
 \end{figure}
+
+% TODO: Note that run over config (nodes=2, tasks=4)
 
 % TODO: Consider re-running this test, could be a misconfiguration in the YAML dispatching (discuss in the paragraph)
 % NOTE: Looks like Slurm is dispatching all runs to four nodes? Investigate and change metrics?
@@ -461,6 +479,7 @@ In summary, Rust remains performant in message passing workloads, but trails C++
 
 % \begin{figure}[H]
 %     \centering
+%     \include{images/5_performance/parallelism/12_hybrid_line.tex}
 %     \includegraphics[width=\textwidth]{images/5_performance/parallelism/12_hybrid_line.png}
 %     \caption{.}
 %     \label{fig:12_hybrid_line}
@@ -468,6 +487,7 @@ In summary, Rust remains performant in message passing workloads, but trails C++
 
 % \begin{figure}[H]
 %     \centering
+%     \include{images/5_performance/parallelism/13_hybrid_line_relative.tex}
 %     \includegraphics[width=\textwidth]{images/5_performance/parallelism/13_hybrid_line_relative.png}
 %     \caption{.}
 %     \label{fig:13_hybrid_line_relative}
@@ -487,14 +507,16 @@ This assessment compares the Rust, Kokkos, and C++ executables performance over 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/parallelism/16_kokkos_line.png}
+    \include{images/5_performance/parallelism/16_kokkos_line.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/parallelism/16_kokkos_line.png}
     \caption{A line plot comparing the total wall times across all computational kernels for multi-threaded Kokkos, Rust, and C++ implementations of HPCCG.}
     \label{fig:16_kokkos_line}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/5_performance/parallelism/17_kokkos_line_relative.png}
+    \include{images/5_performance/parallelism/17_kokkos_line_relative.tex}
+    % \includegraphics[width=\textwidth]{images/5_performance/parallelism/17_kokkos_line_relative.png}
     \caption{A line plot comparing the Rust and Kokkos total wall times relative to the multi-threaded C++ implementation of HPCCG.}
     \label{fig:17_kokkos_line_relative}
 \end{figure}
@@ -512,7 +534,8 @@ Having compared the performance of individual parallelism approaches between C++
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/3_translation/performance/translation_parallelism_rust.png}
+    \include{images/5_performance/parallelism/24_translation_parallelism_rust.tex}
+    % \includegraphics[width=\textwidth]{images/3_translation/performance/24_translation_parallelism_rust.png}
     \caption{A diagram showing the total wall time taken for Rust implementations of parallelism approaches, as the overall mesh size is varied.}
     \label{fig:translation_parallelism_rust}
 \end{figure}
@@ -523,7 +546,8 @@ Figure \ref{fig:translation_parallelism_cpp} shows the same experiments run over
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/3_translation/performance/translation_parallelism_cpp.png}
+    \include{images/5_performance/parallelism/25_translation_parallelism_cpp.tex}
+    % \includegraphics[width=\textwidth]{images/3_translation/performance/25_translation_parallelism_cpp.png}
     \caption{A diagram showing the total wall time taken for C++ implementations of parallelism approaches, as the overall mesh size is varied.}
     \label{fig:translation_parallelism_cpp}
 \end{figure}

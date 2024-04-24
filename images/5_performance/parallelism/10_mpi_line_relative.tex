@@ -1,0 +1,108 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{darkslategray38}{RGB}{38,38,38}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+axis line style={lightgray204},
+height=0.45\textheight,
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=none
+},
+tick align=outside,
+tick pos=left,
+title={MPI Implementation Relative Execution Times},
+width=\textwidth,
+x grid style={lightgray204},
+xlabel=\textcolor{darkslategray38}{Mesh size},
+xmajorgrids,
+xmin=-3183593.75, xmax=67199218.75,
+xtick style={color=darkslategray38},
+xtick={-10000000,0,10000000,20000000,30000000,40000000,50000000,60000000,70000000},
+xticklabels={\ensuremath{-}1,0,1,2,3,4,5,6,7},
+y grid style={lightgray204},
+ylabel=\textcolor{darkslategray38}{Execution time relative to C++},
+ymajorgrids,
+ymin=0.978334672851017, ymax=1.45497187012864,
+ytick style={color=darkslategray38}
+]
+\path [draw=black, semithick]
+(axis cs:15625,1)
+--(axis cs:15625,1);
+
+\path [draw=black, semithick]
+(axis cs:125000,1)
+--(axis cs:125000,1);
+
+\path [draw=black, semithick]
+(axis cs:1000000,1)
+--(axis cs:1000000,1);
+
+\path [draw=black, semithick]
+(axis cs:8000000,1)
+--(axis cs:8000000,1);
+
+\path [draw=black, semithick]
+(axis cs:27000000,1)
+--(axis cs:27000000,1);
+
+\path [draw=black, semithick]
+(axis cs:64000000,1)
+--(axis cs:64000000,1);
+
+\path [draw=black, semithick]
+(axis cs:15625,1.07609152784119)
+--(axis cs:15625,1.14961299360423);
+
+\path [draw=black, semithick]
+(axis cs:125000,1.01974672721846)
+--(axis cs:125000,1.04945558277112);
+
+\path [draw=black, semithick]
+(axis cs:1000000,1.05850736021781)
+--(axis cs:1000000,1.07392284442563);
+
+\path [draw=black, semithick]
+(axis cs:8000000,1.19560692314718)
+--(axis cs:8000000,1.19893943343814);
+
+\path [draw=black, semithick]
+(axis cs:27000000,1.19602129682002)
+--(axis cs:27000000,1.20141281406939);
+
+\path [draw=black, semithick]
+(axis cs:64000000,1.39968045169838)
+--(axis cs:64000000,1.43330654297966);
+
+\addplot [semithick, steelblue31119180, mark=x, mark size=3, mark options={solid}]
+table {%
+15625 1
+125000 1
+1000000 1
+8000000 1
+27000000 1
+64000000 1
+};
+\addlegendentry{C++ with MPI}
+\addplot [semithick, darkorange25512714, mark=x, mark size=3, mark options={solid}]
+table {%
+15625 1.11285221576691
+125000 1.03460121154785
+1000000 1.06621515750885
+8000000 1.19727313518524
+27000000 1.19871699810028
+64000000 1.41649353504181
+};
+\addlegendentry{Rust with MPI}
+\end{axis}
+
+\end{tikzpicture}

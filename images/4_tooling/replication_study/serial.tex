@@ -1,0 +1,185 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{darkslategray38}{RGB}{38,38,38}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+axis line style={lightgray204},
+height=0.45\textheight,
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=none
+},
+log basis y={10},
+tick align=outside,
+tick pos=left,
+title={Serial Implementation Comparison},
+width=\textwidth,
+x grid style={lightgray204},
+xlabel=\textcolor{darkslategray38}{Problem size},
+xmajorgrids,
+xmin=-5.35, xmax=134.35,
+xtick style={color=darkslategray38},
+y grid style={lightgray204},
+ylabel=\textcolor{darkslategray38}{Total time (s)},
+ymajorgrids,
+ymin=0.00276962091188793, ymax=479.472792233479,
+ymode=log,
+ytick style={color=darkslategray38},
+ytick={0.0001,0.001,0.01,0.1,1,10,100,1000,10000},
+yticklabels={
+  $\mathdefault{10^{-4}}$,
+  $\mathdefault{10^{-3}}$,
+  $\mathdefault{10^{-2}}$,
+  $\mathdefault{10^{-1}}$,
+  $\mathdefault{10^{0}}$,
+  $\mathdefault{10^{1}}$,
+  $\mathdefault{10^{2}}$,
+  $\mathdefault{10^{3}}$,
+  $\mathdefault{10^{4}}$
+}
+]
+\path [draw=black, semithick]
+(axis cs:1,0.00699695619045528)
+--(axis cs:1,0.00714889980954473);
+
+\path [draw=black, semithick]
+(axis cs:2,0.0248998488334846)
+--(axis cs:2,0.0253484291665154);
+
+\path [draw=black, semithick]
+(axis cs:4,0.0995044073930531)
+--(axis cs:4,0.104492018206947);
+
+\path [draw=black, semithick]
+(axis cs:8,0.453278231698825)
+--(axis cs:8,0.462615895501175);
+
+\path [draw=black, semithick]
+(axis cs:16,1.87885480947366)
+--(axis cs:16,1.91419551012634);
+
+\path [draw=black, semithick]
+(axis cs:32,7.67157472162308)
+--(axis cs:32,7.82571970997692);
+
+\path [draw=black, semithick]
+(axis cs:64,60.6741855487599)
+--(axis cs:64,63.8700804404401);
+
+\path [draw=black, semithick]
+(axis cs:128,242.655782851411)
+--(axis cs:128,251.361585132589);
+
+\path [draw=black, semithick]
+(axis cs:1,0.00550512106523007)
+--(axis cs:1,0.00581404293476993);
+
+\path [draw=black, semithick]
+(axis cs:2,0.0218687301379282)
+--(axis cs:2,0.0221087098620718);
+
+\path [draw=black, semithick]
+(axis cs:4,0.102995548000624)
+--(axis cs:4,0.117852131999376);
+
+\path [draw=black, semithick]
+(axis cs:8,0.453730961579502)
+--(axis cs:8,0.471573038420498);
+
+\path [draw=black, semithick]
+(axis cs:16,1.91848746920254)
+--(axis cs:16,1.96192453079745);
+
+\path [draw=black, semithick]
+(axis cs:32,7.80141277650708)
+--(axis cs:32,7.90499122349292);
+
+\path [draw=black, semithick]
+(axis cs:64,61.7663163440984)
+--(axis cs:64,64.4131636559016);
+
+\path [draw=black, semithick]
+(axis cs:128,246.217606721236)
+--(axis cs:128,254.281593278764);
+
+\path [draw=black, semithick]
+(axis cs:1,0.00479211088514963)
+--(axis cs:1,0.00485548911485037);
+
+\path [draw=black, semithick]
+(axis cs:2,0.0257170868079985)
+--(axis cs:2,0.0259589131920015);
+
+\path [draw=black, semithick]
+(axis cs:4,0.0939223678966043)
+--(axis cs:4,0.0998856321033957);
+
+\path [draw=black, semithick]
+(axis cs:8,0.445380601935724)
+--(axis cs:8,0.449699398064276);
+
+\path [draw=black, semithick]
+(axis cs:16,1.81830026455212)
+--(axis cs:16,1.85609973544788);
+
+\path [draw=black, semithick]
+(axis cs:32,6.98108506186961)
+--(axis cs:32,7.16251493813039);
+
+\path [draw=black, semithick]
+(axis cs:64,66.4810246754828)
+--(axis cs:64,70.3309753245172);
+
+\path [draw=black, semithick]
+(axis cs:128,262.486656031609)
+--(axis cs:128,277.113343968391);
+
+\addplot [semithick, steelblue31119180, mark=x, mark size=3, mark options={solid}]
+table {%
+1 0.00707292603328824
+2 0.0251241382211447
+4 0.101998224854469
+8 0.457947015762329
+16 1.89652526378632
+32 7.74864625930786
+64 62.2721366882324
+128 247.00862121582
+};
+\addlegendentry{Rust}
+\addplot [semithick, darkorange25512714, mark=x, mark size=3, mark options={solid}]
+table {%
+1 0.00565958069637418
+2 0.0219887178391218
+4 0.110423862934113
+8 0.462652027606964
+16 1.94020617008209
+32 7.85320091247559
+64 63.0897369384766
+128 250.249588012695
+};
+\addlegendentry{C++}
+\addplot [semithick, forestgreen4416044, mark=x, mark size=3, mark options={solid}]
+table {%
+1 0.0048237987793982
+2 0.0258379988372326
+4 0.0969040021300316
+8 0.447539955377579
+16 1.83720004558563
+32 7.07180023193359
+64 68.406005859375
+128 269.800018310547
+};
+\addlegendentry{FORTRAN}
+\end{axis}
+
+\end{tikzpicture}

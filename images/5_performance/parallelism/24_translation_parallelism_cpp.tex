@@ -1,0 +1,181 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{chocolate2267451}{RGB}{226,74,51}
+\definecolor{dimgray85}{RGB}{85,85,85}
+\definecolor{gainsboro229}{RGB}{229,229,229}
+\definecolor{gray119}{RGB}{119,119,119}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{mediumpurple152142213}{RGB}{152,142,213}
+\definecolor{steelblue52138189}{RGB}{52,138,189}
+
+\begin{axis}[
+axis background/.style={fill=gainsboro229},
+axis line style={white},
+height=0.45\textheight,
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=lightgray204,
+  fill=gainsboro229
+},
+tick align=outside,
+tick pos=left,
+title={C++ Parallelism Total Times},
+width=\textwidth,
+x grid style={white},
+xlabel=\textcolor{dimgray85}{Mesh size},
+xmajorgrids,
+xmin=-136718.75, xmax=5621093.75,
+xtick style={color=dimgray85},
+xtick={-1000000,0,1000000,2000000,3000000,4000000,5000000,6000000},
+xticklabels={\ensuremath{-}1,0,1,2,3,4,5,6},
+y grid style={white},
+ylabel=\textcolor{dimgray85}{Total time (s)},
+ymajorgrids,
+ymin=-1.38292786946242, ymax=31.5790793512316,
+ytick style={color=dimgray85}
+]
+\path [draw=black, semithick]
+(axis cs:125000,0.630818193843731)
+--(axis cs:125000,0.646766306156269);
+
+\path [draw=black, semithick]
+(axis cs:421875,2.223066540468)
+--(axis cs:421875,2.244373459532);
+
+\path [draw=black, semithick]
+(axis cs:1000000,5.35376867074015)
+--(axis cs:1000000,5.46672132925985);
+
+\path [draw=black, semithick]
+(axis cs:1953125,10.6241993611994)
+--(axis cs:1953125,10.8332506388006);
+
+\path [draw=black, semithick]
+(axis cs:3375000,18.7914397981746)
+--(axis cs:3375000,18.9563102018254);
+
+\path [draw=black, semithick]
+(axis cs:5359375,29.6293416527015)
+--(axis cs:5359375,29.8630583472985);
+
+\path [draw=black, semithick]
+(axis cs:125000,0.11534518602367)
+--(axis cs:125000,0.12536881397633);
+
+\path [draw=black, semithick]
+(axis cs:421875,0.908496237202436)
+--(axis cs:421875,0.922190262797564);
+
+\path [draw=black, semithick]
+(axis cs:1000000,1.6290644741359)
+--(axis cs:1000000,2.2715155258641);
+
+\path [draw=black, semithick]
+(axis cs:1953125,3.70726366078273)
+--(axis cs:1953125,4.04439133921727);
+
+\path [draw=black, semithick]
+(axis cs:3375000,5.02368443393088)
+--(axis cs:3375000,5.47941556606912);
+
+\path [draw=black, semithick]
+(axis cs:5359375,6.86434211956473)
+--(axis cs:5359375,7.68154788043527);
+
+\path [draw=black, semithick]
+(axis cs:125000,0.634065478044844)
+--(axis cs:125000,0.636860021955156);
+
+\path [draw=black, semithick]
+(axis cs:421875,2.22843066465354)
+--(axis cs:421875,2.24911433534646);
+
+\path [draw=black, semithick]
+(axis cs:1000000,5.38544308377665)
+--(axis cs:1000000,5.41628691622335);
+
+\path [draw=black, semithick]
+(axis cs:1953125,10.6014728603183)
+--(axis cs:1953125,10.7603771396817);
+
+\path [draw=black, semithick]
+(axis cs:3375000,18.6283197759457)
+--(axis cs:3375000,18.9545802240543);
+
+\path [draw=black, semithick]
+(axis cs:5359375,29.5465437042545)
+--(axis cs:5359375,30.0808062957455);
+
+\path [draw=black, semithick]
+(axis cs:125000,0.480264066421818)
+--(axis cs:125000,0.484687433578182);
+
+\path [draw=black, semithick]
+(axis cs:421875,1.70470713896287)
+--(axis cs:421875,1.72148786103713);
+
+\path [draw=black, semithick]
+(axis cs:1000000,4.08637942405161)
+--(axis cs:1000000,4.12355057594839);
+
+\path [draw=black, semithick]
+(axis cs:1953125,8.21026577774712)
+--(axis cs:1953125,8.26302422225288);
+
+\path [draw=black, semithick]
+(axis cs:3375000,14.3626018007787)
+--(axis cs:3375000,14.4694981992213);
+
+\path [draw=black, semithick]
+(axis cs:5359375,22.8226756633978)
+--(axis cs:5359375,23.0698243366022);
+
+\addplot [semithick, chocolate2267451, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.638792276382446
+421875 2.23372006416321
+1000000 5.41024494171143
+1953125 10.7287254333496
+3375000 18.8738746643066
+5359375 29.7462005615234
+};
+\addlegendentry{Serial C++}
+\addplot [semithick, steelblue52138189, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.120357036590576
+421875 0.915343284606934
+1000000 1.9502899646759
+1953125 3.87582755088806
+3375000 5.25155019760132
+5359375 7.27294492721558
+};
+\addlegendentry{C++ with OpenMP}
+\addplot [semithick, mediumpurple152142213, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.635462760925293
+421875 2.23877239227295
+1000000 5.40086507797241
+1953125 10.6809253692627
+3375000 18.7914505004883
+5359375 29.8136749267578
+};
+\addlegendentry{C++ with MPI}
+\addplot [semithick, gray119, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.482475757598877
+421875 1.71309745311737
+1000000 4.10496520996094
+1953125 8.23664474487305
+3375000 14.4160499572754
+5359375 22.9462509155273
+};
+\addlegendentry{C++ with MPI and OpenMP}
+\end{axis}
+
+\end{tikzpicture}

@@ -506,10 +506,20 @@ Figure \ref{fig:translations_total_line} provides an overall picture on how the 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/3_translation/performance/translations_total_line.png}
+    \include{images/3_translation/translations_total_line.tex}
+    % \includegraphics[width=\textwidth]{images/3_translation/performance/translations_total_line.png}
     \caption{A diagram showing the total wall time taken across the three kernels of each translation, as the overall mesh size is varied.}
     \label{fig:translations_total_line}
 \end{figure}
+
+% \begin{figure}[H]
+%     \centering
+%     \include{images/5_performance/scaling_tikz/strong_scaling_threaded}
+%     % \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_threaded.png}
+%     \caption{A line plot comparing the strong scaling runtimes of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
+%     \label{fig:strong_scaling_threaded}
+% \end{figure}
+
 
 % Having seen the overall picture, we can analyse the performance of each kernel. The dominant kernel in the HPCCG mini-app is the sparse matrix-vector multiplication operation. We can see that the data structure refactor has a profound impact on performance here. The remaining kernels have a much smaller impact, with reducing the memory bandwidth required by adopting single indexing making a small improvement, then avoiding bounds checks or using iterators having very similar improvements in performance beyond that.
 

@@ -1,0 +1,188 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{crimson2143940}{RGB}{214,39,40}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{darkslategray38}{RGB}{38,38,38}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{mediumpurple148103189}{RGB}{148,103,189}
+\definecolor{sienna1408675}{RGB}{140,86,75}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+axis line style={lightgray204},
+height=0.45\textheight,
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=none
+},
+tick align=outside,
+tick pos=left,
+title={Multi-Threaded Implementation Comparison},
+width=\textwidth,
+x grid style={lightgray204},
+xlabel=\textcolor{darkslategray38}{Mesh size},
+xmajorgrids,
+xmin=-2150000, xmax=67150000,
+xtick style={color=darkslategray38},
+xtick={-10000000,0,10000000,20000000,30000000,40000000,50000000,60000000,70000000},
+xticklabels={\ensuremath{-}1,0,1,2,3,4,5,6,7},
+y grid style={lightgray204},
+ylabel=\textcolor{darkslategray38}{Total time (s)},
+ymajorgrids,
+ymin=-25.7913154590251, ymax=575.329051768724,
+ytick style={color=darkslategray38}
+]
+\path [draw=black, semithick]
+(axis cs:1000000,5.34438827454193)
+--(axis cs:1000000,5.42485172545807);
+
+\path [draw=black, semithick]
+(axis cs:8000000,43.7885345691461)
+--(axis cs:8000000,44.5500654308539);
+
+\path [draw=black, semithick]
+(axis cs:27000000,148.452354955297)
+--(axis cs:27000000,150.368145044703);
+
+\path [draw=black, semithick]
+(axis cs:64000000,348.323499523336)
+--(axis cs:64000000,360.386500476664);
+
+\path [draw=black, semithick]
+(axis cs:1000000,1.61017148732022)
+--(axis cs:1000000,1.74248851267978);
+
+\path [draw=black, semithick]
+(axis cs:8000000,10.0397988826484)
+--(axis cs:8000000,11.9477361173516);
+
+\path [draw=black, semithick]
+(axis cs:27000000,27.8186839726246)
+--(axis cs:27000000,30.4796160273754);
+
+\path [draw=black, semithick]
+(axis cs:64000000,63.0155340032716)
+--(axis cs:64000000,65.5569159967284);
+
+\path [draw=black, semithick]
+(axis cs:1000000,2.21986248923652)
+--(axis cs:1000000,2.41283751076348);
+
+\path [draw=black, semithick]
+(axis cs:8000000,9.33409289646281)
+--(axis cs:8000000,10.1720021035372);
+
+\path [draw=black, semithick]
+(axis cs:27000000,22.7588093641245)
+--(axis cs:27000000,24.2544906358755);
+
+\path [draw=black, semithick]
+(axis cs:64000000,52.406768330518)
+--(axis cs:64000000,52.568581669482);
+
+\path [draw=black, semithick]
+(axis cs:1000000,6.25873918999268)
+--(axis cs:1000000,6.82466081000732);
+
+\path [draw=black, semithick]
+(axis cs:8000000,63.8942873740022)
+--(axis cs:8000000,65.7118626259978);
+
+\path [draw=black, semithick]
+(axis cs:27000000,204.746427561689)
+--(axis cs:27000000,230.781572438311);
+
+\path [draw=black, semithick]
+(axis cs:64000000,499.593601287083)
+--(axis cs:64000000,548.005398712917);
+
+\path [draw=black, semithick]
+(axis cs:1000000,1.65376688002974)
+--(axis cs:1000000,1.85328311997026);
+
+\path [draw=black, semithick]
+(axis cs:8000000,14.3098625303521)
+--(axis cs:8000000,14.8229374696479);
+
+\path [draw=black, semithick]
+(axis cs:27000000,46.0131259435759)
+--(axis cs:27000000,46.5430240564241);
+
+\path [draw=black, semithick]
+(axis cs:64000000,99.2363635122588)
+--(axis cs:64000000,103.493086487741);
+
+\path [draw=black, semithick]
+(axis cs:1000000,1.53233759678168)
+--(axis cs:1000000,1.54256240321832);
+
+\path [draw=black, semithick]
+(axis cs:8000000,11.7334601576525)
+--(axis cs:8000000,11.8162898423475);
+
+\path [draw=black, semithick]
+(axis cs:27000000,36.4014166698829)
+--(axis cs:27000000,36.4877833301171);
+
+\path [draw=black, semithick]
+(axis cs:64000000,84.8465319256481)
+--(axis cs:64000000,85.3538180743519);
+
+\addplot [semithick, steelblue31119180, mark=x, mark size=3, mark options={solid}]
+table {%
+1000000 5.38462018966675
+8000000 44.1693000793457
+27000000 149.410247802734
+64000000 354.355010986328
+};
+\addlegendentry{C++ with 1 OpenMP thread}
+\addplot [semithick, darkorange25512714, mark=x, mark size=3, mark options={solid}]
+table {%
+1000000 1.6763299703598
+8000000 10.9937677383423
+27000000 29.1491508483887
+64000000 64.2862243652344
+};
+\addlegendentry{C++ with 8 OpenMP threads}
+\addplot [semithick, forestgreen4416044, mark=x, mark size=3, mark options={solid}]
+table {%
+1000000 2.31634998321533
+8000000 9.75304794311523
+27000000 23.5066509246826
+64000000 52.4876747131348
+};
+\addlegendentry{C++ with 32 OpenMP threads}
+\addplot [semithick, crimson2143940, mark=x, mark size=3, mark options={solid}]
+table {%
+1000000 6.54169988632202
+8000000 64.8030776977539
+27000000 217.764007568359
+64000000 523.799499511719
+};
+\addlegendentry{Rust with 1 Rayon thread}
+\addplot [semithick, mediumpurple148103189, mark=x, mark size=3, mark options={solid}]
+table {%
+1000000 1.75352501869202
+8000000 14.5663995742798
+27000000 46.278076171875
+64000000 101.364723205566
+};
+\addlegendentry{Rust with 8 Rayon threads}
+\addplot [semithick, sienna1408675, mark=x, mark size=3, mark options={solid}]
+table {%
+1000000 1.53744995594025
+8000000 11.7748746871948
+27000000 36.4445991516113
+64000000 85.1001739501953
+};
+\addlegendentry{Rust with 32 Rayon threads}
+\end{axis}
+
+\end{tikzpicture}

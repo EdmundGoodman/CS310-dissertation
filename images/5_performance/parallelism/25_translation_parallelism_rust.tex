@@ -1,0 +1,181 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{chocolate2267451}{RGB}{226,74,51}
+\definecolor{dimgray85}{RGB}{85,85,85}
+\definecolor{gainsboro229}{RGB}{229,229,229}
+\definecolor{gray119}{RGB}{119,119,119}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{mediumpurple152142213}{RGB}{152,142,213}
+\definecolor{steelblue52138189}{RGB}{52,138,189}
+
+\begin{axis}[
+axis background/.style={fill=gainsboro229},
+axis line style={white},
+height=0.45\textheight,
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=lightgray204,
+  fill=gainsboro229
+},
+tick align=outside,
+tick pos=left,
+title={Rust Parallelism Total Times},
+width=\textwidth,
+x grid style={white},
+xlabel=\textcolor{dimgray85}{Mesh size},
+xmajorgrids,
+xmin=-136718.75, xmax=5621093.75,
+xtick style={color=dimgray85},
+xtick={-1000000,0,1000000,2000000,3000000,4000000,5000000,6000000},
+xticklabels={\ensuremath{-}1,0,1,2,3,4,5,6},
+y grid style={white},
+ylabel=\textcolor{dimgray85}{Total time (s)},
+ymajorgrids,
+ymin=-1.82808433539877, ymax=45.1943113894709,
+ytick style={color=dimgray85}
+]
+\path [draw=black, semithick]
+(axis cs:125000,0.779656118982615)
+--(axis cs:125000,0.789693881017385);
+
+\path [draw=black, semithick]
+(axis cs:421875,2.55632164214235)
+--(axis cs:421875,2.62382835785765);
+
+\path [draw=black, semithick]
+(axis cs:1000000,6.19294376900195)
+--(axis cs:1000000,6.35945623099805);
+
+\path [draw=black, semithick]
+(axis cs:1953125,12.5751891928374)
+--(axis cs:1953125,12.7739108071626);
+
+\path [draw=black, semithick]
+(axis cs:3375000,21.6653043770414)
+--(axis cs:3375000,21.9961456229586);
+
+\path [draw=black, semithick]
+(axis cs:5359375,40.557258493516)
+--(axis cs:5359375,41.209291506484);
+
+\path [draw=black, semithick]
+(axis cs:125000,0.309297288458942)
+--(axis cs:125000,0.316752711541057);
+
+\path [draw=black, semithick]
+(axis cs:421875,0.759112258047775)
+--(axis cs:421875,0.775687741952225);
+
+\path [draw=black, semithick]
+(axis cs:1000000,1.54119986933917)
+--(axis cs:1000000,1.55555013066083);
+
+\path [draw=black, semithick]
+(axis cs:1953125,2.80682390599246)
+--(axis cs:1953125,2.84262609400754);
+
+\path [draw=black, semithick]
+(axis cs:3375000,4.66096039225482)
+--(axis cs:3375000,4.73758960774518);
+
+\path [draw=black, semithick]
+(axis cs:5359375,8.06759300833981)
+--(axis cs:5359375,8.28130699166019);
+
+\path [draw=black, semithick]
+(axis cs:125000,0.817391041076087)
+--(axis cs:125000,0.822608958923913);
+
+\path [draw=black, semithick]
+(axis cs:421875,2.95001915537841)
+--(axis cs:421875,2.99868084462159);
+
+\path [draw=black, semithick]
+(axis cs:1000000,7.0149363693974)
+--(axis cs:1000000,7.0866636306026);
+
+\path [draw=black, semithick]
+(axis cs:1953125,13.7607447968126)
+--(axis cs:1953125,13.9279552031874);
+
+\path [draw=black, semithick]
+(axis cs:3375000,25.0584615978647)
+--(axis cs:3375000,25.3326384021353);
+
+\path [draw=black, semithick]
+(axis cs:5359375,42.6778202343868)
+--(axis cs:5359375,43.0569297656132);
+
+\path [draw=black, semithick]
+(axis cs:125000,0.67392059088761)
+--(axis cs:125000,0.68587940911239);
+
+\path [draw=black, semithick]
+(axis cs:421875,2.17840611609867)
+--(axis cs:421875,2.18589388390133);
+
+\path [draw=black, semithick]
+(axis cs:1000000,5.09397316158006)
+--(axis cs:1000000,5.17522683841994);
+
+\path [draw=black, semithick]
+(axis cs:1953125,10.0038666058921)
+--(axis cs:1953125,10.0712833941079);
+
+\path [draw=black, semithick]
+(axis cs:3375000,18.4395198616569)
+--(axis cs:3375000,18.6787801383431);
+
+\path [draw=black, semithick]
+(axis cs:5359375,30.9011331705115)
+--(axis cs:5359375,31.1655668294885);
+
+\addplot [semithick, chocolate2267451, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.784675002098083
+421875 2.59007501602173
+1000000 6.27619981765747
+1953125 12.6745500564575
+3375000 21.8307247161865
+5359375 40.8832740783691
+};
+\addlegendentry{Serial Rust}
+\addplot [semithick, steelblue52138189, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.313024997711182
+421875 0.767400026321411
+1000000 1.54837501049042
+1953125 2.82472491264343
+3375000 4.69927501678467
+5359375 8.1744499206543
+};
+\addlegendentry{Rust with Rayon}
+\addplot [semithick, mediumpurple152142213, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.819999933242798
+421875 2.97434997558594
+1000000 7.05079984664917
+1953125 13.844349861145
+3375000 25.1955509185791
+5359375 42.867374420166
+};
+\addlegendentry{Rust with MPI}
+\addplot [semithick, gray119, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.679899930953979
+421875 2.18214988708496
+1000000 5.1346001625061
+1953125 10.0375747680664
+3375000 18.5591506958008
+5359375 31.0333499908447
+};
+\addlegendentry{Rust with MPI and Rayon}
+\end{axis}
+
+\end{tikzpicture}

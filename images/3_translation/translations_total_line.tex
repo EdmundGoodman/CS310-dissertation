@@ -1,0 +1,188 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{crimson2143940}{RGB}{214,39,40}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{darkslategray38}{RGB}{38,38,38}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{mediumpurple148103189}{RGB}{148,103,189}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+axis line style={lightgray204},
+height=0.45\textheight,
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=none
+},
+tick align=outside,
+tick pos=left,
+title={Rust Translations Total Times},
+width=\textwidth,
+x grid style={lightgray204},
+xlabel=\textcolor{darkslategray38}{Mesh size},
+xmajorgrids,
+xmin=-650000, xmax=16400000,
+xtick style={color=darkslategray38},
+xtick={-2000000,0,2000000,4000000,6000000,8000000,10000000,12000000,14000000,16000000,18000000},
+xticklabels={\ensuremath{-}0.2,0.0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8},
+y grid style={lightgray204},
+ylabel=\textcolor{darkslategray38}{Total time (s)},
+ymajorgrids,
+ymin=-31.8505937261743, ymax=685.76384916357,
+ytick style={color=darkslategray38}
+]
+\path [draw=black, semithick]
+(axis cs:125000,3.59458759136562)
+--(axis cs:125000,3.64646240863438);
+
+\path [draw=black, semithick]
+(axis cs:1000000,29.8554891990788)
+--(axis cs:1000000,30.2499108009212);
+
+\path [draw=black, semithick]
+(axis cs:3375000,100.220842202002)
+--(axis cs:3375000,100.665007797998);
+
+\path [draw=black, semithick]
+(axis cs:8000000,246.437751474253)
+--(axis cs:8000000,250.882798525747);
+
+\path [draw=black, semithick]
+(axis cs:15625000,636.8821391496)
+--(axis cs:15625000,653.1450108504);
+
+\path [draw=black, semithick]
+(axis cs:125000,0.916547025389579)
+--(axis cs:125000,0.922152974610421);
+
+\path [draw=black, semithick]
+(axis cs:1000000,6.92113850063032)
+--(axis cs:1000000,6.94586149936968);
+
+\path [draw=black, semithick]
+(axis cs:3375000,24.2411972972584)
+--(axis cs:3375000,24.7771527027416);
+
+\path [draw=black, semithick]
+(axis cs:8000000,63.0366056124052)
+--(axis cs:8000000,64.7179943875948);
+
+\path [draw=black, semithick]
+(axis cs:15625000,125.655049885433)
+--(axis cs:15625000,127.198900114567);
+
+\path [draw=black, semithick]
+(axis cs:125000,0.850320752802428)
+--(axis cs:125000,0.855279247197572);
+
+\path [draw=black, semithick]
+(axis cs:1000000,6.55809995070753)
+--(axis cs:1000000,6.62995004929247);
+
+\path [draw=black, semithick]
+(axis cs:3375000,22.8251515924216)
+--(axis cs:3375000,23.4979984075784);
+
+\path [draw=black, semithick]
+(axis cs:8000000,60.4187811863453)
+--(axis cs:8000000,60.8763688136547);
+
+\path [draw=black, semithick]
+(axis cs:15625000,118.750079255578)
+--(axis cs:15625000,120.460770744422);
+
+\path [draw=black, semithick]
+(axis cs:125000,0.76824458699591)
+--(axis cs:125000,0.77625541300409);
+
+\path [draw=black, semithick]
+(axis cs:1000000,6.19650354922889)
+--(axis cs:1000000,6.31524645077111);
+
+\path [draw=black, semithick]
+(axis cs:3375000,21.7465944841671)
+--(axis cs:3375000,22.3068055158329);
+
+\path [draw=black, semithick]
+(axis cs:8000000,56.9181220770364)
+--(axis cs:8000000,58.3228779229636);
+
+\path [draw=black, semithick]
+(axis cs:15625000,113.696674820263)
+--(axis cs:15625000,114.957775179737);
+
+\path [draw=black, semithick]
+(axis cs:125000,0.786085280220357)
+--(axis cs:125000,0.795214719779643);
+
+\path [draw=black, semithick]
+(axis cs:1000000,6.2095920556317)
+--(axis cs:1000000,6.3088579443683);
+
+\path [draw=black, semithick]
+(axis cs:3375000,21.8757629487399)
+--(axis cs:3375000,22.0673870512601);
+
+\path [draw=black, semithick]
+(axis cs:8000000,58.8383344537454)
+--(axis cs:8000000,59.2720155462546);
+
+\path [draw=black, semithick]
+(axis cs:15625000,114.237761390017)
+--(axis cs:15625000,116.593888609983);
+
+\addplot [semithick, steelblue31119180, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 3.62052488327026
+1000000 30.0527000427246
+3375000 100.442924499512
+8000000 248.660278320312
+15625000 645.013549804688
+};
+\addlegendentry{Direct translation}
+\addplot [semithick, darkorange25512714, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.919350028038025
+1000000 6.93349981307983
+3375000 24.5091743469238
+8000000 63.8773002624512
+15625000 126.426971435547
+};
+\addlegendentry{Indexed translation}
+\addplot [semithick, forestgreen4416044, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.852800011634827
+1000000 6.59402513504028
+3375000 23.1615753173828
+8000000 60.647575378418
+15625000 119.605422973633
+};
+\addlegendentry{Single indexed translation}
+\addplot [semithick, crimson2143940, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.772249937057495
+1000000 6.25587511062622
+3375000 22.0266990661621
+8000000 57.6204986572266
+15625000 114.327224731445
+};
+\addlegendentry{No bounds checking translation}
+\addplot [semithick, mediumpurple148103189, mark=x, mark size=3, mark options={solid}]
+table {%
+125000 0.790650010108948
+1000000 6.2592248916626
+3375000 21.9715747833252
+8000000 59.05517578125
+15625000 115.415824890137
+};
+\addlegendentry{Iterators translation}
+\end{axis}
+
+\end{tikzpicture}

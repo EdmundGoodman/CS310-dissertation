@@ -163,17 +163,17 @@ The necessary complexity to represent the unique aspects of the results being re
 
 A full listing of the YAML file for the replication study is provided in Appendix \ref{sec:tooling-replication-yaml}. It is only 190 lines long, much of which can be templated from examples in the tool documentation. This is significantly shorter in line length than the code that would be required to script running all the configurations of the programs, aggregating the results, and plotting graphs for them -- and avoids much of the time spent debugging that would be required for writing such custom scripts. Examples of the original and replicated figures from the paper are shown pairwise in figures \ref{fig:replication_mine_1}, \ref{fig:replication_original_1}, \ref{fig:replication_mine_2}, \ref{fig:replication_original_2}, \ref{fig:replication_mine_4}, and \ref{fig:replication_original_4}.
 
-\newpage
-
+% \newpage
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_original_1.png}
+    \includegraphics[width=0.35\textheight]{images/4_tooling/replication_study/replication_original_1.png}
     \caption{A plot comparing total time taken for a serial codebase, from Moran and Bull's paper \cite{moranEmergingTechnologiesRust2023}.}
     \label{fig:replication_original_1}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_mine_1.png}
+    \include{images/4_tooling/replication_study/serial.tex}
+    % \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_mine_1.png}
     \caption{A plot comparing total time taken for a serial codebase, replicated using HPC MultiBench.}
     \label{fig:replication_mine_1}
 \end{figure}
@@ -181,13 +181,14 @@ A full listing of the YAML file for the replication study is provided in Appendi
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_original_2.png}
+    \includegraphics[width=0.35\textheight]{images/4_tooling/replication_study/replication_original_2.png}
     \caption{A plot comparing serial execution times relative to C++, from Moran and Bull's paper \cite{moranEmergingTechnologiesRust2023}.}
     \label{fig:replication_original_2}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_mine_2.png}
+    \include{images/4_tooling/replication_study/serial_relative.tex}
+    % \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_mine_2.png}
     \caption{A plot comparing serial execution times relative to C++, replicated using HPC MultiBench.}
     \label{fig:replication_mine_2}
 \end{figure}
@@ -195,13 +196,14 @@ A full listing of the YAML file for the replication study is provided in Appendi
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_original_4.png}
+    \includegraphics[width=0.35\textheight]{images/4_tooling/replication_study/replication_original_4.png}
     \caption{A plot showing rate of iterations scaling with the number of threads used, from Moran and Bull's paper \cite{moranEmergingTechnologiesRust2023}.}
     \label{fig:replication_original_4}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_mine_4.png}
+    \include{images/4_tooling/replication_study/iterations_threads_16.tex}
+    % \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_mine_4.png}
     \caption{A plot showing rate of iterations scaling with the number of threads used, replicated using HPC MultiBench.}
     \label{fig:replication_mine_4}
 \end{figure}
