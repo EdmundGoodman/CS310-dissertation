@@ -511,53 +511,53 @@ Figure \ref{fig:translations_total_line} provides an overall picture on how the 
     \label{fig:translations_total_line}
 \end{figure}
 
-Having seen the overall picture, we can analyse the performance of each kernel. The dominant kernel in the HPCCG mini-app is the sparse matrix-vector multiplication operation. We can see that the data structure refactor has a profound impact on performance here. The remaining kernels have a much smaller impact, with reducing the memory bandwidth required by adopting single indexing making a small improvement, then avoiding bounds checks or using iterators having very similar improvements in performance beyond that.
+% Having seen the overall picture, we can analyse the performance of each kernel. The dominant kernel in the HPCCG mini-app is the sparse matrix-vector multiplication operation. We can see that the data structure refactor has a profound impact on performance here. The remaining kernels have a much smaller impact, with reducing the memory bandwidth required by adopting single indexing making a small improvement, then avoiding bounds checks or using iterators having very similar improvements in performance beyond that.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/3_translation/performance/translations_sparsemv_line.png}
-    \caption{A diagram showing the wall time taken for the sparsmv kernel only of each translation, as the overall mesh size is varied.}
-    \label{fig:translations_waxpby_line}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=\textwidth]{images/3_translation/performance/translations_sparsemv_line.png}
+%     \caption{A diagram showing the wall time taken for the sparsmv kernel only of each translation, as the overall mesh size is varied.}
+%     \label{fig:translations_waxpby_line}
+% \end{figure}
 
-Figures \ref{fig:translations_ddot_line} and \ref{fig:translations_waxpby_line} show the wall time taken for the vector dot product and pairwise summation of two scaled vector kernels respectively. As compared with the sparse matrix-vector kernel, shown in Figure \ref{fig:translations_waxpby_line}, they are much less affected by data structure refactoring for small values, but then more affected for large values. This might be due to caching behaviours, as the direct translation requires more data to operate on, hence resulting in cache capacity misses for smaller meshes.
+% Figures \ref{fig:translations_ddot_line} and \ref{fig:translations_waxpby_line} show the wall time taken for the vector dot product and pairwise summation of two scaled vector kernels respectively. As compared with the sparse matrix-vector kernel, shown in Figure \ref{fig:translations_waxpby_line}, they are much less affected by data structure refactoring for small values, but then more affected for large values. This might be due to caching behaviours, as the direct translation requires more data to operate on, hence resulting in cache capacity misses for smaller meshes.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/3_translation/performance/translations_ddot_line.png}
-    \caption{A diagram showing the wall time taken for the ddot kernel only of each translation, as the overall mesh size is varied.}
-    \label{fig:translations_ddot_line}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=\textwidth]{images/3_translation/performance/translations_ddot_line.png}
+%     \caption{A diagram showing the wall time taken for the ddot kernel only of each translation, as the overall mesh size is varied.}
+%     \label{fig:translations_ddot_line}
+% \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/3_translation/performance/translations_waxpby_line.png}
-    \caption{A diagram showing the wall time taken for the waxpby kernel only of each translation, as the overall mesh size is varied.}
-    \label{fig:translations_waxpby_line}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=\textwidth]{images/3_translation/performance/translations_waxpby_line.png}
+%     \caption{A diagram showing the wall time taken for the waxpby kernel only of each translation, as the overall mesh size is varied.}
+%     \label{fig:translations_waxpby_line}
+% \end{figure}
 
-In addition to characterising how different translations affect performance, we can also get a preliminary understanding of the efficacy of different parallelism techniques in Rust. Figure \ref{fig:translation_parallelism_rust} shows the relative performance as characterised by the scaling of total wall time for serial, multi-threaded, MPI, and hybrid translations of the HPCCG mini-app.
+% % TODO: Consider moving these summary charts to the performance analysis section?
+% In addition to characterising how different translations affect performance, we can also get a preliminary understanding of the efficacy of different parallelism techniques in Rust. Figure \ref{fig:translation_parallelism_rust} shows the relative performance as characterised by the scaling of total wall time for serial, multi-threaded, MPI, and hybrid translations of the HPCCG mini-app.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/3_translation/performance/translation_parallelism_rust.png}
-    \caption{A diagram showing the total wall time taken for Rust implementations of parallelism approaches, as the overall mesh size is varied.}
-    \label{fig:translation_parallelism_rust}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=\textwidth]{images/3_translation/performance/translation_parallelism_rust.png}
+%     \caption{A diagram showing the total wall time taken for Rust implementations of parallelism approaches, as the overall mesh size is varied.}
+%     \label{fig:translation_parallelism_rust}
+% \end{figure}
 
-Here we can see that multi-threading is by far the most performant for small workloads on a single computer node. However, message passing approaches provide the capability to scale processing to clustered compute resources beyond the shared memory architecture of a single machine, and can be used in combination with multi-threaded approaches.
+% Here we can see that multi-threading is by far the most performant for small workloads on a single computer node. However, message passing approaches provide the capability to scale processing to clustered compute resources beyond the shared memory architecture of a single machine, and can be used in combination with multi-threaded approaches.
 
-Figure \ref{fig:translation_parallelism_cpp} shows the same experiments run over the parallelism methodologies of the C++ codebase. From this we can see that very similar trends hold, with the only difference being the Rust MPI implementation is slightly slower. A likely cause for this is the overhead as a result of the Rust bindings into the C++ implementation of the MPI specification.
+% Figure \ref{fig:translation_parallelism_cpp} shows the same experiments run over the parallelism methodologies of the C++ codebase. From this we can see that very similar trends hold, with the only difference being the Rust MPI implementation is slightly slower. A likely cause for this is the overhead as a result of the Rust bindings into the C++ implementation of the MPI specification.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/3_translation/performance/translation_parallelism_cpp.png}
-    \caption{A diagram showing the total wall time taken for C++ implementations of parallelism approaches, as the overall mesh size is varied.}
-    \label{fig:translation_parallelism_cpp}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=\textwidth]{images/3_translation/performance/translation_parallelism_cpp.png}
+%     \caption{A diagram showing the total wall time taken for C++ implementations of parallelism approaches, as the overall mesh size is varied.}
+%     \label{fig:translation_parallelism_cpp}
+% \end{figure}
 
 In summary, the translation effort resulted in a performant implementation of the HPCCG mini-app in Rust, supporting both shared-memory parallelism through \texttt{rayon}, along with the stretch goal of distributed memory parallelism through the Rust MPI bindings. In addition to this, the Rust implementations of parallelism approaches shared similar performance characteristics to their C++ counterparts. This demonstrates that it is possible to use Rust for High-Performance Applications, for which HPCCG is representative workload. However, there are still aspects of Rust which add difficulty to this process, such as the state of the documentation of the Rust bindings to MPI -- but this is likely to improve in the future as Rust and its ecosystem matures.
-
 
 
 \section{Equivalence checking}

@@ -505,9 +505,28 @@ From Figure \ref{fig:16_kokkos_line} which shows execution time of the Rust and 
 In this set of results, the slow down of Kokkos is not sufficiently comparable to that of Rust to motivate the performance-productivity trade-off. However, the benchmarked implementation uses Kokkos for parallelism only, without modifying the data structure, so may underreport the upper bound for the performance impact of Kokkos. % TODO: Find a paper with this upper bound
 
 
-% \section{Summary of results}
-% \label{sec:performance-results}
+\section{Summary of results}
+\label{sec:performance-results}
 
-% Performance
+Having compared the performance of individual parallelism approaches between C++ and Rust implementations, we can finally get an overall view of performance through a comparison between the approaches for each of the languages. Figure \ref{fig:translation_parallelism_rust} shows the relative performance as characterised by the scaling of total wall time for serial, multi-threaded, MPI, and hybrid Rust translations of the HPCCG mini-app.
 
-% Productivity
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/3_translation/performance/translation_parallelism_rust.png}
+    \caption{A diagram showing the total wall time taken for Rust implementations of parallelism approaches, as the overall mesh size is varied.}
+    \label{fig:translation_parallelism_rust}
+\end{figure}
+
+Here we can see that multi-threading is by far the most performant for small workloads on a single computer node. However, message passing approaches provide the capability to scale processing to clustered compute resources beyond the shared memory architecture of a single machine, and can be used in combination with multi-threaded approaches.
+
+Figure \ref{fig:translation_parallelism_cpp} shows the same experiments run over the parallelism methodologies of the C++ codebase. From this we can see that very similar trends hold, with the only difference being the Rust MPI implementation is slightly slower. A likely cause for this is the overhead as a result of the Rust bindings into the C++ implementation of the MPI specification.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/3_translation/performance/translation_parallelism_cpp.png}
+    \caption{A diagram showing the total wall time taken for C++ implementations of parallelism approaches, as the overall mesh size is varied.}
+    \label{fig:translation_parallelism_cpp}
+\end{figure}
+
+% TODO: Check results 1.5x
+In summary, from the detailed comparisons in the previous sections we can see that Rust consistently approaches C++ in performance for representative High-Performance Computing workloads, with around a $1.5 \times$ slowdown across approaches. However, the trends and scaling characteristics between the two languages are very similar. This is linearly scaled slowdown is consistent with the data collected using profilers, including the overhead in executed assembly code shown by \texttt{perf}, and the lower overall arithmetic intensity and rate of computational operations shown in the roofline plots.
