@@ -14,7 +14,7 @@
 axis line style={lightgray204},
 height=0.45\textheight,
 legend cell align={left},
-legend style={fill opacity=0.8, draw opacity=1, text opacity=1, anchor=south east, draw=none},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1, anchor=south east, at={(0.97,0.03)}, draw=none},
 tick align=outside,
 tick pos=left,
 title={Multi-Threaded Implementation Relative Execution Times},
@@ -103,23 +103,24 @@ table {%
 27000000 1
 64000000 1
 };
-\addlegendentry{C++ with 1 OpenMP thread}
-\addplot [semithick, darkorange25512714, mark=x, mark size=3, mark options={solid}]
-table {%
-1000000 1
-8000000 1
-27000000 1
-64000000 1
-};
-\addlegendentry{C++ with 8 OpenMP threads}
-\addplot [semithick, forestgreen4416044, mark=x, mark size=3, mark options={solid}]
-table {%
-1000000 1
-8000000 1
-27000000 1
-64000000 1
-};
-\addlegendentry{C++ with 32 OpenMP threads}
+\addlegendentry{Baseline C++ with OpenMP threading}
+% \addlegendentry{C++ with 1 OpenMP thread}
+% \addplot [semithick, darkorange25512714, mark=x, mark size=3, mark options={solid}]
+% table {%
+% 1000000 1
+% 8000000 1
+% 27000000 1
+% 64000000 1
+% };
+% \addlegendentry{C++ with 8 OpenMP threads}
+% \addplot [semithick, forestgreen4416044, mark=x, mark size=3, mark options={solid}]
+% table {%
+% 1000000 1
+% 8000000 1
+% 27000000 1
+% 64000000 1
+% };
+% \addlegendentry{C++ with 32 OpenMP threads}
 \addplot [semithick, crimson2143940, mark=x, mark size=3, mark options={solid}]
 table {%
 1000000 1.21488606929779
@@ -127,7 +128,7 @@ table {%
 27000000 1.45749032497406
 64000000 1.47817730903625
 };
-\addlegendentry{Rust with 1 Rayon thread}
+\addlegendentry{Relative Rust with 1 Rayon thread}
 \addplot [semithick, mediumpurple148103189, mark=x, mark size=3, mark options={solid}]
 table {%
 1000000 1.04604995250702
@@ -135,7 +136,7 @@ table {%
 27000000 1.58763039112091
 64000000 1.57677209377289
 };
-\addlegendentry{Rust with 8 Rayon threads}
+\addlegendentry{Relative Rust with 8 Rayon threads}
 \addplot [semithick, sienna1408675, mark=x, mark size=3, mark options={solid}]
 table {%
 1000000 0.663738250732422
@@ -143,7 +144,7 @@ table {%
 27000000 1.55039536952972
 64000000 1.62133634090424
 };
-\addlegendentry{Rust with 32 Rayon threads}
+\addlegendentry{Relative Rust with 32 Rayon threads}
 \end{axis}
 
 \end{tikzpicture}

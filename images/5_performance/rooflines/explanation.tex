@@ -1,0 +1,34 @@
+\begin{tikzpicture}
+  \pgfplotsset {
+    scale only axis,
+    axis equal image,
+    width=5in,
+    /pgf/number format/1000 sep={},
+    /tikz/maxline/.style={blue, thick, no marks},
+    /tikz/memline/.style={red, thick, no marks},
+    /tikz/maxlabel/.style={blue!40!black, right, fill=white, fill opacity=0.7, text opacity=1.0, rounded corners=2pt, inner sep=0.5pt},
+    /tikz/memlabel/.style={red!50!black, rotate=45, right, fill=white, fill opacity=0.7, text opacity=1.0, rounded corners=2pt, inner sep=0.5pt}
+  }
+
+  \def\Xmin{1.000000e-02}
+  \def\Xmax{1.000000e+02}
+
+  \begin{loglogaxis}[
+    grid=both,
+    grid style={black!50, densely dotted},
+    xlabel= FLOPs/Byte,
+    ylabel= GFLOPs/sec,
+    xmin=\Xmin,
+    xmax=\Xmax,
+    ymin=1.500000e+00,
+    ymax= ,
+    log ticks with fixed point
+    ]
+
+    \node[maxlabel] at (axis cs: 1.9000000e+00,1.8448000e+01) {22.0 FP64/sec (Maximum)};
+    \node[memlabel] at (axis cs: 1.1036459e-01,2.1571047e+00) {DRAM - 24.9 GB/s};
+    \addplot[memline, domain=(\Xmin:8.8336673e-01)] {2.4950000e+01*x};
+    \addplot[maxline, domain=(8.8336673e-01:\Xmax)] {2.2040000e+01};
+
+  \end{loglogaxis}
+\end{tikzpicture}

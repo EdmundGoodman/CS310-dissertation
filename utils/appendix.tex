@@ -201,8 +201,8 @@ This data structure provides significant performance improvements over a full ma
 \section{Hardware specifications}
 \label{sec:tooling-replication-yaml}
 
-\begin{listing}[H]
-    \begin{minted}[linenos,breaklines]{yaml}
+\begin{code}
+    \begin{minted}{yaml}
 run_configurations:
   "cpp-serial":
     sbatch_config:
@@ -396,7 +396,7 @@ benches:
     \end{minted}
     \caption{The YAML file defining the reproducibility study of Moran and Bull's paper ``Emerging Technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.}
     \label{listing:athena-lscpu}
-\end{listing}
+\end{code}
 
 
 
@@ -433,8 +433,8 @@ The \texttt{lstopo} tool can be used to draw a graphical representation of both 
 
 The results of running \texttt{lscpu} on the compute nodes for each of the systems are shown below in Listings \ref{listing:athena-lscpu}, \ref{listing:kudu-lscpu}, and \ref{listing:avon-lscpu}.
 
-\begin{listing}[H]
-    \begin{minted}[linenos,breaklines]{text}
+\begin{code}
+    \begin{minted}{text}
 Architecture:             x86_64
   CPU op-mode(s):         32-bit, 64-bit
   Address sizes:          39 bits physical, 48 bits virtual
@@ -486,10 +486,10 @@ Vulnerabilities:
     \end{minted}
     \caption{The output of the \texttt{lscpu} command on Athena.}
     \label{listing:athena-lscpu}
-\end{listing}
+\end{code}
 
-\begin{listing}[H]
-    \begin{minted}[linenos,breaklines]{text}
+\begin{code}
+    \begin{minted}{text}
 Architecture:        x86_64
 CPU op-mode(s):      32-bit, 64-bit
 Byte Order:          Little Endian
@@ -519,10 +519,10 @@ Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cm
     \end{minted}
     \caption{The output of the \texttt{lscpu} command on the Kudu compute node.}
     \label{listing:kudu-lscpu}
-\end{listing}
+\end{code}
 
-\begin{listing}[H]
-    \begin{minted}[linenos,breaklines]{text}
+\begin{code}
+    \begin{minted}{text}
 Architecture:        x86_64
 CPU op-mode(s):      32-bit, 64-bit
 Byte Order:          Little Endian
@@ -552,4 +552,4 @@ Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cm
     \end{minted}
     \caption{The output of the \texttt{lscpu} command on Athena.}
     \label{listing:avon-lscpu}
-\end{listing}
+\end{code}

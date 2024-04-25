@@ -5,11 +5,11 @@
 
 In conclusion, this project assesses Rust as suitable for performant and production implementations of High-Performance Computing codebases, answering the titular question. This conclusion is as a result of three factors.
 
-Firstly, \Cref{ch:translation} shows that it is possible to translate non-trivial existing codebases representative of High-Performance Computing workloads from C++ into Rust, including leveraging both shared and distributed memory parallelism through the \texttt{rayon} and \texttt{mpi} crates. It further shows that these translations provide significant benefits to developer productivity. These include reduced effort spent debugging as a result of memory and concurrency safety guarantees and the rich type system, along with quantitative models of productivity using the \texttt{scc} tool suggesting around a $0.61 \times$ total cost to complete develop the codebase with both shared and distributed memory parallelism in Rust.
+Firstly, \Cref{ch:translation} shows that it is possible to translate non-trivial existing codebases representative of High-Performance Computing workloads from C++ into Rust, including leveraging both shared and distributed memory parallelism through the \texttt{rayon} and \texttt{mpi} crates. It further shows that these translations provide significant benefits to developer productivity. These include reduced effort spent debugging as a result of memory and concurrency safety guarantees and the rich type system, along with quantitative models of productivity using the \texttt{scc} tool suggesting around $0.61 \times$ the total cost is required to complete develop a codebase with equivalent functionality leveraging both shared and distributed memory parallelism in Rust.
 
 Secondly, \Cref{ch:performance} shows that the performance of Rust translations of non-trivial C++ codebases closely approaches their reference implementations, with at worst around a $1.5 \times$ slowdown incurred across parallelism strategies. In addition to this, the Rust translations exhibit similar strong and weak scaling properties to the original C++ implementations, demonstrating its capability to scale to the extent required for High-Performance Computing workloads. These performance measurements concur with existing literature, such as Moran and Bull's ``Emerging Technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.
 
-These first two factors can be interpreted together by plotting a graph comparing the empirical performance and estimated productivity of C++ and Rust implementations of the HPCCG mini-app, as shown in Figure \ref{fig:conclusions_performance_productivity}. This figure visualises the fact that C++ offers fair performance gains over Rust, but development of Rust programs is likely to improve development productivity.
+These first two factors can be interpreted together by plotting a graph comparing the empirical performance and estimated productivity of C++ and Rust implementations of the HPCCG mini-app, as shown in Figure \ref{fig:conclusions_performance_productivity}. This figure visualises the result that C++ offers fair performance gains over Rust, but development of Rust programs is likely to improve development productivity.
 
 \begin{figure}[H]
     \centering
@@ -19,20 +19,11 @@ These first two factors can be interpreted together by plotting a graph comparin
     \label{fig:conclusions_performance_productivity}
 \end{figure}
 
+% TODO: Check up on hybrid re-runs
 % scc . --exclude-file Cargo.lock --exclude-dir target
 % scc . --exclude-file .gitignore YAML* dump_matlab*
-% name,performance (200^3 in s),scc cost($)
-% serial,58.1+/-0.6,11844
-% rayon(32),11.77+/-0.04,11980
-% mpi,58.28+/-0.05,27553
-% hybrid,68.26+/-0.19,27723
-% Do the header comments mess this up?
-% serial,43.6+/-0.6,31665
-% openmp(32),9.8+/-0.4,31970
-% mpi,48.68+/-0.05,45180
-% hybrid,35.87+/-0.17,45500
 
-The final factor which impacts the conclusion is that Rust's performance and productivity are likely to improve faster than C++. This is because it is a relatively young language, whose package ecosystem and optimising compilers are still under active development and hence yet to reach maturity.
+The final factor which impacts the conclusion is that the performance and productivity of Rust is likely to improve faster than for C++. This is because it is a relatively young language, whose package ecosystem and optimising compilers are still under active development and hence yet to reach maturity.
 
 These factors taken in combination demonstrate Rust's suitability for High-Performance Computing applications, as despite its performance not matching C++, it provides commensurate benefits in developer productivity such as its compiler guarantees of memory and thread safety, which might make it preferable for real-world applications bounded by budget.
 
@@ -50,7 +41,7 @@ These factors taken in combination demonstrate Rust's suitability for High-Perfo
 %     Why should this project be considered an achievement?
 %     What are the limitations of this project?
 
-On reflection, I am immensely proud of the work I have completed in the course of this project. Coming in to the project, I did not have a good way to estimate how long translation tasks, so generously scheduled time in my project specification to undertake these tasks. It transpired that I was able to complete the translation of the serial and parallel implementations faster than expected, which allowed me to focus on the stretch goals of the project. The initially planned stretch goal was extending the translation effort to include an assessment of the Rust bindings to MPI. This presented an interesting technical challenge of using complex Rust structures within an API which does not exactly map the C++ implementation of the MPI specification.
+On reflection, I am immensely proud of the work I have completed in the course of this project. Coming in to the project, I did not have a good way to estimate how long translation tasks, so generously scheduled time in my project specification to undertake these tasks. It transpired that I was able to complete the translation of the serial and parallel implementations faster than expected, which allowed me to focus on the stretch goals of the project. The initially planned stretch goal was extending the translation effort to include an assessment of the Rust bindings to MPI. This presented an interesting technical challenge of using complex Rust structures within an API which does not exactly map to the C++ implementation of the MPI specification.
 
 In addition to this, empowered by incredibly helpful conversations with my supervisor, I also chose to extend the project by building tooling to facilitate performance measurements on High-Performance Computing resources using Slurm. I found this very fulfilling, as I personally enjoy building tooling, and was able to apply knowledge about what makes real-world tools effective that I learnt on my year in industry. In my opinion, this is one of the stand-out aspects of this project, as it not only was it incredibly helpful during my performance analysis, but can also be used as an open source software product going forward.
 
@@ -93,7 +84,7 @@ Secondly, when developing the novel equivalence checking approach leveraging for
 %     \label{fig:autocxx_pr}
 % \end{figure}
 
-This pull request has since been merged into the main branch in this repository, and as such will be included in the next release of the \texttt{autocxx} tool. Since this functionality is very common in High-Performance Applications, this confirmation of support unblocks applying this technique in future work
+This pull request has since been merged into the main branch of this repository, and as such will be included in the next release of the \texttt{autocxx} tool. Since this functionality is very common in High-Performance Applications, this confirmation of support unblocks applying this technique in future work
 
 Finally, I made a pull request into the HPCCG repository to add Doxygen-style docstrings to the mini-app, based on the understanding that I gained during the translation process \url{https://github.com/Mantevo/HPCCG/pull/5}. However, since this project was last actively developed seven years ago, this pull request has not been reviewed nor merged.
 
