@@ -66,11 +66,14 @@ From the third rule of Rust's ownership model, we can see that memory management
 \begin{code}
     %TC:ignore
     \begin{minted}{rust}
-        {                      // s is not valid here, it’s not yet declared
-            let s = "hello";   // s is valid from this point forward
-        
+        {
+            // s is not valid here, it’s not yet declared
+            let s = "hello";
+            // s is valid from this point forward
+
             // do stuff with s
-        }                      // this scope is now over, and s is no longer valid
+        }
+        // this scope is now over, and s is no longer valid
     \end{minted}
     %TC:endignore
     \caption{A Rust program to demonstrate the scope of variables, derived from Listing 4-1 of Klabnik and Nichols' ``The Rust Programming Language'' \cite{RustProgrammingLanguage}.}
@@ -160,7 +163,7 @@ In the early 2010s, physical limitations began to change how computer hardware w
     \label{fig:scaling-trends-transistor-clock}
 \end{figure}
 
-As a result of this, the 2013 Mantevo paper notes that ``future performance gains come almost solely from running sets of instructions concurrently'' \cite{heroux2013mantevo}. This can be seen in \label{fig:scaling-trends-transistor-clock} as the increase in prevalence of multicore processors for parallel execution. There are some mechanisms which allow this to be implemented transparently to the programmer in hardware, such as instruction-level parallelism through superscalar processing and out-of-order execution \cite{pattersonHennessyComputerOrganisationArchitecture}, or vectorisation for SIMD processing \cite{pattersonHennessyComputerOrganisationArchitecture}. However, these performance gains begin to be curtailed by data hazards inherent to the software being executed \cite{shahhoseini1999achieving}, along with physical limitations to silicon footprint for a single CPU. As a result of this, parallelism approaches which are not transparent to the programmer are required for further performance increases.
+As a result of this, the 2013 Mantevo paper notes that ``future performance gains come almost solely from running sets of instructions concurrently'' \cite{heroux2013mantevo}. This can be seen in \ref{fig:scaling-trends-transistor-clock} as the increase in prevalence of multicore processors for parallel execution. There are some mechanisms which allow this to be implemented transparently to the programmer in hardware, such as instruction-level parallelism through superscalar processing and out-of-order execution \cite{pattersonHennessyComputerOrganisationArchitecture}, or vectorisation for SIMD processing \cite{pattersonHennessyComputerOrganisationArchitecture}. However, these performance gains begin to be curtailed by data hazards inherent to the software being executed \cite{shahhoseini1999achieving}, along with physical limitations to silicon footprint for a single CPU. As a result of this, parallelism approaches which are not transparent to the programmer are required for further performance increases.
 
 \subsection{Shared memory parallelism}
 \label{ssec:shared-memory-paralellism}
@@ -227,7 +230,7 @@ In Figure \ref{listing:cpp-ddot-openmp-race}, we can see the application of the 
     \label{listing:cpp-ddot-openmp-reduction}
 \end{code}
 
-Listing \ref{listing:cpp-ddot-openmp-reduction} shows how this can be simply mitigated by using an OpenMP reduction, which avoids this issue by maintaining local copies of the result across threads, then combining them at the end. However, this shows how susceptible even simple parallel programs can be to hard-to-debug errors. As discussed in section \ref{ssec:rust-parallelism}, Rust provides guarantees against this category of undefined behaviour, motivating its use in High-Performance Computing applications, which often rely heavily on multi-threading.
+Listing \ref{listing:cpp-ddot-openmp-reduction} shows how this can be simply mitigated by using an OpenMP reduction, which avoids this issue by maintaining local copies of the result across threads, then combining them at the end. However, this shows how susceptible even simple parallel programs can be to hard-to-debug errors. As discussed in section \ref{ssec:rust-fearless-concurrency}, Rust provides guarantees against this category of undefined behaviour, motivating its use in High-Performance Computing applications, which often rely heavily on multi-threading.
 
 The multi-threading approach to parallel is very effective for single machines running small or medium-sized programs. However, it is dependent on the machine it is executing having a shared memory architecture, so cannot scale beyond running on a single machine to clusters of computers. As a result of this, different approaches are required to aggregate together the work done by machines within a compute cluster with a distributed memory architecture.
 
@@ -239,7 +242,7 @@ Two pieces of key terminology in MPI are ``rank'' and ``size''. Size refers to t
 
 There are multiple implementations of the MPI standard, such as OpenMPI \cite{gabriel2004open} and MPICH \cite{gropp1996user}. These provide the functionality defined by the MPI standard for languages such as C++, FORTRAN, and Java. The MPI API is more complex than OpenMP, without the convenient compiler directives for parallelising loops, instead requiring more manual control over the way in which work is distributed. However, this provides the commensurate benefit of the ability to precisely control how data is shared, and allows it to operated over a distributed memory architecture.
 
-Again taking the example of the dot product operation shown in Listing \ref{listing:cpp-ddot}, Listing \label{listing:cpp-ddot-mpi} shows how MPI can be used to distribute the operation across a many ranks, allowing it to leverage parallelism on a distributed memory architecture.
+Again taking the example of the dot product operation shown in Listing \ref{listing:cpp-ddot}, Listing \ref{listing:cpp-ddot-mpi} shows how MPI can be used to distribute the operation across a many ranks, allowing it to leverage parallelism on a distributed memory architecture.
 
 \begin{code}
     %TC:ignore
@@ -273,12 +276,12 @@ Again taking the example of the dot product operation shown in Listing \ref{list
     \label{listing:cpp-ddot-mpi}
 \end{code}
 
-Even in this simple code snippet, we can see the additional programmer effort required to use MPI over OpenMP. Lines 6 to 11 of Listing \label{listing:cpp-ddot-mpi} manually split up the array to the ranks, whereas the OpenMP compiler directive does this automatically. The \mintinline{rust}{MPI_Allreduce} command on line 21 sends messages containing the local result to be reduced together with the \mintinline{rust}{MPI_SUM} operation to calculate the global result, which is the transmitted back as a message to all the ranks.
+Even in this simple code snippet, we can see the additional programmer effort required to use MPI over OpenMP. Lines 6 to 11 of Listing \ref{listing:cpp-ddot-mpi} manually split up the array to the ranks, whereas the OpenMP compiler directive does this automatically. The \mintinline{rust}{MPI_Allreduce} command on line 21 sends messages containing the local result to be reduced together with the \mintinline{rust}{MPI_SUM} operation to calculate the global result, which is the transmitted back as a message to all the ranks.
 
 \subsection{Performance portability frameworks}
 \label{ssec:performance-portability-frameworks}
 
-There also exist portability frameworks, such as Kokkos \cite{edwardsKokkosEnablingPerformance2013} and RAJA \cite{RAJAPortabilitySuite}, which provide an abstraction over many parallelism techniques to improve software portability. This reduces the programmer effort to write software which is highly performant across different hardware, but can incur a performance cost. As with OpenMP and MPI, taking the example of the dot product operation shown in Listing \ref{listing:cpp-ddot}
+There also exist portability frameworks, such as Kokkos \cite{edwardsKokkosEnablingPerformance2013} and RAJA \cite{RAJAPortabilitySuite}, which provide an abstraction over many parallelism techniques to improve software portability. This reduces the programmer effort to write software which is highly performant across different hardware, but can incur a performance cost. As with OpenMP and MPI, taking the example of the dot product operation shown in Listing \ref{listing:cpp-ddot}, an implementation of the same function using Kokkos for parallel execution is shown in Listing \ref{listing:cpp-ddot-kokkos}.
 
 \begin{code}
     %TC:ignore
@@ -301,7 +304,7 @@ There also exist portability frameworks, such as Kokkos \cite{edwardsKokkosEnabl
     \end{minted}
     %TC:endignore
     \caption{A C++ function using OpenMP to parallelise the dot product operation, using a reduction to avoid a race condition.}
-    \label{listing:cpp-ddot-openmp-reduction}
+    \label{listing:cpp-ddot-kokkos}
 \end{code}
 
 Kokkos is designed to be ``hardware agnostic'', providing an abstraction for writing performant code which can run on across CPUs and GPUs from a variety of hardware vendors \cite{KokkosEcosystem}. As discussed in the later section \ref{ssec:p3hpc}, this provides both productivity and portability for the programmer, as this abstraction means they can be less concerned about compatibility across hardware. However, this can come at a performance cost, as the abstraction may not be able to compile to be as performant as hand-optimised code. The prominence of Kokkos in the High-Performance Computing space is encouraging for the suitability of Rust for the same space, as it means that programmers are willing to make sacrifices in performance for commensurate improvements to other aspects of software development, such as productivity and portability.
@@ -405,8 +408,11 @@ Costanzo et al. provide a very compelling empirical analysis comparing Rust and 
 % https://github.com/lmoran94/eurocc_cfd (112 lines of Rust)
 Moran and Bull \cite{moranEmergingTechnologiesRust2023} investigate the performance of Rust as compared with C++ and FORTRAN on computational fluid dynamics problems in their technical report ``Emerging Technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}. As with Costanzo et al., Rust is introduced as a programming language which may be suitable for HPC, and the selected problem domain is explained as representative of common High-Performance Computing workloads. The paper goes on to benchmark Rust implementations of the problem on a HPC system, and compare them to C++ and FORTRAN implementations. The paper concludes that Rust is slower than C++ and FORTRAN for parallel workloads.
 
-Moran and Bull present a similar empirical analysis to Costanzo et al., comparing a small custom codebase which is representative of High-Performance Computing workloads, but differs by including FORTRAN in its comparisons, along with placing a greater focus on performance analysis and scaling, and less consideration to programming effort. However, Moran and Bull report significantly slower performance, significantly trailing C++ and FORTRAN, which contrasts Costanzo et al.'s findings of Rust being slightly slower or equally performant. Moran and Bull attribute their findings to the Rust compiler's attitude to memory safety. However, inspecting the source code made public after the publication of the paper \cite{Lmoran94Eurocc_cfdCFD}, it can be seen that the implementation does not fully leverage the capabilities of Rust. For example, it does not apply the optimisation techniques enumerated in Costanzo et al.'s paper. A reader of the paper created an optimised version  \cite{moranPaperFalse} \cite{phazer99HerePlayground2023}, which shows a 50\% performance increase over the paper's implementation by avoiding an extraneous copy operation, bringing Rust's performance closer to C++ and FORTRAN. However, this change makes the comparison against FORTRAN and C++ unfair, as the reference implementations also rely on this extraneous copy operation. A replication trial of the experiments in the paper using the published code is presented in section \ref{ssec:hpc-multibench-replication-study}, as both a demonstration of the utility of the HPC MultiBench tool, and to investigate the difference to Costanzo et al.'s findings. % In summary, possibly flawed due to bounds checked memory access, but not as flawed as some commentators looking only at the Rust implementation think it is.
-% TODO: Following replication study, this may need a re-work?
+Moran and Bull present a similar empirical analysis to Costanzo et al., comparing a small custom codebase which is representative of High-Performance Computing workloads, but differs by including FORTRAN in its comparisons, along with placing a greater focus on performance analysis and scaling, and less consideration to programming effort. However, Moran and Bull report significantly slower performance, significantly trailing C++ and FORTRAN, which contrasts Costanzo et al.'s findings of Rust being slightly slower or equally performant. Moran and Bull attribute their findings to the Rust compiler's attitude to memory safety.
+
+However, inspecting the source code made public after the publication of the paper \cite{Lmoran94Eurocc_cfdCFD}, it can be seen that the implementation does not leverage all the performance capabilities of Rust. For example, it does not apply many of the optimisation techniques enumerated in Costanzo et al.'s paper. A reader of the paper created an optimised version  \cite{moranPaperFalse} \cite{phazer99HerePlayground2023}, which shows a 50\% performance increase over the paper's implementation by avoiding an extraneous copy operation, bringing Rust's performance closer to C++ and FORTRAN. However, this change makes the comparison against FORTRAN and C++ unfair, as the reference implementations also rely on this extraneous copy operation. A replication trial of the experiments in the paper using the published code is presented in section \ref{ssec:hpc-multibench-replication-study}, as both a demonstration of the utility of the HPC MultiBench tool, and to investigate the difference to Costanzo et al.'s findings.
+% In summary, possibly flawed due to bounds checked memory access, but not as flawed as some commentators looking only at the Rust implementation think it is.
+% % TODO: Following replication study, this may need a re-work?
 
 
 % % Towards Safe HPC: Productivity and Performance via Rust Interfaces for a Distributed C++ Actors Library
@@ -422,7 +428,6 @@ Moran and Bull present a similar empirical analysis to Costanzo et al., comparin
 % \end{figure}
 
 % However, the data shown in Figure \ref{fig:actors_bad_histogram} does not support the claim that Rust is as performant as C++. The inclusion of the much slower ``upc'' and ``shmem'' implementations skew the scale of the plot so Rust and C++ versions look the same, but in fact by examining the data labels we can see the implementation is on average $1.46\times$ slower for this kernel, which is non-negligibly slower. This aligns with the results of other publications such as Costanzo et al. who observed a $1.18\times$ slowdown, and noted it as such. In the author's opinion, this paper is emblematic of a common problem in literature about the Rust programming language -- the bias held by some that the Rust programming language is better in all respects than other programming languages. Despite the fact that the data in the paper shows that the Rust implementation is slower \ref{fig:actors_bad_histogram}, the data is presented disingenuously in order to draw the conclusion that it is equally performant.
-
 
 
 % % Summary

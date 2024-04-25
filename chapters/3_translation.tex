@@ -244,7 +244,7 @@ In addition to this, a second key insight is that the pointers in \mintinline[br
 
 Since High-Performance Computing workloads are often array or mesh based, this strategy of replacing pointers with indices still holds for the dominant computational kernels of many full applications. Where pointers cannot be substituted with indices, borrowed references should be preferred, then smart pointers such as the \mintinline{rust}{Rc<RefCell<f64>>} construct as a worst-case solution.
 
-As discussed in \Cref{ch:background}, the dominant computational kernel of HPCCG is sparse matrix-vector computation. Listing \ref{} shows how this is implemented leveraging the Yale sparse matrix representation outlined in Listing \ref{listing:cpp-sparsemv}. Listing \ref{listing:rust-sparsemv-indexed} shows how this kernel can be translated using the indexed data structure as a point of reference for later changes.
+As discussed in \Cref{ch:background}, the dominant computational kernel of HPCCG is sparse matrix-vector computation. Listing \ref{listing:rust-sparsemv-indexed} shows how this kernel can be translated using the indexed data structure as a point of reference for later changes.
 
 \begin{code}
     %TC:ignore
@@ -740,7 +740,7 @@ Having created this binding, Listing \ref{listing:rust-autocxx-unit-test} shows 
         }
     \end{minted}
     %TC:endignore
-    \caption{.}
+    \caption{Leveraging the generated foreign function interface to drive unit tests in both C++ and Rust with shared ``Arrange'' and ``Assert'' phases.}
     \label{listing:rust-autocxx-unit-test}
 \end{code}
 

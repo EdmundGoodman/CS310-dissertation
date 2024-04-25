@@ -39,7 +39,7 @@ As High-Performance Computing is an active research space, there are a number of
 From this table, we can see that a number of tools exist as wrappers for Slurm for scientific computing workflows. However, these tools are generally focussed on orchestrating High-Performance Computing resources to run scientific computing programs, often in the R programming language, rather than providing a mechanism to run and compare the performance of programs in arbitrary languages. Our research did not identify any existing tools which directly compete with the purpose of HPC MultiBench.
 
 \section{Design and implementation}
-\label{sec:hpc-multibench-design}
+\label{sec:hpc-multibench-design-implementation}
 
 The HPC MultiBench tool started as a utility for personal use to facilitate performance measurements, which then later turned into a production-ready tool. As such, the design was guided by the functionality required by the author to conduct such measurements. As such, the identified goals of the tool are:
 
@@ -52,8 +52,49 @@ The HPC MultiBench tool started as a utility for personal use to facilitate perf
     \item Render an interactive user interface without an X-forwarded graphical connection
 \end{enumerate}
 
+% TODO: Could add this section, but doesn't add much value and bloats word count and narrative
+% \section{Source code structure}
+% \label{ssec:hpc-multibench-structure}
+% % Source code structure
+% % Diagram of package relations
+
+\subsection{Configuration file}
+\label{ssec:hpc-multibench-configuration}
+
+The YAML schema of the HPC MultiBench is the key abstraction which drives its ergonomics and simplicity to use. Since the problem of running, aggregating metrics about, and simple analysis of programs is similar across many use cases, it is possible to create a domain-specific configuration language which expresses the majority of the functionality required. In order to maintain the simplicity, and hence usability, of this abstraction, a minority of complex functionality is not supported. However, mechanisms such as exporting run data for further analysis are provided to mitigate this issue. As discussed in the industry review in section \ref{sec:hpc-multibench-industry-review}, the design of the YAML schema was praised as effectively and ergonomically expressing common functionality.
+
+Structurally, the YAML schema describes a \textit{test plan}, which is composed of two sections. Firstly, \textit{run configurations}, which describe how to run different versions of the program to compare on the computer resource. Secondly, \textit{test benches}, which describe which run configurations to compare, how many statistical re-runs to perform, what should be varied in the course of the experiment, along with the metrics to extract and the analysis to visualise.
+
+The values varied over the course of the experiment are described by a \textit{test matrix}, inspired by continuous integration configuration files to guarantee functionality across many machines. This allows expressing the cross product of two variables through adjacent items, and multiple variables changing independently, through tuple keys. The \textit{metrics} to be analysed are extracted from the outputs of the Slurm job runs with regex patterns. \textit{derived\_metrics} enhance their capabilities through  meta-programming capabilities within the tool to functionally define metrics in terms of ones matched with regex, whilst retaining correct uncertainty values.
+
+% For brevity, an in-depth explanation of all the functionality the YAML schema can express is omitted here, but a more full explanation can be found on the documentation website \url{https://edmundgoodman.co.uk/hpc-multibench/yaml_schema.html}, along with relevant docstring-generated documentation of the source code \url{https://edmundgoodman.co.uk/hpc-multibench/reference/yaml_model.html}. In addition to this, an example of a YAML file under this schema for the replication study discussed in section \ref{ssec:hpc-multibench-replication-study} can be found in Appendix \ref{sec:tooling-replication-yaml}.
+
+It is critical that files in under this YAML schema are parsed and validated in a robust manner. In order to do this, the Pydantic library \cite{PydanticPydantic2024} is used to leverage Python type annotations to extract structured data from a dictionary extracted from the YAML file. This is similar to an object-relational model for databases, constructing a sequence of nested objects representing the state of the configuration file which can then be used natively and with guarantees of type safety within the rest of the codebase. Finally, this approach makes the parsing logic very explicit, and as such the schema can be understood through the the entity-relationship diagram shown in Figure \ref{fig:hpc-multibench-yaml-model}, and the docstring-generated documentation available on the documentation website \url{https://edmundgoodman.co.uk/hpc-multibench/reference/yaml_model.html}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/4_tooling/implementation/yaml_model.png}
+    \caption{An entity-relationship diagram showing the Pydantic model representing the YAML schema, generated using the \texttt{erdantic} tool.}
+    \label{fig:hpc-multibench-yaml-model}
+\end{figure}
+
+\subsection{Data flow}
+\label{ssec:hpc-multibench-data-flow}
+
+Having parsed the configuration data, the majority of the application logic implements the data processing pipeline to create and run the instantations, then extract metrics from and aggregate the results. These data flows are depicted in Figure \ref{fig:hpc-multibench-data-flow}, and are described in more detail in the docstring-generated documentation for the \textit{test bench} class \url{https://edmundgoodman.co.uk/hpc-multibench/reference/test_bench.html}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/4_tooling/implementation/hpc_multibench_data_flow.png}
+    \caption{A diagram showing the data flow through the HPC MultiBench tool.}
+    \label{fig:hpc-multibench-data-flow}
+\end{figure}
+
+In this diagram, we can see that the record and report phases operate completely independently of each of, sharing information through the \texttt{metadata.csv} file. This allows experiments to be run asynchronously, avoiding problems caused by dropped \texttt{ssh} connections without requiring tools such as \texttt{tmux}.
+
 \subsection{User interface}
-\label{sec:hpc-multibench-ui}
+\label{ssec:hpc-multibench-ui}
+
 A key design goal of the project was providing an interactive user interface, which can run on remote machines without requiring setup such as configuring X-forwarding. This was motivated by the fact most High-Performance Computing resources are accessed over an SSH connection, which may be proxied through other servers. To mitigate this, X-forwarded graphical applications can be flaky or have very high latency. As a result of this, the tool was designed to have a simple command line interface, including a mode to render results interactively in the terminal without requiring X-forwarding.
 
 The HPC MultiBench command-line user interface is designed to be familiar to users of existing tools, such as the performance profiler \texttt{perf}. Much like \texttt{perf}, it provides two verb subcommands, \texttt{record} and \texttt{report}. The \texttt{record} command asynchronously dispatches experimental runs via Slurm, and the \texttt{report} command aggregates and presents an analysis of the results of these runs.
@@ -67,33 +108,6 @@ In addition to these, the \texttt{interactive} subcommand uses the Textual \cite
     \label{fig:hpc-multibench-line-plotext-2}
 \end{figure}
 
-\subsection{Configuration file}
-\label{sec:hpc-multibench-configuration-design}
-
-The YAML schema of the HPC MultiBench is the key abstraction which drives its ergonomics and simplicity to use. Since the problem of running, aggregating metrics about, and simple analysis of programs is similar across many use cases, it is possible to create a domain-specific configuration language which expresses the majority of the functionality required. In order to maintain the simplicity, and hence usability, of this abstraction, a minority of complex functionality is not supported. However, mechanisms such as exporting run data for further analysis are provided to mitigate this issue. As discussed in the industry review in section \ref{sec:hpc-multibench-industry-review}, the design of the YAML schema was praised as effectively and ergonomically expressing common functionality.
-
-Structurally, the YAML schema describes a \textit{test plan}, which is composed of two sections. Firstly, \textit{run configurations}, which describe how to run different versions of the program to compare on the computer resource. Secondly, \textit{test benches}, which describe which run configurations to compare, how many statistical re-runs to perform, what should be varied in the course of the experiment, along with the metrics to extract and the analysis to visualise.
-
-The values varied over the course of the experiment are described by a \textit{test matrix}, inspired by continuous integration configuration files to guarantee functionality across many machines. This allows expressing the cross product of two variables through adjacent items, and multiple variables changing independently, through tuple keys. The \textit{metrics} to be analysed are extracted from the outputs of the Slurm job runs with regex patterns. \textit{derived\_metrics} enhance their capabilities through  meta-programming capabilities within the tool to functionally define metrics in terms of ones matched with regex, whilst retaining correct uncertainty values.
-
-For brevity, an in-depth explanation of all the functionality the YAML schema can express is omitted here, but a more full explanation can be found on the documentation website \url{https://edmundgoodman.co.uk/hpc-multibench/yaml_schema.html}, along with relevant auto-generated documentation of the source code \url{https://edmundgoodman.co.uk/hpc-multibench/reference/yaml_model.html}. In addition to this, an example of a YAML file under this schema for the replication study discussed in section \ref{ssec:hpc-multibench-replication-study} can be found in Appendix \ref{sec:tooling-replication-yaml}.
-
-\section{Implementation}
-\label{sec:hpc-multibench-implementation}
-
-% One of the key aspects of the implementation of the tool is the robust parsing of the configuration YAML file. In order to do this, the Pydantic library is used to leverage Python type annotations to extract structured data from a dictionary extracted from the YAML file. This is similar to an object-relational model for databases, constructing a sequence of nested objects representing the state of the configuration file which can then be used natively and type-safely within the rest of the codebase. Finally, this approach makes the parsing logic very explicit, and as such the schema can be understood through the docstring-generated documentation for this ORM available on the documentation website \url{https://edmundgoodman.co.uk/hpc-multibench/reference/yaml_model.html}.
-
-% Having parsed the configuration data, the majority of the application logic refers to the data processing pipeline to create and run the instantations, then extract metrics from and aggregate the results. These data flows are depicted in Figure \ref{}, and are described in more detail in the docstring-generated documentation for the \textit{test bench} class \url{https://edmundgoodman.co.uk/hpc-multibench/reference/test_bench.html}.
-
-% TODO: diagram of data flow
-
-% Implementation of the TUI and plotting functionality
-
-% TODO: Consider merging this with the design section?
-% TODO: How do I say that making complex tooling is very hard, but I am really good at python/building tooling so I managed it...
-Due to the complexity of the source code composing the tool, many of the details of its implementation are omitted for brevity. This is to allow space to focus on the implementation details of the Rust translation of HPCCG discussed in \Cref{ch:translation}, and the use cases for and industry review of the tool in sections \ref{sec:hpc-multibench-example-use-case} and \ref{sec:hpc-multibench-industry-review} respectively.
-
-
 \subsection{Developer tooling and documentation}
 \label{ssec:hpc-multibench-developer-tooling-documentation}
 
@@ -101,16 +115,19 @@ For any software development project of non-trivial size, it is critical to leve
 
 To ensure that the development was completed on time, best practices such as \texttt{git} for version control were leveraged. In addition to this, more esoteric tooling such as pre-commit hooks to run linters and type checkers, along with continuous integration infrastructure, allowed software bugs to be caught early.
 
-% TODO: Does this show off quite how cool the tool is?
-% TODO: Could add screenshot of the auto-generated docs from docstrings
 For a software tool to be adopted, users must be able to install it, run it, and apply it to their use cases. As a result of this, documentation is required to explain to users how to perform these steps. As part of its continuous integration infrastructure, HPC MultiBench generates a documentation website generated from markdown and docstrings in the python source code using \texttt{MkDocs-Material} framework \cite{donathSquidfunkMkdocsmaterial2024}, which is then deployed as a static site hosted on GitHub pages. This documentation site can be found at \url{https://edmundgoodman.co.uk/hpc-multibench/}, with a screenshot of the splash page shown in Figure \ref{fig:documentation_splash}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/4_tooling/documentation_splash.png}
+    \includegraphics[width=\textwidth]{images/4_tooling/implementation/documentation_splash.png}
     \caption{A screenshot of the documentation website splash page for the HPC MultiBench tool, hosted at \url{https://edmundgoodman.co.uk/hpc-multibench/}.}
     \label{fig:documentation_splash}
 \end{figure}
+
+% TODO: Could add screenshot of the auto-generated docs from docstrings
+
+% TODO: Is this needed?
+In addition to this, as part of the the open source contributions made by this project, discussed in \ref{sec:open-source-work}, this tool will be made public on GitHub once the assessment phase of the module has finished. In addition to this, it will be released to PyPI -- allowing it to be installed with a single command using Python's package manage, \texttt{pip}.
 
 
 \section{Example use case}
@@ -128,9 +145,9 @@ This section shows the workflow of running a replication study on Moran and Bull
 As a result of the focussed design goals of the HPC MultiBench tool, the workflow for the replication study facilitated by the HPC MultiBench tool is exceedingly simple, consisting of six short steps -- each of which requires only one terminal command:
 
 \begin{enumerate}
-    \item Clone the GitHub repository containing the source code
-    \item Add the HPC MultiBench tool as a submodule to the repository
+    \item Clone the HPC MultiBench tool repository
     \item Install the HPC MultiBench tool using \texttt{poetry}
+    \item Add the GitHub repository containing the source code as a submodule
     \item Write a YAML file defining the run configurations and analysis presented in the paper
     \item Use the \texttt{record} command of the HPC MultiBench tool to run the jobs defined by the YAML file
     \item Use the \texttt{report} command of the HPC MultiBench tool to run analyse the results defined by the YAML file
@@ -143,16 +160,14 @@ Listing \ref{listing:replication-study-workflow} shows the six terminal commands
 \begin{code}
     %TC:ignore
     \begin{minted}{bash}
-        git clone https://github.com/lmoran94/eurocc_cfd
-        git submodule add https://github.com/EdmundGoodman/hpc-multibench
-        cd hpc_multibench && poetry install
-        vim ../replication_study.yaml  # The YAML file representing the paper is written here
+        git clone https://github.com/EdmundGoodman/hpc-multibench
+        poetry install --without docs,test,dev
+        git submodule add https://github.com/lmoran94/eurocc_cfd generated_results/
+        vim generated_results/replication_study.yaml  # The YAML file representing the paper is written here
         poetry run hpc_multibench \
-            -y generated_results/eurocc_cfd-kudu-results/ _test_plans/perf_comparison.yaml \
-            record
+            -y generated_results/replication_study.yaml record
         poetry run hpc_multibench \
-            -y generated_results/eurocc_cfd-kudu-results/ _test_plans/perf_comparison.yaml \
-            report
+            -y generated_results/replication_study.yaml report
     \end{minted}
     %TC:endignore
     \caption{A listing of the six bash commands required to run a full replication study of Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.}

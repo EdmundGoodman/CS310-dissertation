@@ -63,9 +63,6 @@ The specification document enumerated the set of MoSCoW prioritised \cite{CaseMe
   (\textbf{Could have}, \textit{depends on 15})
 \end{enumerate}
 
-\section{Mini-app selection}
-\label{sec:miniapp-selection}
-
 
 
 \section{Mini-app selection process}
@@ -200,6 +197,8 @@ This data structure provides significant performance improvements over a full ma
 
 \section{Hardware specifications}
 \label{sec:tooling-replication-yaml}
+
+The YAML file which fully defines the replication study using the HPC MultiBench tool of Moran and Bull's paper ``Emerging Technologies, Rust in HPC'' \cite{moranEmergingTechnologiesRust2023} can be seen in Listing \ref{listing:replication-study-yaml-file} below:
 
 \begin{code}
     \begin{minted}{yaml}
@@ -395,7 +394,7 @@ benches:
             "Problem size": "128"
     \end{minted}
     \caption{The YAML file defining the reproducibility study of Moran and Bull's paper ``Emerging Technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.}
-    \label{listing:athena-lscpu}
+    \label{listing:replication-study-yaml-file}
 \end{code}
 
 
@@ -553,3 +552,17 @@ Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cm
     \caption{The output of the \texttt{lscpu} command on Athena.}
     \label{listing:avon-lscpu}
 \end{code}
+
+
+\chapter{Conclusion}
+\label{ch:conclusion-appendix}
+
+\section{\texttt{autocxx} pull request}
+\label{sec:autocxx-pull-request-appendix}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/8_appendix/autocxx_pr.png}
+    \caption{A screenshot of the pull request adding integration tests for array support made into \texttt{autocxx}.}
+    \label{fig:autocxx_pr}
+\end{figure}

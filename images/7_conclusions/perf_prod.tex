@@ -18,12 +18,12 @@ width=\textwidth,
 x grid style={lightgray204},
 xlabel=\textcolor{darkslategray38}{Estimated cost of development [\$]},
 xmajorgrids,
-xmin=10161.2, xmax=47182.8,
+xmin=0, xmax=50000,
 xtick style={color=darkslategray38},
 y grid style={lightgray204},
-ylabel=\textcolor{darkslategray38}{Total runtime for 200x200x200 mesh [s]},
+ylabel=\textcolor{darkslategray38}{Total runtime for $200 \times 200  \times 200$ mesh [s]},
 ymajorgrids,
-ymin=6.4475, ymax=71.4025,
+ymin=0, ymax=70,
 ytick style={color=darkslategray38}
 ]
 \path [draw=black, semithick]
@@ -39,8 +39,8 @@ ytick style={color=darkslategray38}
 --(axis cs:27553,58.33);
 
 \path [draw=black, semithick]
-(axis cs:27723,68.07)
---(axis cs:27723,68.45);
+(axis cs:27723,53.97)
+--(axis cs:27723,54.37);
 
 \path [draw=black, semithick]
 (axis cs:31665,43)
@@ -55,74 +55,74 @@ ytick style={color=darkslategray38}
 --(axis cs:45180,48.73);
 
 \path [draw=black, semithick]
-(axis cs:45500,35.7)
---(axis cs:45500,36.04);
+(axis cs:45500,38.3)
+--(axis cs:45500,39.3);
 
-\addplot [semithick, black, mark=x, mark size=3, mark options={solid,draw=steelblue31119180}, only marks]
+\addplot [semithick, black, mark=x, mark size=5, mark options={solid,draw=steelblue31119180}, only marks]
 table {%
 11844 58.1
 11980 11.77
 27553 58.28
-27723 68.2600021362305
+27723 54.17
 };
 \addlegendentry{Rust}
-\addplot [semithick, black, mark=x, mark size=3, mark options={solid,draw=darkorange25512714}, only marks]
+\addplot [semithick, black, mark=x, mark size=5, mark options={solid,draw=darkorange25512714}, only marks]
 table {%
 31665 43.6
 31970 9.8
 45180 48.68
-45500 35.87
+45500 38.8
 };
 \addlegendentry{C++}
 
 \draw (axis cs:11944,58.1) node[
-  scale=0.75,
+  scale=0.8,
   anchor=north,
   text=black,
   rotate=0.0
-]{serial};
+]{Serial};
 \draw (axis cs:12080,11.77) node[
-  scale=0.75,
+  scale=0.8,
   anchor=north,
   text=black,
   rotate=0.0
-]{rayon};
+]{Rayon};
 \draw (axis cs:27653,58.28) node[
-  scale=0.75,
+  scale=0.8,
+  anchor=south,
+  text=black,
+  rotate=0.0
+]{MPI};
+\draw (axis cs:27823,54.17) node[
+  scale=0.8,
   anchor=north,
   text=black,
   rotate=0.0
-]{mpi};
-\draw (axis cs:27823,68.26) node[
-  scale=0.75,
-  anchor=north,
-  text=black,
-  rotate=0.0
-]{hybrid};
+]{Hybrid};
 \draw (axis cs:31765,43.6) node[
-  scale=0.75,
+  scale=0.8,
   anchor=north,
   text=black,
   rotate=0.0
-]{serial};
+]{Serial};
 \draw (axis cs:32070,9.8) node[
-  scale=0.75,
+  scale=0.8,
   anchor=north,
   text=black,
   rotate=0.0
-]{openmp};
+]{OpenMP};
 \draw (axis cs:45280,48.68) node[
-  scale=0.75,
+  scale=0.8,
   anchor=north,
   text=black,
   rotate=0.0
-]{mpi};
-\draw (axis cs:45600,35.87) node[
-  scale=0.75,
+]{MPI};
+\draw (axis cs:45600,38.8) node[
+  scale=0.8,
   anchor=north,
   text=black,
   rotate=0.0
-]{hybrid};
+]{Hybrid};
 
 \end{axis}
 \end{tikzpicture}

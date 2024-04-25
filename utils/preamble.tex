@@ -77,9 +77,11 @@ autogobble
 \makeatletter
 \fancypagestyle{plain}{
 	\fancyhf{}
-	\fancyhead[LE]{\thepage}
-	\fancyhead[RE]{\textit{\@author}}
-	\fancyhead[RO]{\thepage}
-	\fancyhead[LO]{\textit{\@title}}
+	% \fancyhead[LE]{\thepage}
+	% \fancyhead[RE]{\textit{\@author}}
+	% \fancyhead[RO]{\thepage}
+	% \fancyhead[LO]{\textit{\@title}
+	\fancyhead[R]{\thepage}
+	\fancyhead[L]{\textit{Assessing the suitability of Rust for performant and productive\\ implementations of HPC codebases}}
 }
 \makeatother

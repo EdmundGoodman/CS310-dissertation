@@ -171,8 +171,8 @@ During the course of experimentation, three different compute resources were use
 To best allow for reproducibility of the reported test data, the hardware specifications for the machines used as follows, with additional information about the machines listed in Appendix \ref{sec:hardware-specifications} for completeness. For Kudu and Avon, Slurm is used to dispatch jobs, so the commands are run from within a Slurm job to be representative of the compute nodes rather than the login nodes of the cluster.
 
 \begin{table}[H]
-    \caption{A table showing the software versions across the three compute resources.}
-    \label{table:perfTools}
+    \caption{A table showing the model names and numbers of logical cores across the three compute resources.}
+    \label{table:compute-resource-cpus}
     \begin{tabular}{|p{0.15\linewidth}||p{0.7\linewidth}|p{0.15\linewidth}|}
     \hline
     \textbf{Resource} & \textbf{CPU}                                            & \textbf{Logical cores} \\ \hline\hline
@@ -186,7 +186,7 @@ The software versions used for benchmarking across the three systems are enumera
 
 \begin{table}[H]
     \caption{A table showing the software versions across the three compute resources.}
-    \label{table:perfTools}
+    \label{table:compute-resource-software-versions}
     \begin{tabular}{|p{0.24\linewidth}||p{0.2\linewidth}|p{0.2\linewidth}|p{0.2\linewidth}|}
     \hline
     \textbf{Software name} & \textbf{Athena} & \textbf{Kudu} & \textbf{Avon} \\
@@ -328,7 +328,7 @@ In summary, we can see that both the C++ and Rust implementations weakly scale s
 In modern High-Performance Computing systems, the majority of performance is achieved through parallelism, as predicted by the Mantevo Suite paper \cite{heroux2013mantevo}. As a result of this, for Rust to be suitable for use in High-Performance Computing workloads, it must be able to achieve parallel compute performance similar to that of currently used languages such as C++. This section provides an empirical analysis of the performance of Rust as compared with C++ for increasingly parallel workloads, from serial as a reference to shared memory parallelism through multi-threading and distributed memory parallelism through message passing.
 
 \subsection{Serial execution}
-\label{ssec:multi-threaded}
+\label{ssec:serial-execution}
 
 For many workloads, overall performance is bottlenecked by their serial components. This is because almost any program leveraging parallelism will have serial sections, and even if these are very short they can take up a significant proportion of a program's runtime for highly parallel programs, as a corollary of Amdahl's law \cite{amdahlsLaw}. As such, measuring serial performance is a critical component of the overall assessment of Rust's performance in High-Performance Computing applications.
 
@@ -410,11 +410,11 @@ In summary, Rust remains performant in multi-threading workloads, but trails C++
 Shared memory parallelism is a very powerful technique for enhancing program performance. However, its efficacy is upper bounded by being constrained to a single machine with a shared memory architecture. In order to scale beyond this, distributed memory parallelism must be leveraged. This is required for many High-Performance Computing applications, as the largest supercomputers are all composed of clusters of many machines \cite{HomeTOP500}.
 % As discussed in the translation section \ref{}, Rust provides MPI bindings which facilitate this.
 
-To assess Rust's performance using MPI for message passing, we ran the C++ and Rust executables over both a range of mesh sizes, from $25 \times 25 \times 25$ to $250 \times 250 \times 250$, incrementing each axis size first by $25$, then by $50$ each time, and a range of nodes $1$, $2$, and $4$, with one task per node., in addition to the experimental methodology discussed in section \ref{ssec:experimental-methodology}.
-% For the original MPI implementation, mesh size is constrained by the reference implementation constant value \mintinline{c++}{const int max_external = 100000;}.
-% As a result of this, experiments ran only up to $250 \times 250 \times 250$ rather than $400 \times 400 \times 400$ for parallel implementations. Future work could include increasing this value and fixing any associated bugs, then running HPCCG across many nodes on a much larger mesh. 
+For the original MPI implementation, mesh size is constrained by the reference implementation constant value \mintinline{c++}{const int max_external = 100000;}. This constrains the largest mesh size computable on with two MPI ranks to around $250 \times 250 \times 250$. In order to exercise the MPI implementation across more ranks and larger mesh sizes, the original HPCCG codebase was modified to set \mintinline{c++}{max_external} to the largest value encodable by a four byte integer. This allowed very large experiments on meshes up to $800 \times 800 \times 800$ across 5 MPI ranks.
+
+To assess Rust's performance using MPI for message passing, we ran the C++ and Rust executables over both a range of mesh sizes, from $25 \times 25 \times 25$ to $250 \times 250 \times 250$, incrementing each axis size first by $25$, then by $50$ each time. Two nodes and two MPI tasks per node were used in addition to the experimental methodology discussed in section \ref{ssec:experimental-methodology}. The results of these experiments are shown in Figures \ref{fig:9_mpi_line} and \ref{fig:10_mpi_line_relative}.
+
 % TODO: large run with this turned up, then reference it here.
-The results of these experiments are shown in Figures \ref{fig:9_mpi_line} and \ref{fig:10_mpi_line_relative}.
 
 \begin{figure}[H]
     \centering
@@ -432,17 +432,15 @@ The results of these experiments are shown in Figures \ref{fig:9_mpi_line} and \
     \label{fig:10_mpi_line_relative}
 \end{figure}
 
-% TODO: Note that run over config (nodes=2, tasks=4)
+% % TODO: Consider re-running this test, could be a misconfiguration in the YAML dispatching (discuss in the paragraph)
+% % NOTE: Looks like Slurm is dispatching all runs to four nodes? Investigate and change metrics?
+% In Figure \ref{fig:9_mpi_line}, we can see that the performance trends form two tight bundles, one of the C++ implementations and one of the Rust implementations. All data points in these bundles are within each others' uncertainty intervals, suggesting that there is no increase in performance as a result of adding more MPI tasks for this workload. Since this property is shared by the implementation in both languages, this indicates overhead introduced in communication latency by adding nodes is approximately equal to the performance gain by increasing the number of tasks concurrently processing the data. However, this property is still desirable, as it allows very large mesh sizes to be scaled across clustered compute resources, which can then leverage multi-threading within each machine, as discussed in the next section.
 
-% TODO: Consider re-running this test, could be a misconfiguration in the YAML dispatching (discuss in the paragraph)
-% NOTE: Looks like Slurm is dispatching all runs to four nodes? Investigate and change metrics?
-In Figure \ref{fig:9_mpi_line}, we can see that the performance trends form two tight bundles, one of the C++ implementations and one of the Rust implementations. All data points in these bundles are within each others' uncertainty intervals, suggesting that there is no increase in performance as a result of adding more MPI tasks for this workload. Since this property is shared by the implementation in both languages, this indicates overhead introduced in communication latency by adding nodes is approximately equal to the performance gain by increasing the number of tasks concurrently processing the data. However, this property is still desirable, as it allows very large mesh sizes to be scaled across clustered compute resources, which can then leverage multi-threading within each machine, as discussed in the next section.
+% Alternatively, this result could be an unexpected emergent property of dispatching many Slurm jobs, which might over-allocate the number of nodes to be the maximum across all jobs, hence resulting in no change across the intended degrees of parallelism.
 
-Alternatively, this result could be an unexpected emergent property of dispatching many Slurm jobs, which might over-allocate the number of nodes to be the maximum across all jobs, hence resulting in no change across the intended degrees of parallelism.
+% This is measured property is further confirmed by Figure \ref{fig:10_mpi_line_relative} showing the relative performance, again with tightly bundled trends for Rust and C++. The decrease in relative performance of Rust appears to be trending up without converging within the range of this experiment. Ideally, the mesh size would be increased till this decrease converged to a value, but the previously discussed structural limitations of the HPCCG mini-app prevent such runs being measured.
 
-This is measured property is further confirmed by Figure \ref{fig:10_mpi_line_relative} showing the relative performance, again with tightly bundled trends for Rust and C++. The decrease in relative performance of Rust appears to be trending up without converging within the range of this experiment. Ideally, the mesh size would be increased till this decrease converged to a value, but the previously discussed structural limitations of the HPCCG mini-app prevent such runs being measured.
-
-In summary, Rust remains performant in message passing workloads, but trails C++ in performance with around a $1.19 \pm 0.01\times$ slow-down, with the expectation this will converge to a higher value for larger workloads, likely to around the serial slow down of $1.5 \pm 0.1\times$, as both implementations invoke the same implementation of MPI. The results from runs on Avon match those from those shown above on Kudu, with the slowdown across threads similarly converging at around $1.5 \pm 0.25$.
+% In summary, Rust remains performant in message passing workloads, but trails C++ in performance with around a $1.19 \pm 0.01\times$ slow-down, with the expectation this will converge to a higher value for larger workloads, likely to around the serial slow down of $1.5 \pm 0.1\times$, as both implementations invoke the same implementation of MPI. The results from runs on Avon match those from those shown above on Kudu, with the slowdown across threads similarly converging at around $1.5 \pm 0.25$.
 
 % \subsection{MPI with Multi-threading}
 % \label{ssec:mpi-multithreading}
@@ -454,7 +452,7 @@ In summary, Rust remains performant in message passing workloads, but trails C++
 % \begin{figure}[H]
 %     \centering
 %     \include{images/5_performance/parallelism/12_hybrid_line.tex}
-%     \includegraphics[width=\textwidth]{images/5_performance/parallelism/12_hybrid_line.png}
+%     % \includegraphics[width=\textwidth]{images/5_performance/parallelism/12_hybrid_line.png}
 %     \caption{.}
 %     \label{fig:12_hybrid_line}
 % \end{figure}
@@ -462,7 +460,7 @@ In summary, Rust remains performant in message passing workloads, but trails C++
 % \begin{figure}[H]
 %     \centering
 %     \include{images/5_performance/parallelism/13_hybrid_line_relative.tex}
-%     \includegraphics[width=\textwidth]{images/5_performance/parallelism/13_hybrid_line_relative.png}
+%     % \includegraphics[width=\textwidth]{images/5_performance/parallelism/13_hybrid_line_relative.png}
 %     \caption{.}
 %     \label{fig:13_hybrid_line_relative}
 % \end{figure}
@@ -473,7 +471,7 @@ In summary, Rust remains performant in message passing workloads, but trails C++
 
 
 \subsection{Performance portability frameworks}
-\label{ssec:performance-portability-frameworks}
+\label{ssec:performance-portability-frameworks-results}
 
 Finally, performance portability frameworks, such as Kokkos \cite{KokkosEcosystem}, are commonly used within High-Performance Computing to allow writing software which can run across a variety of hardware. However, such frameworks often incur a performance cost over hand-optimised implementations targeted at specific hardware. The fact that these frameworks are common, despite this performance cost, motivates the idea that Rust could be suitable for High-Performance Computing as a result of its productivity benefits, despite its performance impact.
 
@@ -518,6 +516,7 @@ Here we can see that multi-threading is by far the most performant for small wor
 
 Figure \ref{fig:translation_parallelism_cpp} shows the same experiments run over the parallelism methodologies of the C++ codebase. From this, we can see that very similar trends hold, with the only difference being the Rust MPI implementation is slightly slower. A likely cause for this is the overhead as a result of the Rust bindings into the C++ implementation of the MPI specification.
 
+% TODO: These might need to be updated to be consistent with final conclusion graph
 \begin{figure}[H]
     \centering
     \include{images/5_performance/parallelism/25_translation_parallelism_cpp.tex}
@@ -527,4 +526,8 @@ Figure \ref{fig:translation_parallelism_cpp} shows the same experiments run over
 \end{figure}
 
 % TODO: Check results 1.5x
-In summary, from the detailed comparisons in the previous sections we can see that Rust consistently approaches C++ in performance for representative High-Performance Computing workloads, with around a $1.5 \times$ slowdown across approaches. However, the trends and scaling characteristics between the two languages are very similar. This is linearly scaled slowdown is consistent with the data collected using profilers, including the overhead in executed assembly code shown by \texttt{perf}, and the lower overall arithmetic intensity and rate of computational operations shown in the roofline plots.
+In summary, from the detailed comparisons in the previous sections we can see that Rust consistently approaches C++ in performance for representative High-Performance Computing workloads, with at worst around a $1.5 \times$ slow-down incurred across parallelism strategies. These performance measurements concur with existing literature, such as Moran and Bull's ``Emerging Technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.
+
+This significant slow-down is likely because the dominant kernel in HPCCG, sparse matrix-vector multiplication, is less amenable to optimisation in Rust than in C++. Since this kernel is very common in High-Performance Computing, this impacts its suitability for these workloads. However, other literature such as Constanzo et al. \cite{costanzoPerformanceVsProgramming2021} examining less High-Performance Computing specific kernels such as the N-body problem find that Rust is equally performant in these cases.
+
+In addition to this, the Rust translations exhibit similar strong and weak scaling properties to the original C++ implementations, demonstrating its capability to scale to the extent required for High-Performance Computing workloads. This is linear slowdown across scaling is consistent with the data collected using profilers, including the overhead in executed assembly code shown by \texttt{perf}, and the lower overall arithmetic intensity and rate of computational operations shown in the roofline plots.
