@@ -28,6 +28,7 @@ Typically, the abstractions across programming languages are equally powerful. H
 This restriction of valid programs being well simply-typed in Simply-Typed Lambda Calculus is mirrored by the prohibition of undefined behaviour in Rust, as shown in Figure \ref{fig:excalidraw_programs_venn}. In fact, Rust's ownership model can be formally described as an affine type system, as every value must be used once or not at all \cite{reed2015patina}. This prohibition is beneficial to programmers, as they similarly do not want to write programs which exhibit undefined behaviour. This is supported by the fact that programmers in other languages like C++ use dynamic and static analysis tools such as Valgrind \cite{ValgrindHome} and AddressSanitiser \cite{Sanitizers2023} to guarantee these properties outside the compiler.
 
 % TODO: Consider replacing this diagram with tikz?
+% https://tex.stackexchange.com/questions/484541/nested-ellipses-in-tikzpicture-chomsky-hierarchy
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{images/3_translation/excalidraw_programs_venn.png}
@@ -379,7 +380,7 @@ The use of packages such as \texttt{rayon} allows developers to write multithrea
 \subsection{Distributed memory parallelism}
 \label{sec:translation-mpi}
 
-\Cref{ch:background} introduced MPI as a standard for distributed memory parallelism with implementations in languages such as C++, FORTRAN and Java. Unfortunately, Rust is notable in its absence from this list of languages with MPI implementations. However, a key feature of Rust is its support for foreign function interfaces, allowing it to invoke functions implemented in other languages. This means that a Rust can bind into a C++ implementation of MPI using a foreign function interface, then provide a safe API over these bindings. The \texttt{mpi} crate \cite{noauthor_rsmpirsmpi_2024} %\cite{RsmpiRsmpi2024}
+\Cref{ch:background} introduced MPI as a standard for distributed memory parallelism with implementations in languages such as C++, FORTRAN and Java. Unfortunately, Rust is notable in its absence from this list of languages with MPI implementations. However, a key feature of Rust is its support for foreign function interfaces, allowing it to invoke functions implemented in other languages. This means that a Rust can bind into a C++ implementation of MPI using a foreign function interface, then provide a safe API over these bindings. Rust's \texttt{mpi} library \cite{noauthor_rsmpirsmpi_2024} %\cite{RsmpiRsmpi2024}
 provides these bindings, along with an idiomatic interface around them.
 
 The process of translating the MPI aspect of HPCCG into Rust was by far the most difficult part of the translation process. It was significantly more complex than the next most difficult aspect of populating the data structure -- taking around two weeks dedicated work. This difficulty was broadly as a result of three key factors:
@@ -437,7 +438,7 @@ for (i = 0; i < num_neighbors; i++) {
 
 It is exceedingly difficult to reason about this idiom's memory and concurrent safety properties. This is because first a arbitrary number of asynchronous receive operations known only at runtime are spawned, each of which receive data into a location in a buffer again known only at runtime. After this, data is sent to these receive operations, relying on program logic to ensure no asynchronous receive operations are left waiting for a response. If this logic is faulty, the error would manifest as hanging indefinitely at the next MPI wait or barrier. This would be very difficult to debug, as the point in the codebase at which it hangs might be significantly displaced from the logic causing it to hang.
 
-In order to implement this using the \texttt{mpi} crate, stronger guarantees about memory safety and tying together the sending and receiving operations are needed. This ensures that no asynchronous receive operations are left waiting for a response, and prevents data races. However, these strong guarantees are very difficult to achieve. The identified mechanism to implement this functionality in Rust is shown below in Listing \ref{listing:rust-mpi-exchange-externals}.
+In order to implement this using Rust's \texttt{mpi} library, stronger guarantees about memory safety and tying together the sending and receiving operations are needed. This ensures that no asynchronous receive operations are left waiting for a response, and prevents data races. However, these strong guarantees are very difficult to achieve. The identified mechanism to implement this functionality in Rust is shown below in Listing \ref{listing:rust-mpi-exchange-externals}.
 
 \begin{code}
     %TC:ignore
@@ -489,9 +490,9 @@ mpi::request::multiple_scope(matrix.num_send_neighbors, |scope, coll| {
 
 In the listing, we can see that populating the send buffer is moved out of the original order. This is required to conform to Rust's ownership rules, as the send buffer must be shared across the lexical scopes of multiple MPI requests defined in the closure on line 8. This helps resolve the memory safety concerns. In addition to this, we can see that the send and receive operations are paired within their scopes, which guarantees every asynchronous receive will receive data and not hang indefinitely.
 
-Since the documentation for the \texttt{mpi} crate is very sparse, this translation was developed by reading the source code of the crate functions and their bindings into the C++ specification implementation, across many iterations trying to achieve the memory safety properties required for compilation.
+Since the documentation for Rust's \texttt{mpi} library is very sparse, this translation was developed by reading the source code of the library's functions and their bindings into the C++ specification implementation, across many iterations trying to achieve the memory safety properties required for compilation.
 
-In summary, it is possible to translate most existing C++ code using MPI into Rust with equivalent functionality using the \texttt{mpi} crate. However, this translation process is involved, requiring expertise which is hard to acquire due to the minimal documentation. As Rust and its ecosystem matures, this process is likely to get easier, with improved documentation and tweaks to the interface design.
+In summary, it is possible to translate most existing C++ code using MPI into Rust with equivalent functionality using Rust's \texttt{mpi} library. However, this translation process is involved, requiring expertise which is hard to acquire due to the minimal documentation. As Rust and its ecosystem matures, this process is likely to get easier, with improved documentation and tweaks to the interface design.
 
 % TODO: (+ poor documentation, link to future open source work)
 
@@ -689,14 +690,14 @@ Translated code often has a similar internal structure to the reference implemen
     \label{listing:rust-ddot-unit-test}
 \end{code}
 
-By driving code units which should be equivalent across translations with the same arrangement of data, then asserting they produce the same results, strong guarantees of unit equivalence can be achieved. In addition to this, using the \texttt{tarpaulin} crate \cite{xd009642Xd009642Tarpaulin2024} to measure code coverage of the Rust unit tests, we can see that they provide full coverage over all functions excluding timing code and the main function which dispatches the solver. 
+By driving code units which should be equivalent across translations with the same arrangement of data, then asserting they produce the same results, strong guarantees of unit equivalence can be achieved. In addition to this, using Rust's \texttt{tarpaulin} library \cite{xd009642Xd009642Tarpaulin2024} to measure code coverage of the Rust unit tests, we can see that they provide full coverage over all functions excluding timing code and the main function which dispatches the solver. 
 
 This combination of full code coverage and guarantees of equivalence for the tested properties of each unit gives strong confidence in the overall equivalence of the program. However, the process of translating these tests is manual and can be tedious for large banks of tests. As a result of this, it can be susceptible to human error -- which weakens the confidence in the equivalence checking process.
 
 \subsubsection{Automating the novel approach}
 \label{sssec:equivalence-polyglotest}
 
-To strengthen the confidence and reduce the tedium of this process, we propose an automated methodology to facilitate writing Rust translations in this way. Using the \texttt{autocxx} crate, a foreign function interface between the two languages can be generated. Hence, the unit tests of one can invoke the code units of both itself and the other, as shown in Listing \ref{listing:rust-autocxx-bindings}.
+To strengthen the confidence and reduce the tedium of this process, we propose an automated methodology to facilitate writing Rust translations in this way. Using the \texttt{autocxx} library, a foreign function interface between the two languages can be generated. Hence, the unit tests of one can invoke the code units of both itself and the other, as shown in Listing \ref{listing:rust-autocxx-bindings}.
 
 \begin{code}
     %TC:ignore

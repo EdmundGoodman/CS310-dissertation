@@ -8,7 +8,6 @@
 \title{Assessing the suitability of Rust for performant and productive implementations of HPC codebases}
 \supervisor{Dr Richard Kirk}
 
-\showthe\font
 %%%%%%%%%%%%%%%%%%%%
 
 % https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/format/
@@ -18,22 +17,35 @@
 \begin{document}
 
 %TC:ignore
+\pagenumbering{gobble}
 \input{utils/titlepage.tex}
-\pagestyle{plain}
-
+% TODO: Abstract is longer than 200 words - email Greg?
 \input{chapters/0_abstract.tex}
 
+\pagestyle{plain}
+\newpage
+\pagenumbering{roman}
+
+% TODO: Add quotations at chapter starts like eth rust in hpc paper
+% TODO: Add abbreviations/glossary (e.g. HPC, LLVM, SMP, CSR, SIMD, FLOPS, ...) (separate page)
 % TODO: Make the way figures/tables are captioned consistent, e.g. not starting with ``a figure that shows?''
+% TODO: Fix kerning on list of listings
 \tableofcontents
 \listoffigures
 \listoftables
 \listoflistings
+\addcontentsline{toc}{chapter}{List of Listings}
+\newpage
 %TC:endignore
 
 % TODO: Consider switching to include for performance?
 % https://tex.stackexchange.com/questions/246/when-should-i-use-input-vs-include
 % TODO: Move chapters into separate folders with their own image folders?
 % TODO: Decide on sentence vs title case and be consistent throughout
+% TODO: Consider colouring headings
+% TODO: Make chapter numbers on right side adjacent to names
+% TODO: Consider colour captions, and adding figure/listing icons
+\pagenumbering{arabic}
 \input{chapters/1_introduction.tex}
 \input{chapters/2_background.tex}
 \input{chapters/3_translation.tex}
@@ -47,7 +59,7 @@
 \bibliographystyle{IEEEtran}
 \bibliography{bibliography}
 
-\input{utils/appendix}
+\input{chapters/8_appendix}
 %TC:endignore
 
 \end{document}

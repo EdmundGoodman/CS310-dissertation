@@ -3,23 +3,27 @@
     
     The Mantevo Suite is a collection of mini-apps, largely written in C++ and FORTRAN. Mini-apps are small software codebases with performance characteristics representative of full-scale applications. They are traditionally used for hardware-software co-design, allowing simple but accurate estimates of application performance on hardware. However, they can also be used to assess the software stack they are run on, for example the language in which they are implemented.
     
-    This project assesses the suitability of Rust for performant and productive implementations of HPC codebases through the example of HPCCG, ``the original Mantevo mini-app''. We present a Rust implementation of HPCCG, showing the possibility of applying both shared and distributed memory parallelism in Rust to HPC codebases using Rayon and MPI, along with a workflow for translation including a novel approach for equivalence checking between Rust and C++. We further present a performance analysis within a novel framework empowering reproducibility, which empirically shows Rust closely approaches C++ in performance on real-world applications. We conclude that Rust is a viable language for High-Performance Computing applications, despite its performance not matching C++, as it provides commensurate benefits in developer productivity such as its compiler guarantees of memory and thread safety.
+    This project assesses the suitability of Rust for performant and productive implementations of HPC codebases through the example of HPCCG, ``the original Mantevo mini-app''. We present a Rust implementation of HPCCG, showing the possibility of applying both shared and distributed memory parallelism in Rust to HPC codebases using Rayon and MPI, along with a workflow for translation including a novel approach for equivalence checking between Rust and C++. We further present a performance analysis within a novel framework empowering reproducibility, which empirically shows Rust approaches C++ in performance
+    for representative HPC workloads. % on real-world applications.
+    We conclude that Rust is a viable language for
+    HPC % High-Performance Computing
+    applications, despite its performance not matching C++, as it provides commensurate benefits in developer productivity such as its compiler guarantees of memory and thread safety.
     
     \textbf{Keywords:} \textit{High-Performance Computing, Parallel Computing, Mini-application, Mantevo, HPCCG, Rust, C++, OpenMP, Rayon, MPI}
 \end{abstract}
 
 
 
-\textbf{Acknowledgements:} Firstly, I would like to thank my project supervisor, Dr Richard Kirk, who generously spent many hours providing great insight in supervisor meetings, from the conception of the project to its final straights.
+\thispagestyle{empty}
+\begin{center}
+    \textbf{Acknowledgements}
+\end{center}
 
-Secondly, I'd like to thank my friends on the Computer Science course at Warwick, including Alex Florescu, Arpad Kiss, and Dewi Jones, along with many others. Their moral support throughout this year and opinions on final drafts has been invaluable, helping me both motivate and enjoy myself through the course of this project.
+Firstly, I would like to thank my project supervisor, Dr Richard Kirk, who generously spent many hours providing great insight in supervisor meetings, from the conception of the project to its final straights.
+
+Secondly, I'd like to thank my friends on the Computer Science course at Warwick, including Alex Florescu, Arpad Kiss, and Dewi Jones, along with many others. Their moral and intellectual support throughout this year has been invaluable, helping me both motivate and enjoy myself through the course of this project, along with providing helpful opinions on final drafts.
 
 Thirdly, I'd like to thank my parents, Jonathan and Victoria Goodman, for their perpetual support and well-reasoned advice.
 
 Finally, I'd like to thank Vijaya Bashyam from IBM for her input on the project as a whole, along with Toby Flynn and Sam Curtis for their opinions on the HPC MultiBench tool. %, and the Open-Source community at large for thanklessly developing the tools and technologies this project relied upon.
 
-
-% TODO: Improve keyword formatting
-% TODO: Add quotations at chapter starts like eth rust in hpc paper
-% TODO: Add acknowledgements (separate page)
-% TODO: Add abbreviations/glossary (e.g. HPC, LLVM, SMP, CSR, SIMD, FLOPS, ...) (separate page)

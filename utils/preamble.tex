@@ -2,6 +2,7 @@
 \usepackage[]{geometry}
 % \usepackage[latin1]{inputenc}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage[UKenglish]{babel}
 \usepackage[UKenglish]{isodate}
 \usepackage{amsmath}
@@ -21,22 +22,13 @@
 \usepackage[dvipsnames, table]{xcolor}
 \usepackage[sc]{mathpazo}
 \linespread{1.05}
-\usepackage[T1]{fontenc}
-\usepackage{minted}
+
 
 % TODO: Check packages for needed/uneeded
 % TODO: Play with formatting (e.g. french spacing) and margins
-% \usepackage[toc,page]{appendix}
-\usepackage{tikz}
-\usepackage{pgfplots}
-% https://github.com/nschloe/tikzplotlib
-\DeclareUnicodeCharacter{2212}{−}
-\usepgfplotslibrary{groupplots,dateplot}
-\usetikzlibrary{patterns,shapes.arrows,backgrounds}
-\pgfplotsset{compat=newest}
-
-% https://tex.stackexchange.com/a/53540
+\usepackage{minted}
 \usepackage{caption}
+% https://tex.stackexchange.com/a/53540
 \newenvironment{code}{\captionsetup{type=listing}}{}
 \setminted{  
 % frame=lines,
@@ -47,7 +39,19 @@
 linenos,
 breaklines,
 autogobble
-}  
+}
+
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+% https://github.com/nschloe/tikzplotlib
+\DeclareUnicodeCharacter{2212}{−}
+\usepgfplotslibrary{groupplots,dateplot}
+\usetikzlibrary{patterns,shapes.arrows,backgrounds}
+\pgfplotsset{compat=newest}
+
+\usepackage[nottoc,numbib]{tocbibind}
+
 
 \hypersetup{
 	colorlinks=true,

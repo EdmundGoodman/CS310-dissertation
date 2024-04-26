@@ -7,13 +7,13 @@
 
 In conclusion, this project assesses Rust as suitable for performant and productive implementations of High-Performance Computing codebases on the basis of three major factors.
 
-Firstly, \Cref{ch:translation} shows that it is possible to translate non-trivial existing codebases representative of High-Performance Computing workloads from C++ into Rust, including leveraging both shared and distributed memory parallelism through the \texttt{rayon} and \texttt{mpi} crates. It further shows that these translations provide significant benefits to developer productivity. These include reduced effort spent debugging as a result of memory and concurrency safety guarantees and the rich type system, along with quantitative models of productivity using the \texttt{scc} tool suggesting only $0.61 \times$ the total cost is required to complete develop a codebase with equivalent functionality leveraging both shared and distributed memory parallelism in Rust.
+Firstly, \Cref{ch:translation} shows that it is possible to translate non-trivial existing codebases representative of High-Performance Computing workloads from C++ into Rust, including leveraging both shared and distributed memory parallelism through Rust's \texttt{rayon} and \texttt{mpi} libraries. It further shows that these translations provide significant benefits to developer productivity. These include reduced effort spent debugging as a result of memory and concurrency safety guarantees and the rich type system, along with quantitative models of productivity using the \texttt{scc} tool suggesting only $0.61 \times$ the total cost is required to complete develop a codebase with equivalent functionality leveraging both shared and distributed memory parallelism in Rust.
+% TODO: Check if this flows neatly?
+Similarly, the Kokkos performance portability framework allows developers to write code which is portable across many hardware architectures, improving developer productivity. However, it is reported to exhibit a $1.11 \times$ slow-down on representative workloads in High-Performance Computing \cite{carteredwardsKokkosEnablingManycore2014}. This provides a real-world example of the importance of developer productivity for High-Performance Computing.
 
-% TODO: Check changes against results summary
-% TODO: Add note about kokkos
 Secondly, \Cref{ch:performance} shows that the performance of Rust translations of non-trivial C++ codebases approaches their reference implementations, with at worst around a $1.5 \times$ slow-down incurred across parallelism strategies. This measured slow-down concurs with existing literature, such as Moran and Bull's ``Emerging Technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}, and shows that it extends to larger codebases which leverage distributed memory parallelism. This slow-down is likely because the dominant kernel in HPCCG, sparse matrix-vector multiplication, is less amenable to optimisation by the Rust compiler than the C++ compiler. Since this kernel is very common in High-Performance Computing, this impacts its suitability for these workloads. However, other literature such as Constanzo et al. \cite{costanzoPerformanceVsProgramming2021} examining kernels less specific to High-Performance Computing, such as the N-body problem, find that Rust is equally performant in these cases. In addition to this, the Rust translations exhibit similar strong and weak scaling properties to the original C++ implementations, demonstrating its capability to scale to the extent required for High-Performance Computing workloads.
 
-These first two factors can be interpreted together by plotting a graph comparing the empirical performance and estimated productivity of the C++ and Rust implementations of the HPCCG mini-app, as shown in Figure \ref{fig:conclusions_performance_productivity}. This figure visualises the result that C++ offers fair performance gains over Rust, but development of Rust programs is likely to improve development productivity.
+These first two factors can be interpreted together by plotting a graph comparing the empirical performance and estimated productivity of the C++ and Rust implementations of the HPCCG mini-app, as shown in Figure \ref{fig:conclusions_performance_productivity}. This figure visualises the result that C++ offers fair performance gains over Rust, but development using Rust may improve developer productivity.
 
 \begin{figure}[H]
     \centering
@@ -22,23 +22,20 @@ These first two factors can be interpreted together by plotting a graph comparin
     \caption{A comparison of performance and productivity between the C++ and Rust languages.}
     \label{fig:conclusions_performance_productivity}
 \end{figure}
-
-% TODO: Check up on hybrid re-runs
 % scc . --exclude-file Cargo.lock --exclude-dir target
 % scc . --exclude-file .gitignore YAML* dump_matlab*
 
-The final factor which impacts the conclusion is that the performance and productivity of Rust is likely to improve faster than for C++. This is because it is a relatively young language, whose package ecosystem and optimising compilers are yet to reach maturity. As a result of this, there is likely more scope for improvement and less technical debt than with C++, facilitating a faster rate of improvement.
-% This can be enhanced by development of tooling to facilitate building and testing ...
+The final factor which impacts the conclusion is that the performance, productivity, and interoperability of Rust is likely to improve faster than for C++. This is because it is a relatively young language, whose package ecosystem and optimising compilers are yet to reach maturity. As a result of this, there is likely more scope for improvement and less technical debt than with C++, facilitating a faster rate of improvement.
+% TODO: Check if this flows neatly?
+This can be enhanced by development of tooling and methodologies to facilitate building and testing Rust programs, such as the proposed novel approach to mitigate issues within translation and the HPC MultiBench tool to facilitated reproducible performance analysis.
 
 These factors taken in combination demonstrate Rust's suitability for High-Performance Computing applications, as despite its performance not matching C++ for the measured computational kernels, it provides commensurate benefits in developer productivity such as its compiler guarantees of memory and thread safety.
-% , which might make it preferable for real-world applications bounded by budget.
 
 
 \section{Future work}
 \label{sec:future-work}
 
-% TODO: Make this not first person?
-Firstly, I am aiming to submit a paper derived from this project to the P3HPC (Performance, Portability and Productivity in High-Performance Computing) 2024 workshop, as a result of the three novel contributions discussed in \Cref{ch:introduction}.
+Firstly, the author aims to submit a paper derived from this project to the P3HPC (Performance, Portability and Productivity in High-Performance Computing) 2024 workshop, as a result of the three novel contributions discussed in \Cref{ch:introduction}.
 % TODO: Re-iterate these contributions
 
 In addition to this, whilst HPCCG is around an order of magnitude longer than any of the Rust codebases examined in existing literature, it is one of the shortest mini-apps in the Mantevo suite. In addition to this, although HPCCG is ``the original Mantevo mini-app'', other mini-apps in the suite are more influential and commonly used. As a result of this, one avenue for future work is translating and analysing a longer, more influential mini-app, for example MiniMD \cite{osti_1231191} or HPCG \cite{dongarra2015hpcg}.
@@ -51,25 +48,18 @@ Finally, equivalence checking is a very broad and complex field. As such, future
 \section{Reflection}
 \label{sec:reflection}
 
-% It can be a useful exercise for you (and a point of consolidation for the reader) to put together a brief summary of what you have achieved. This is not a compulsory section, but a self-assessment is welcome. A suggested format for this is to include a short section entitled 'Author's Assessment of the Project' consisting of brief (up to 100 words) answers to each of the following questions.
-%     What is the (technical) contribution of this project?
-%     Why should this contribution be considered relevant and important for the subject of your degree?
-%     How can others make use of the work in this project?
-%     Why should this project be considered an achievement?
-%     What are the limitations of this project?
+On reflection, I am immensely proud of the work I have completed in the course of this project. The project was a success, as it achieved all of its ``Must have'' and ``Should have'' objectives, shown in Appendix \ref{sec:project-requirements}. These include translating, equivalence checking, and undertaking a performance analysis of a High-Performance Computing mini-app across serial, shared memory, and distributed memory parallelism approaches.
 
+In addition to this, empowered by incredibly helpful conversations with my supervisor, I chose to extend the project by building tooling to facilitate performance measurements on High-Performance Computing resources using Slurm. I found this very fulfilling, as I personally enjoy building tooling which can improve difficult processes in the real world. In my opinion, this is one of the stand-out aspects of this project, as it not only was it incredibly helpful during my performance analysis, but can also be used as an open source software product going forward. I believe it stands on its own as a helpful utility for engineers working in High-Performance Computing, as validated by the industry review.
 
-% TODO: Re-work this paragraph
-On reflection, I am immensely proud of the work I have completed in the course of this project.
-
-% Coming in to the project, I did not have a good way to estimate how long translation tasks, so generously scheduled time in my project specification to undertake these tasks. It transpired that I was able to complete the translation of the serial and parallel implementations faster than expected, which allowed me to focus on the stretch goals of the project. The initially planned stretch goal was extending the translation effort to include an assessment of the Rust bindings to MPI. This presented an interesting technical challenge of using complex Rust structures within an API which does not exactly map to the C++ implementation of the MPI specification.
-
-% This project was a success, as it achieved all of its ``Must have'' and ``Should have'' objectives, shown in Appendix \ref{sec:project-requirements}. These include translating, equivalence checking, and undertaking a performance analysis of a High-Performance Computing mini-app across serial, shared memory, and distributed memory parallelism approaches. In addition to this, two ``Could have'' objectives relating to the equivalence checking were dropped, which allowed time for the development of tooling for reproducibly running and aggregating performance experiments. This tool facilitated deep performance analysis of the HPCCG translation, but also stands on its own as a helpful utility for engineers working in High-Performance Computing, as validated by the industry review.
-
-In addition to this, empowered by incredibly helpful conversations with my supervisor, I also chose to extend the project by building tooling to facilitate performance measurements on High-Performance Computing resources using Slurm. I found this very fulfilling, as I personally enjoy building tooling which can improve difficult processes in the real world. In my opinion, this is one of the stand-out aspects of this project, as it not only was it incredibly helpful during my performance analysis, but can also be used as an open source software product going forward.
+% TODO: Add section about difficulties
 
 Finally, I believe that this project extends existing literature on the topic to a meaningful degree with three novel contributions. Firstly, it provides a translation and assessment of suitability for an application which is both around an order of magnitude longer than the largest existing work, and more representative of common High-Performance Computing workloads. This assessment is also broader in scope than those in existing literature, including distributed memory parallelism with MPI, and leveraging sophisticated techniques such as roofline models and strong and weak scaling analyses. Secondly, it proposes both a novel approach and novel tool to mitigate issues within translation and reproducible performance analysis, making future work in the field easier to undertake.
 
+% In addition to this, two ``Could have'' objectives relating to the equivalence checking were dropped, which allowed time for the development of tooling for reproducibly running and aggregating performance experiments. This tool facilitated deep performance analysis of the HPCCG translation, but also stands on its own as a helpful utility for engineers working in High-Performance Computing, as validated by the industry review.
+
+% This is too negative
+% Coming in to the project, I did not have a good way to estimate how long translation tasks, so generously scheduled time in my project specification to undertake these tasks. It transpired that I was able to complete the translation of the serial and parallel implementations faster than expected, which allowed me to focus on the stretch goals of the project. The initially planned stretch goal was extending the translation effort to include an assessment of the Rust bindings to MPI. This presented an interesting technical challenge of using complex Rust structures within an API which does not exactly map to the C++ implementation of the MPI specification.
 
 \section{Open source work}
 \label{sec:open-source-work}
