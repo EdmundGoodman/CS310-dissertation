@@ -1,42 +1,32 @@
-\makeatletter
-\begin{titlepage}
-    \textbf{\Huge \@title} \\[1.5cm]
-    \Large \textbf{\@author} \\
-    Department of Computer Science \\
-    University of Warwick \\
-    \newline
-    \ifdefempty{\@supervisor}{}{
-        Supervised by \@supervisor \\
-    }
-    \ifdefempty{\@yearofstudy}{}{
-        Year of Study: \@yearofstudy \\
-    }
+% \makeatletter
+% \begin{titlepage}
+%     % \textbf{\Huge \@title} \\[1.5cm]
+%     % \Large \textbf{\@author} \\
+%     % Department of Computer Science \\
+%     % University of Warwick \\
+%     % \newline
+%     % \ifdefempty{\@supervisor}{}{
+%     %     Supervised by \@supervisor \\
+%     % }
+%     % \ifdefempty{\@yearofstudy}{}{
+%     %     Year of Study: \@yearofstudy \\
+%     % }
 
-    \vfill
-    \today
+%     % \vfill
+%     % \today
 
-    \begin{adjustwidth}{-\oddsidemargin-1in}{-\rightmargin}
-        \centering
-        \includegraphics[width=\paperwidth]{images/line.png}
-    \end{adjustwidth}
-    \vspace*{-3.5cm}
+%     % \begin{adjustwidth}{-\oddsidemargin-1in}{-\rightmargin}
+%     %     \centering
+%     %     \includegraphics[width=\paperwidth]{images/_title_page/line.png}
+%     % \end{adjustwidth}
+%     % \vspace*{-3.5cm}
+% \end{titlepage}
+% \makeatother
 
-    
-    
-\end{titlepage}
-\makeatother
+\newgeometry{margin=0pt}
+\includegraphics{images/_title_page/title_page.pdf}
+\restoregeometry
+% \clearpage
 
-
-% \newpage
-% \vspace*{\fill}
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.5\textwidth]{images/Warwick_Crest.png}
-%     \label{fig:warwick_crest}
-% \end{figure}
-% \vspace*{\fill}
-% \newpage
-
-% TODO: Make this look prettier!
 % TODO: Add inner page liner or similar? (see Musab's notes)
 % TODO: Alternate page margins for printing (https://warwick.ac.uk/services/warwickprint/printing/printing-a4-a3/)

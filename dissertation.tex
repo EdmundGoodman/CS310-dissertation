@@ -2,6 +2,7 @@
 % \documentclass[a4paper,fleqn,twoside,12pt]{report}
 
 \input{utils/preamble.tex}
+\input{utils/acronyms.tex}
 
 \author{Edmund Goodman}
 \yearofstudy{3\textsuperscript{rd}} % year, excluding industrial placement
@@ -26,11 +27,13 @@
 \newpage
 \pagenumbering{roman}
 
-% TODO: Add quotations at chapter starts like eth rust in hpc paper
-% TODO: Add abbreviations/glossary (e.g. HPC, LLVM, SMP, CSR, SIMD, FLOPS, ...) (separate page)
+% TODO: Add quotations at chapter starts like eth rust in hpc paper (epigraph package)
+% TODO: Make quotes prettier...
 % TODO: Make the way figures/tables are captioned consistent, e.g. not starting with ``a figure that shows?''
 % TODO: Fix kerning on list of listings
 \tableofcontents
+\printglossary[type=\acronymtype,title={List of Abbreviations}]
+\addcontentsline{toc}{chapter}{List of Abbreviations}
 \listoffigures
 \listoftables
 \listoflistings

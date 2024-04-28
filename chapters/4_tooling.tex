@@ -12,7 +12,7 @@ HPC MultiBench is a tool to generate and run HPC batch compute jobs for performa
 \section{Motivations}
 \label{sec:hpc-multibench-motivation}
 
-Manually spawning and aggregating the metrics from many similar jobs with different configurations is tedious. It is a repetitive and time-consuming process, and as such discourages duplicating results for statistical confidence -- despite being susceptible to human error. However, it is a common task in workflows for designing High-Performance Computing software, as it provides critical metrics to characterise application performance.
+Manually spawning and aggregating the metrics from many similar jobs with different configurations is tedious. It is a repetitive and time-consuming process, and as such discourages duplicating results for statistical confidence -- despite being susceptible to human error. However, it is a common task in workflows for designing \acrshort{HPC} software, as it provides critical metrics to characterise application performance.
 
 Consider a single trial comparing the performance of two programs across eight problem sizes, with eight different thread counts per problem size. In total, this requires 128 program runs. Re-running this trial five times for statistical confidence requires 640 program runs, which is an untenably large number of jobs to dispatch manually. Currently, there are two approaches to this problem: either ignore statistical confidence and manually spawn many jobs, or create an application-specific script to submit the jobs. Both of these approaches are time-consuming, either manually submitting the jobs or writing and debugging the custom script. As a result of this, this step can form a bottleneck in certain workflows.
 
@@ -21,24 +21,24 @@ However, this process of running and aggregating jobs is very similar between pe
 \section{Existing tools}
 \label{sec:hpc-multibench-existing-tools}
 
-As High-Performance Computing is an active research space, there are a number of existing tools which also act as a wrapper around Slurm, as shown in Table \ref{tab:hpc-multibench-existing-tools}. However, none of these tools appear to provide first-class support for this particular use case.
+As \acrshort{HPC} is an active research space, there are a number of existing tools which also act as a wrapper around Slurm, as shown in Table \ref{tab:hpc-multibench-existing-tools}. However, none of these tools appear to provide first-class support for this particular use case.
 
-% TODO: Check all tables have bold headings
-% TODO: Consider citing GitHub on tool names and papers on tool descriptions?
 \begin{table}[H]
     \caption{Existing tools which provide wrappers for Slurm.}
     \label{tab:hpc-multibench-existing-tools}
+    %TC:ignore
     \begin{tabular}{|p{0.2\linewidth}|p{0.8\linewidth}|}
     \hline
     \textbf{Tool name}  & \textbf{Tool description} \\ \hline\hline
-    slurmR     & ``A lightweight wrapper for Slurm'' \cite{gvegayonJournalOpenSource}, which provides a framework to distribute computation of programs written in the R language across compute clusters, particularly in the field of biostatistics. \\ \hline
-    targets    & ``A Make-like pipeline tool for statistics and data science in R'' \cite{landauTargetsPackageDynamic2021}, which orchestrates processing of programs written in R, providing caching capabilities to avoid re-running unchanged parts of the pipeline. \\ \hline
-    batchtools & ``Provides an implementation of a Map-like operation to define and asynchronously execute jobs on a variety of parallel backends'' for the R programming language \cite{langBatchtoolsToolsWork2017}. \\ \hline
-    ClusterMQ  & ``[An R package] to send function calls as jobs on a computing cluster with a minimal interface'' \cite{schubertClustermqEnablesEfficient2019}. \\ \hline
+    slurmR \cite{USCbiostatsSlurmR2024} & ``A lightweight wrapper for Slurm'' \cite{gvegayonJournalOpenSource}, which provides a framework to distribute computation of programs written in the R language across compute clusters, particularly in the field of biostatistics. \\ \hline
+    targets \cite{RopensciTargets2024} & ``A Make-like pipeline tool for statistics and data science in R'' \cite{landauTargetsPackageDynamic2021}, which orchestrates processing of programs written in R, providing caching capabilities to avoid re-running unchanged parts of the pipeline. \\ \hline
+    batchtools \cite{langBatchtoolsToolsWork2017} & ``Provides an implementation of a Map-like operation to define and asynchronously execute jobs on a variety of parallel backends'' for the R programming language \cite{langBatchtoolsToolsWork2017}. \\ \hline
+    ClusterMQ \cite{schubertMschubertClustermq2024} & ``[An R package] to send function calls as jobs on a computing cluster with a minimal interface'' \cite{schubertClustermqEnablesEfficient2019}. \\ \hline
     \end{tabular}
+    %TC:endignore
 \end{table}
 
-From this table, we can see that a number of tools exist as wrappers for Slurm for scientific computing workflows. However, these tools are generally focussed on orchestrating High-Performance Computing resources to run scientific computing programs, often in the R programming language, rather than providing a mechanism to run and compare the performance of programs in arbitrary languages. Our research did not identify any existing tools which directly compete with the purpose of HPC MultiBench.
+From this table, we can see that a number of tools exist as wrappers for Slurm for scientific computing workflows. However, these tools are generally focussed on orchestrating \acrshort{HPC} resources to run scientific computing programs, often in the R programming language, rather than providing a mechanism to run and compare the performance of programs in arbitrary languages. Our research did not identify any existing tools which directly compete with the purpose of HPC MultiBench.
 
 \section{Design and implementation}
 \label{sec:hpc-multibench-design-implementation}
@@ -46,19 +46,13 @@ From this table, we can see that a number of tools exist as wrappers for Slurm f
 The HPC MultiBench tool started as a utility for personal use to facilitate performance measurements, which then later turned into a production-ready tool. As such, the design was guided by the functionality required by the author to conduct such measurements. As such, the identified goals of the tool are:
 
 \begin{enumerate}
-    \item Run programs on High-Performance Computing resources across a range of configurations
+    \item Run programs on \acrshort{HPC} resources across a range of configurations
     \item Extract numerical metrics from program runs
     \item Re-run programs and aggregate their metrics for statistical confidence in results
     \item Plot graphs showing metric trends over configurations
     \item Use a YAML configuration file to allow the definition of program runs, their metrics, and resulting plots
     \item Render an interactive user interface without an X-forwarded graphical connection
 \end{enumerate}
-
-% TODO: Could add this section, but doesn't add much value and bloats word count and narrative
-% \section{Source code structure}
-% \label{ssec:hpc-multibench-structure}
-% % Source code structure
-% % Diagram of package relations
 
 \subsection{Configuration file}
 \label{ssec:hpc-multibench-configuration}
@@ -76,7 +70,7 @@ It is critical that files in under this YAML schema are parsed and validated in 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/4_tooling/implementation/yaml_model.png}
-    \caption{An entity-relationship diagram showing the Pydantic model representing the YAML schema, generated using the \texttt{erdantic} tool.}
+    \caption{Entity-relationship diagram showing the Pydantic model representing the YAML schema, generated using the \texttt{erdantic} tool.}
     \label{fig:hpc-multibench-yaml-model}
 \end{figure}
 
@@ -88,7 +82,7 @@ Having parsed the configuration data, the majority of the application logic impl
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{images/4_tooling/implementation/hpc_multibench_data_flow.png}
-    \caption{A diagram showing the data flow through the HPC MultiBench tool.}
+    \caption{Data flow through the HPC MultiBench tool.}
     \label{fig:hpc-multibench-data-flow}
 \end{figure}
 
@@ -97,7 +91,7 @@ In this diagram, we can see that the record and report phases operate completely
 \subsection{User interface}
 \label{ssec:hpc-multibench-ui}
 
-A key design goal of the project was providing an interactive user interface, which can run on remote machines without requiring setup such as configuring X-forwarding. This was motivated by the fact most High-Performance Computing resources are accessed over an SSH connection, which may be proxied through other servers. To mitigate this, X-forwarded graphical applications can be flaky or have very high latency. As a result of this, the tool was designed to have a simple command line interface, including a mode to render results interactively in the terminal without requiring X-forwarding.
+A key design goal of the project was providing an interactive user interface, which can run on remote machines without requiring setup such as configuring X-forwarding. This was motivated by the fact most \acrshort{HPC} resources are accessed over an SSH connection, which may be proxied through other servers. To mitigate this, X-forwarded graphical applications can be flaky or have very high latency. As a result of this, the tool was designed to have a simple command line interface, including a mode to render results interactively in the terminal without requiring X-forwarding.
 
 The HPC MultiBench command-line user interface is designed to be familiar to users of existing tools, such as the performance profiler \texttt{perf}. Much like \texttt{perf}, it provides two verb subcommands, \texttt{record} and \texttt{report}. The \texttt{record} command asynchronously dispatches experimental runs via Slurm, and the \texttt{report} command aggregates and presents an analysis of the results of these runs.
 
@@ -106,7 +100,7 @@ In addition to these, the \texttt{interactive} subcommand uses the Textual \cite
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/4_tooling/interactive_screenshots/hpc-multibench-line-plotext-2.png}
-    \caption{A screenshot of the interactive mode user interface plotting a line graph, rendered entirely in the Terminal.}
+    \caption{Screenshot of the interactive mode user interface plotting a line graph, rendered entirely in the Terminal.}
     \label{fig:hpc-multibench-line-plotext-2}
 \end{figure}
 
@@ -122,14 +116,14 @@ For a software tool to be adopted, users must be able to install it, run it, and
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/4_tooling/implementation/documentation_splash.png}
-    \caption{A screenshot of the documentation website splash page for the HPC MultiBench tool, hosted at \url{https://edmundgoodman.co.uk/hpc-multibench/}.}
+    \caption{Screenshot of the documentation website splash page for the HPC MultiBench tool, hosted at \url{https://edmundgoodman.co.uk/hpc-multibench/}.}
     \label{fig:documentation_splash}
 \end{figure}
 
 % TODO: Could add screenshot of the auto-generated docs from docstrings
 
 % TODO: Is this needed?
-In addition to this, as part of the the open source contributions made by this project, discussed in \ref{sec:open-source-work}, this tool will be made public on GitHub once the assessment phase of the module has finished. In addition to this, it will be released to PyPI -- allowing it to be installed with a single command using Python's package manage, \texttt{pip}.
+In addition to this, as part of the open source contributions made by this project, discussed in \ref{sec:open-source-work}, this tool will be made public on GitHub once the assessment phase of the module has finished. In addition to this, it will be released to PyPI -- allowing it to be installed with a single command using Python's package manage, \texttt{pip}.
 
 
 \section{Example use case}
@@ -137,7 +131,7 @@ In addition to this, as part of the the open source contributions made by this p
 
 As discussed in section \ref{sec:hpc-multibench-motivation}, a key motivation for this tool is streamlining the tedious process of manually running, aggregating, and analysing the results of many program runs to create a statistically confident characterisation of the performance of programs. Since this process is so time-consuming, due to both the process of conducting many runs, and re-writing scripts to aggregate and present the data, it is often not viable to spend time running replication studies of existing work, despite the benefits many benefits this work provides. Beyond the clear use case for this tool of running and analysing original results, which is showcased in full in \Cref{ch:performance}, this tool also makes it possible to very quickly conduct replication studies of existing work in the field.
 
-In his paper ``Shall we Really do it Again? The Powerful Concept of Replication is Neglected in the Social Sciences'', Schmidt introduces replication as ``one of the central issues in any empirical science'', and goes on to define replication studies as ``'' \cite{schmidtShallWeReally2009}. In recent years, the absence of reproducible results in publications has been branded the ``replication crisis'', with Ioannidis publishing a paper title ``Why Most Published Research Findings Are False'' on the basis of a very high rate of non-reproducibility of experimental data \cite{ioannidisWhyMostPublished2005}. Since High-Performance computing relies on many empirical measurements to draw conclusions about characteristics of hardware and software, tooling to facilitate reproducibility is clearly desirable.
+In his paper ``Shall we Really do it Again? The Powerful Concept of Replication is Neglected in the Social Sciences'', Schmidt introduces replication as ``one of the central issues in any empirical science'', and goes on to define replication studies as ``'' \cite{schmidtShallWeReally2009}. In recent years, the absence of reproducible results in publications has been branded the ``replication crisis'', with Ioannidis publishing a paper title ``Why Most Published Research Findings Are False'' on the basis of a very high rate of non-reproducibility of experimental data \cite{ioannidisWhyMostPublished2005}. Since \acrshort{HPC} relies on many empirical measurements to draw conclusions about characteristics of hardware and software, tooling to facilitate reproducibility is clearly desirable.
 
 \subsection{Replication study of ``Emerging technologies: Rust in HPC''}
 \label{ssec:hpc-multibench-replication-study}
@@ -157,8 +151,6 @@ As a result of the focussed design goals of the HPC MultiBench tool, the workflo
 
 Listing \ref{listing:replication-study-workflow} shows the six terminal commands required to perform these six steps.
 
-% TODO: Consider framing all listings with [linenos,breaklines,frame=single]
-% TODO: Submoduling strategy has changed, update to reflect this
 \begin{code}
     %TC:ignore
     \begin{minted}{bash}
@@ -172,7 +164,7 @@ Listing \ref{listing:replication-study-workflow} shows the six terminal commands
             -y generated_results/replication_study.yaml report
     \end{minted}
     %TC:endignore
-    \caption{A listing of the six bash commands required to run a full replication study of Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.}
+    \caption{Six bash commands required to run a full replication study of Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.}
     \label{listing:replication-study-workflow}
 \end{code}
 
@@ -184,7 +176,7 @@ A full listing of the YAML file for the replication study is provided in Appendi
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_original_1.png}
-    \caption{A plot comparing total time taken for a serial codebase, from Moran and Bull's paper \cite{moranEmergingTechnologiesRust2023}.}
+    \caption{Total time taken for a serial codebase, from Moran and Bull's paper \cite{moranEmergingTechnologiesRust2023}.}
     \label{fig:replication_original_1}
 \end{figure}
 \begin{figure}[H]
@@ -192,7 +184,7 @@ A full listing of the YAML file for the replication study is provided in Appendi
     \input{images/4_tooling/replication_study/serial.tex}
     \vspace*{-0.5cm}
     % \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_mine_1.png}
-    \caption{A plot comparing total time taken for a serial codebase, replicated using HPC MultiBench.}
+    \caption{Total time taken for a serial codebase, replicated using HPC MultiBench.}
     \label{fig:replication_mine_1}
 \end{figure}
 
@@ -200,7 +192,7 @@ A full listing of the YAML file for the replication study is provided in Appendi
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_original_2.png}
-    \caption{A plot comparing serial execution times relative to C++, from Moran and Bull's paper \cite{moranEmergingTechnologiesRust2023}.}
+    \caption{Serial execution times relative to C++, from Moran and Bull's paper \cite{moranEmergingTechnologiesRust2023}.}
     \label{fig:replication_original_2}
 \end{figure}
 \begin{figure}[H]
@@ -208,7 +200,7 @@ A full listing of the YAML file for the replication study is provided in Appendi
     \input{images/4_tooling/replication_study/serial_relative.tex}
     \vspace*{-0.5cm}
     % \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_mine_2.png}
-    \caption{A plot comparing serial execution times relative to C++, replicated using HPC MultiBench.}
+    \caption{Serial execution times relative to C++, replicated using HPC MultiBench.}
     \label{fig:replication_mine_2}
 \end{figure}
 
@@ -216,7 +208,7 @@ A full listing of the YAML file for the replication study is provided in Appendi
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{images/4_tooling/replication_study/replication_original_4.png}
-    \caption{A plot showing rate of iterations scaling with the number of threads used, from Moran and Bull's paper \cite{moranEmergingTechnologiesRust2023}.}
+    \caption{Rate of iterations scaling with the number of threads used, from Moran and Bull's paper \cite{moranEmergingTechnologiesRust2023}.}
     \label{fig:replication_original_4}
 \end{figure}
 \begin{figure}[H]
@@ -224,7 +216,7 @@ A full listing of the YAML file for the replication study is provided in Appendi
     \input{images/4_tooling/replication_study/iterations_threads_16.tex}
     \vspace*{-0.5cm}
     % \includegraphics[width=\textwidth]{images/4_tooling/replication_study/replication_mine_4.png}
-    \caption{A plot showing rate of iterations scaling with the number of threads used, replicated using HPC MultiBench.}
+    \caption{Rate of iterations scaling with the number of threads used, replicated using HPC MultiBench.}
     \label{fig:replication_mine_4}
 \end{figure}
 

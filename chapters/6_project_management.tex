@@ -5,43 +5,38 @@
 
 \section{Specification}
 \label{sec:specification}
-% Did the student make clear at the start of the project what they intended to do?
 
 At the start of the project, a set of MoSCoW prioritised \cite{CaseMethodFastTrack} requirements were created, which fully defined concrete goals for the project. These are included in Appendix \ref{sec:project-requirements}. These fixed requirements gave the project a clear overall goal from a very early stage, and helped adopt good planning and development methodologies. 
-%These methodologies are discussed in the next section, \ref{sec:organisation}.
 
 \section{Organisation}
 \label{sec:organisation}
-% Did the student plan their activities in advance and keep to the plan? Did the student exhibit good time-management skills?
 
 Good organisation is critical to the success of any project. To guarantee the success of this project, I maintained a strong focus on organisation from the start of the specification, for example by having regular, minuted, meetings with my project supervisor, and setting aside regular blocks of time in my week to make progress towards timelined goals.
 
 \subsection{Project plan}
 \label{ssec:organisation-plan}
-% Gantt chart and planning
 
 One important aspect of project organisation is having a robust plan. Following the creation of the project requirements, I created a Gantt chart to set a timeline for their completion, shown in Figure \ref{fig:diss_gantt_spec_2}:
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{images/6_project_management/diss_gantt_spec_2.png}
-    \caption{The proposed project timetable, showing each of the objectives and the dependencies between them.}
+    \caption{Gantt chart of the proposed project timetable, showing each of the objectives and the dependencies between them.}
     \label{fig:diss_gantt_spec_2}
 \end{figure}
 
 As discussed in the development methodology section \ref{ssec:organisation-methodology}, I followed an Agile methodology to undertake this project. One key benefit of this project was adaptability to change based on new information or supervisor discussion (following the agile manifesto: ``Responding to change over following a plan'' \cite{beckManifestoAgileSoftware2001}). 
 
-When approaching the half-way point of the project and writing the progress report, I had made very strong progress towards the project objectives, with a working implementation of the Rust translation of the HPCCG mini-app completed ahead of schedule. As a result of this new information, following discussion with my supervisor, I chose to modify my project plan to include the translation of a second, larger mini-application, called MiniMD \cite{osti_1231191}. During the Christmas break, I investigated the MiniMD codebase and build system, and found that it presented unforeseen challenges, for example a build process which involved a Makefile manually expanding C++ macros. This build process did not map well into modern build systems like CMake, nor Rust's procedural macro system. As a result of this, again following discussion with my supervisor, I chose to return to the original project plan, with the stretch goal of translating the MPI component of HPCCG. This allowed me to extend the scope of the assessment of Rust's capability as a language for High-Performance Computing, and gave me time to build the HPC MultiBench tool, which was not initially planned. These significant changes would be very difficult following a plan-based methodology, such as waterfall -- but were possible through Agile, and resulted in a better project outcome, informed by experience learnt in the process.
+When approaching the half-way point of the project and writing the progress report, I had made very strong progress towards the project objectives, with a working implementation of the Rust translation of the HPCCG \acrshort{mini-app} completed ahead of schedule. As a result of this new information, following discussion with my supervisor, I chose to modify my project plan to include the translation of a second, larger \acrshort{mini-app}, called MiniMD \cite{osti_1231191}. During the Christmas break, I investigated the MiniMD codebase and build system, and found that it presented unforeseen challenges, for example a build process which involved a Makefile manually expanding C++ macros. This build process did not map well into modern build systems like CMake, nor Rust's procedural macro system. As a result of this, again following discussion with my supervisor, I chose to return to the original project plan, with the stretch goal of translating the MPI component of HPCCG. This allowed me to extend the scope of the assessment of Rust's capability as a language for \acrshort{HPC}, and gave me time to build the HPC MultiBench tool, which was not initially planned. These significant changes would be very difficult following a plan-based methodology, such as waterfall -- but were possible through Agile, and resulted in a better project outcome, informed by experience learnt in the process.
 
 % The final version of the project timeline is shown as a Gantt chart in Figure \ref{}:
-% TODO: % Final Gantt chart
+% NOTE: Consider making final Gantt chart
 
 In summary, creating and following a project plan from the start of the project, whilst being empowered to change it as required, contributed strongly to the success of this project.
 
 \subsection{Development methodology}
 \label{ssec:organisation-methodology}
 
-% What is an Agile methodology
 In 2001, a group of seventeen leaders in the field of software engineering published ``The Manifesto for Agile Software Development'' \cite{beckManifestoAgileSoftware2001}. This proposed four key principles to consider during software development:
 
 \begin{itemize}
@@ -58,7 +53,7 @@ I chose to use a variant of the Scrum methodology, as it is simple to implement 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.75\textwidth]{images/6_project_management/excalidraw_agile.png}
-    \caption{A diagram of a typical workflow for the Scrum flavour of Agile development.}
+    \caption{Typical workflow for the Scrum flavour of Agile development.}
     \label{fig:excalidraw_agile}
 \end{figure}
 
@@ -72,14 +67,13 @@ This decision to manage the project with an agile methodology has yielded many b
 
 \subsection{Software tools}
 \label{ssec:software-tools}
-% Tools selected for use
 
 This project heavily leveraged \texttt{git} in combination with a private GitHub repositories. All source code, from helper scripts to software products, are tracked in \texttt{git}. Using \texttt{git} for source control management allowed syncing work across DCS, SCRTP, and personal machines, and reviewing and restoring to work done in the past.
 
 A significant aspect of the project was developing software, resulting in two major software products:
 
 \begin{enumerate}
-    \item The translated mini-app code -- necessarily written in Rust.
+    \item The translated \acrshort{mini-app} code -- necessarily written in Rust.
     \item The HPC MultiBench tool -- written in Python for high-velocity development.
 \end{enumerate}
 
@@ -87,45 +81,22 @@ For this software development, I followed the GitHub flow development workflow \
 
 Long-format text was written in \LaTeX\ using Overleaf\cite{OverleafOnlineLaTeX}, and also tracked in \texttt{git} via Overleaf's integration with GitHub for linear commit histories. In addition to this, I used Zotero \cite{ZoteroYourPersonal} to manage citations, which again supports an integration with Overleaf.
 
-
 \subsection{Responding to unforeseen issues}
 \label{ssec:organisation-unforeseen-issues}
 
 As discussed in the previous section, \ref{ssec:organisation-methodology}, following an Agile methodology empowered the project to be flexible to change, allowing the original plan to be adapted based on new information or ongoing supervisor discussions. A concrete example of this is the development of the HPC MultiBench tool. Its development was not an explicit project requirement enumerated in the specification, but following identification of a need and supervisor discussion, it was included as part of the project to facilitate performance analysis. This successful deviation from the initial project plan also supports the fact that the chosen methodology would have been robust against major unforeseen issues, had any occurred.
 
-% TODO: typeset risk matrix better, or move to appendix
-In the project specification, a Risk Matrix characterising possible issues was generated, as shown in Table \ref{tab:risk_matrix}.
-Of these identified possible risks, the only one which manifested itself was compute resources becoming busy, which is consistent with it having the highest estimated likelihood. This had a low impact on the project progress, as I had access to two resources (both \texttt{kudu} on DCS and \texttt{Avon} on SCRTP), and could switch to other tasks whilst waiting for long jobs to complete.
-
-% When generating the Risk Matrix for the specification, some possible risks were excluded, such as personal computer failure. However, this was experienced multiple times during the project
-
-\begin{table}[ht]
-\begin{adjustwidth}{-3em}{-3em}
-    \centering
-    \caption{The proposed Risk Matrix for the project, from the project specification.}
-    \label{tab:risk_matrix}
-    \begin{tabular}{|p{0.2\linewidth}|p{0.25\linewidth}|p{0.065\linewidth}|p{0.085\linewidth}|p{0.055\linewidth}|p{0.24\linewidth}|} \hline
-         Risk&  Cause of risk&  Bad- ness&  Likeli- hood&  Score& Mitigation strategy\\ \hline
-         Major upheaval of the Rust language&  The Rust Foundation making a controversial decision \cite{AmNoLonger2023} \cite{AddRFCGovernance} \cite{TelemetryGoToolchain}&  4&  1&  \cellcolor{green!25}4 & Use a previous edition of Rust via \texttt{rustup}\\ \hline 
-         Data structure for selected mini-app cannot be recreated under Rust's memory safety
-  constraints&  Some data structures cannot be represented with Rust's ownership model, such as doubly linked lists \cite{leeBuildingMemorysafeNetwork2017}&  5&  6&  \cellcolor{red!25}30& Create a safe API around the required unsafe data structure\\ \hline 
-         Compute resources become busy slowing development and testing&    Towards the end of term two, many students use \texttt{kudu} for coursework and dissertations&  2&  8&  \cellcolor{orange!25}16& Use a different compute resource, for example if \texttt{kudu} is busy use SCRTP or local machines\\ \hline 
-         Unable to install Rust on compute resources&  Some compute resources may have restrictive permissions for users&  9&  3&  \cellcolor{red!25}27& Install only for a single user, or leverage containerisation to avoid installation issues\\ \hline 
- Loss of access to IBM computer resources or mentor and connections& Internal changes to IBM unrelated to the project& 4& 1& \cellcolor{green!25}4 &Whilst the IBM resources are nice to have, none of them are essential to the project, so can just continue without them\\ \hline
-    \end{tabular}
-    \end{adjustwidth}
-\end{table}
+In the project specification, a Risk Matrix characterising possible issues was generated, as shown in Table \ref{tab:risk_matrix}, included in Appendix \ref{sec:risk-matrix-appendix}. Of these identified possible risks, the only one which manifested itself was compute resources becoming busy, which is consistent with it having the highest estimated likelihood. This had a low impact on the project progress, as I had access to two resources (both \texttt{kudu} on DCS and \texttt{Avon} on SCRTP), and could switch to other tasks whilst waiting for long jobs to complete.
 
 \section{Effort and motivation}
 \label{sec:effort-and-motivation}
-% Did the student work hard?
 
 I believe this project could be described as high effort through deeply consistent work. In the first term, I had no timetabled lectures nor seminars on Fridays, so set them aside as a time to work exclusively on the project. This allowed me to avoid incurring the cost of context switching to other activities. As a result of this, I was able to make strong progress, completing the translation and parallelisation objectives ahead of schedule. In the new year, I suggested and undertook a challenge along with a group of friends to make a project-related \texttt{git} commit every day during the month of January (``proj-anuary'', a portmanteau of project and January). I then chose to continue this for the entirety of the second term of this academic year, as shown in Figure \ref{fig:github_year_long_contributions}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{images/6_project_management/github_year_long_contributions.png}
-    \caption{A diagram showing my GitHub contributions over the past academic year. Commits from January 1\textsuperscript{st} to March 18\textsuperscript{th} form an unbroken consecutive streak of 78 days.}
+    \caption{The author's GitHub contributions over the past academic year. Commits from January 1\textsuperscript{st} to March 18\textsuperscript{th} form an unbroken consecutive streak of 78 days.}
     \label{fig:github_year_long_contributions}
 \end{figure}
 
@@ -133,15 +104,15 @@ This consistent approach to project progression paid great dividends, with even 
 
 \section{Legal, social, ethical, and professional issues}
 \label{sec:legal-social-ethical-professional-issues}
-% Has the student taken into account matters such as ethics, social issues, and the law, as they relate to the project?
 
 At the start of the project, any legal, social, ethical, and professional issues that might relate to the project were identified. 
 
-Firstly, a small number of legal issues were identified as relating to the project, largely relating to software licensing. Since High-Performance Computing is an active field of development in industry, some libraries or tools may have restrictive licences, so care was taken when picking and using tools to conform to the terms of their licences. Additionally, when identifying possible legal issues in the specification, it was noted that some mini-apps in the Mantevo suite are based on simulations of experiments in nuclear physics, so working with them might require special care to conform to relevant UK law. However, this issue was mitigated by selecting to examine the HPCCG mini-app \cite{herouxHPCCGSolverPackage2007}, which is instead based on methods of conjugate gradients solving linear systems \cite{hestenesMethodsConjugateGradients1952}.
+Firstly, a small number of legal issues were identified as relating to the project, largely relating to software licensing. Since \acrshort{HPC} is an active field of development in industry, some libraries or tools may have restrictive licences, so care was taken when picking and using tools to conform to the terms of their licences. Additionally, when identifying possible legal issues in the specification, it was noted that some \acrshort{mini-app}s in the Mantevo suite are based on simulations of experiments in nuclear physics, so working with them might require special care to conform to relevant UK law. However, this issue was mitigated by selecting to examine the HPCCG \acrshort{mini-app} \cite{herouxHPCCGSolverPackage2007}, which is instead based on methods of conjugate gradients solving linear systems \cite{hestenesMethodsConjugateGradients1952}.
 
-Secondly, a level of professionalism is required for all projects. This project does not necessitate any professional considerations above basic norms, such as making meaningful commit messages, or avoiding profanity in source code comments. % TODO: Change this list of basic norms
+Secondly, a level of professionalism is required for all projects. This project does not necessitate any professional considerations above basic norms, such as making meaningful commit messages, or writing well documented and maintainable code.
 
-Finally, since this project does not use human-generated data (for example data from surveys), nor is it creating a product humans directly use, it does not have any notable ethical nor social considerations. This was verified by following the flowchart on the \href{https://warwick.ac.uk/fac/sci/dcs/teaching/ethics}{ethical consent page of the project website}. % TODO: Could argue that shift to building HPC multibench requires social considerations
+% Finally, since this project does not use human-generated data (for example data from surveys), nor is it creating a product humans directly use, it does not have any notable ethical nor social considerations. This was verified by following the flowchart on the \href{https://warwick.ac.uk/fac/sci/dcs/teaching/ethics}{ethical consent page of the project website}. % NOTE: Could argue that shift to building HPC multibench requires social considerations, but I don't think that it does
+Finally, since this project does not use human-generated data (for example data from surveys), it does not have any notable ethical nor social considerations. This was verified by following the flowchart on the \href{https://warwick.ac.uk/fac/sci/dcs/teaching/ethics}{ethical consent page of the project website}.
 
 Due to the importance of these categories of issues, they were reviewed again for any changes at the midpoint of the project when writing the progress report, and yet again at the end when writing the final report. Since the project remained broadly fixed in scope, no additional issues were identified at either of these points.
 

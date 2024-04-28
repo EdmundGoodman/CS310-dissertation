@@ -5,13 +5,13 @@
 % \textbf{This chapter is now complete - but wasn't in the first three chapter draft submission!} %
 % =============================================================================================== %
 
-In this chapter, we discuss the translation process from C++ to Rust of the selected mini-app, HPCCG. First, we introduce the implementation details of HPCCG, along with the translation methodology undertaken. Then, we present a sequence of incrementally performant translations, showing how features of and packages for the Rust language can contribute to the performance of translations of C++ codebases. Next, we discuss approaches for checking program equivalence, which is critical to guarantee performance comparisons are fair. Finally, we conclude with a section on lessons learned from the process, and a proposed workflow for engineers translating High-Performance C++ codebases to Rust.
+In this chapter, we discuss the translation process from C++ to Rust of the selected \acrshort{mini-app}, HPCCG. First, we introduce the implementation details of HPCCG, along with the translation methodology undertaken. Then, we present a sequence of incrementally performant translations, showing how features of and packages for the Rust language can contribute to the performance of translations of C++ codebases. Next, we discuss approaches for checking program equivalence, which is critical to guarantee performance comparisons are fair. Finally, we conclude with a section on lessons learned from the process, and a proposed workflow for engineers translating High-Performance C++ codebases to Rust.
 
 % The overall goal of this effort is to generate a software product -- a Rust translation of the HPCCG codebase, with strong performance running in serial, and whilst leveraging shared and distributed memory parallelism. On top of this, we propose a approaches for equivalence checking such translations, and use them to give confidence the Rust translation of HPCCG can be used for fair performance comparisons with the reference C++ version.
 
-As discussed in \Cref{ch:background}, this translation effort is novel with respect to assessing High-Performance Computing for a number of reasons. Previous literature has translated only single computation kernels \cite{bychkovRustLanguageSupercomputing2021} with support for shared and distributed memory parallelism, or very short ``toy example'' applications of around only 150 lines \cite{costanzoPerformanceVsProgramming2021} \cite{moranEmergingTechnologiesRust2023} with support for only shared memory parallelism.
+As discussed in \Cref{ch:background}, this translation effort is novel with respect to assessing \acrshort{HPC} for a number of reasons. Previous literature has translated only single computation kernels \cite{bychkovRustLanguageSupercomputing2021} with support for shared and distributed memory parallelism, or very short ``toy example'' applications of around only 150 lines \cite{costanzoPerformanceVsProgramming2021} \cite{moranEmergingTechnologiesRust2023} with support for only shared memory parallelism.
 
-Contrasting this, HPCCG is a standard mini-app as part of the Mantevo suite, with the C++ version totalling 1524 lines and having support for both shared and distributed memory parallelism. This order of magnitude increase in codebase length over modern existing work and support for distributed memory parallelism outside of single computation kernel contexts is both novel and provides a valuable insight into the suitability of Rust in High-Performance Computing.
+Contrasting this, HPCCG is a standard \acrshort{mini-app} as part of the Mantevo suite, with the C++ version totalling 1524 lines and having support for both shared and distributed memory parallelism. This order of magnitude increase in codebase length over modern existing work and support for distributed memory parallelism outside of single computation kernel contexts is both novel and provides a valuable insight into the suitability of Rust in \acrshort{HPC}.
 
 \section{Design}
 \label{sec:translation-design}
@@ -27,12 +27,12 @@ Typically, the abstractions across programming languages are equally powerful. H
 
 This restriction of valid programs being well simply-typed in Simply-Typed Lambda Calculus is mirrored by the prohibition of undefined behaviour in Rust, as shown in Figure \ref{fig:excalidraw_programs_venn}. In fact, Rust's ownership model can be formally described as an affine type system, as every value must be used once or not at all \cite{reed2015patina}. This prohibition is beneficial to programmers, as they similarly do not want to write programs which exhibit undefined behaviour. This is supported by the fact that programmers in other languages like C++ use dynamic and static analysis tools such as Valgrind \cite{ValgrindHome} and AddressSanitiser \cite{Sanitizers2023} to guarantee these properties outside the compiler.
 
-% TODO: Consider replacing this diagram with tikz?
+% NOTE: This could be re-written in Tikz
 % https://tex.stackexchange.com/questions/484541/nested-ellipses-in-tikzpicture-chomsky-hierarchy
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{images/3_translation/excalidraw_programs_venn.png}
-    \caption{A diagram to show the relative powers of increasingly restrictive program models.}
+    \caption{Relative powers of increasingly restrictive program models.}
     \label{fig:excalidraw_programs_venn}
 \end{figure}
 
@@ -51,7 +51,7 @@ Unfortunately, this pointer based implementation presents difficulties when tran
 
 This section provides a description of the technical details of the translation process.
 % In order to guarantee that the Rust implementation is performant as possible, and hence representative of the capabilities of the Rust language, a workflow of incremental improvement was adopted for the translation process.
-First, a direct translation to Rust was undertaken, matching the program model as closely as possible to provide confidence in program equivalence. Then, a number of incremental improvements to the Rust implementation were undertaken to result in a performant serial implementation of the HPCCG mini-app. Finally, this serial implementation was modified to implement shared and distributed memory parallelism using \texttt{rayon} and the Rust MPI bindings. Source code for each of these translation versions can be found in the \texttt{hpccg-rs} \texttt{git} repository.
+First, a direct translation to Rust was undertaken, matching the program model as closely as possible to provide confidence in program equivalence. Then, a number of incremental improvements to the Rust implementation were undertaken to result in a performant serial implementation of the HPCCG \acrshort{mini-app}. Finally, this serial implementation was modified to implement shared and distributed memory parallelism using \texttt{rayon} and the Rust MPI bindings. Source code for each of these translation versions can be found in the \texttt{hpccg-rs} \texttt{git} repository.
 
 
 \subsection{Direct translation}
@@ -59,7 +59,7 @@ First, a direct translation to Rust was undertaken, matching the program model a
 The first translation was designed to be as direct a mapping between the program models of C++ and Rust as possible. This helped develop a strong understanding of the codebase, and gave initial confidence in program equivalence, as the only factor which could result in different program functionality was the language semantics of Rust differing from C++.
 
 % In C++, pointers are very commonly used for memory indirection. This is especially true i
-In C++ codebases for High-Performance Computing, memory indirection using pointers is very common. This is because such codebases often operate on multidimensional arrays representing meshes, which are represented in C++ by pointers. However, using pointers in this way makes programs very susceptible to a certain category of bugs, for example accessing uninitialised memory as a result of faulty pointer arithmetic. As discussed in \Cref{ch:background}, interaction with raw pointers in Rust is considered an \mintinline{rust}{unsafe} operation, as it is difficult to statically guarantee that it will not result in undefined behaviour. Much of the behaviour of pointers can instead be implemented in Rust through borrowing references, but strict ownership rules prohibit some common behaviour such as concurrent mutable references, requiring the use of smart pointers.
+In C++ codebases for \acrshort{HPC}, memory indirection using pointers is very common. This is because such codebases often operate on multidimensional arrays representing meshes, which are represented in C++ by pointers. However, using pointers in this way makes programs very susceptible to a certain category of bugs, for example accessing uninitialised memory as a result of faulty pointer arithmetic. As discussed in \Cref{ch:background}, interaction with raw pointers in Rust is considered an \mintinline{rust}{unsafe} operation, as it is difficult to statically guarantee that it will not result in undefined behaviour. Much of the behaviour of pointers can instead be implemented in Rust through borrowing references, but strict ownership rules prohibit some common behaviour such as concurrent mutable references, requiring the use of smart pointers.
 
 This presented the first significant challenge in the translation effort, as the implementation of the Yale representation of sparse matrix in HPCCG relies heavily on raw pointers and pointer arithmetic. This complicates the direct translation process, as references and smart pointers in Rust necessarily have different semantics to raw pointers, and may be less performant. This was identified as a risk during the specification phase, and was captured in the Risk Matrix \ref{tab:risk_matrix}, which is shown in \Cref{ch:project-management} in the discussion of project management. A truncated version of the data structure which implements this Yale representation in C++ is shown in Listing \ref{listing:cpp-sparse-matrix-structure}.
 
@@ -77,7 +77,7 @@ This presented the first significant challenge in the translation effort, as the
         }
     \end{minted}
     %TC:endignore
-    \caption{A truncated version of the C++ data structure which implements the Yale representation of the sparse matrix, from Heroux's original implementation of HPCCG \cite{MantevoHPCCG2023}.}
+    \caption{Truncated version of the C++ data structure which implements the Yale representation of the sparse matrix, from Heroux's original implementation of HPCCG \cite{MantevoHPCCG2023}.}
     \label{listing:cpp-sparse-matrix-structure}
 \end{code}
 
@@ -144,7 +144,7 @@ The first key insight in the translation process is that the interior mutability
         }
     \end{minted}
     %TC:endignore
-    \caption{A truncated version of the sparse matrix data structure, directly translated to Rust using the interior mutability pattern of smart pointers.}
+    \caption{Truncated version of the sparse matrix data structure, directly translated to Rust using the interior mutability pattern of smart pointers.}
     \label{listing:rust-sparse-matrix-structure}
 \end{code}
 
@@ -213,7 +213,7 @@ Unfortunately, leveraging the interior mutability pattern comes at a steep cost 
 %     \caption{An annotated screenshot of the \texttt{perf} performance profiler, showing the dominating performance impact of extra instructions checking the dereference operation.}
 %     \label{fig:perf_annot_labelled}
 % \end{figure}
-This severe performance cost is unacceptable for High-Performance Computing use cases. Hence, for Rust to be viable for these purposes, there must be a way to avoid incurring this cost.
+This severe performance cost is unacceptable for \acrshort{HPC} use cases. Hence, for Rust to be viable for these purposes, there must be a way to avoid incurring this cost.
 
 \subsection{Reworked data structure}
 \label{sec:translation-reworked-data-structure}
@@ -241,11 +241,11 @@ In addition to this, a second key insight is that the pointers in \mintinline[br
         }
     \end{minted}
     %TC:endignore
-    \caption{A truncated version of the sparse matrix data structure, re-worked in Rust to use an index rather than pointer based implementation of the Yale representation.}
+    \caption{Truncated version of the sparse matrix data structure, re-worked in Rust to use an index rather than pointer based implementation of the Yale representation.}
     \label{listing:rust-sparse-matrix-structure-indexed}
 \end{code}
 
-Since High-Performance Computing workloads are often array or mesh based, this strategy of replacing pointers with indices still holds for the dominant computational kernels of many full applications. Where pointers cannot be substituted with indices, borrowed references should be preferred, then smart pointers such as the \mintinline{rust}{Rc<RefCell<f64>>} construct as a worst-case solution.
+Since \acrshort{HPC} workloads are often array or mesh based, this strategy of replacing pointers with indices still holds for the dominant computational kernels of many full applications. Where pointers cannot be substituted with indices, borrowed references should be preferred, then smart pointers such as the \mintinline{rust}{Rc<RefCell<f64>>} construct as a worst-case solution.
 
 As discussed in \Cref{ch:background}, the dominant computational kernel of HPCCG is sparse matrix-vector computation. Listing \ref{listing:rust-sparsemv-indexed} shows how this kernel can be translated using the indexed data structure as a point of reference for later changes.
 
@@ -269,7 +269,7 @@ As discussed in \Cref{ch:background}, the dominant computational kernel of HPCCG
         }
     \end{minted}
     %TC:endignore
-    \caption{A translation to Rust of the C++ function, using a single-indexed sparse matrix representation to compute sparse matrix-vector multiplication.}
+    \caption{Translation to Rust of the C++ sparse matrix-vector multiplication function, using a single-indexed sparse matrix representation.}
     \label{listing:rust-sparsemv-indexed}
 \end{code}
 
@@ -302,7 +302,7 @@ Fortunately, Rust provides a mechanism to disable these runtime checks -- the \m
         }
     \end{minted}
     %TC:endignore
-    \caption{A translation to Rust of the C++ function, using unchecked vector indexing to compute sparse matrix-vector multiplication.}
+    \caption{Translation to Rust of the C++ sparse matrix-vector multiplication function, using unchecked vector indexing.}
     \label{listing:rust-sparsemv-unchecked}
 \end{code}
 
@@ -344,7 +344,7 @@ fn sparsemv(matrix: &SparseMatrix, vector: &[f64]) -> Vec<f64> {
 }
     \end{minted}
     %TC:endignore
-    \caption{A translation to Rust of the C++ function, using iterators to compute sparse matrix-vector multiplication.}
+    \caption{Translation to Rust of the C++ sparse matrix-vector multiplication function, using iterators.}
     \label{listing:rust-sparsemv-iterator}
 \end{code}
 
@@ -369,13 +369,13 @@ Although in this case the use of iterators does not eliminate the need for unche
         }
     \end{minted}
     %TC:endignore
-    \caption{A translation to Rust of the C++ function, using \texttt{rayon} to compute sparse matrix-vector multiplication using shared memory parallelism.}
+    \caption{Translation to Rust of the C++ sparse matrix-vector multiplication function, using \texttt{rayon} for shared memory parallelism.}
     \label{listing:rust-sparsemv-rayon}
 \end{code}
 
 This change to leveraging shared memory parallelism requires only two eight characters to be changed -- adding the \texttt{par} prefix to the two outer zipped iterators. In addition to this, as a result of the Rust compiler's static checks, there are much stronger guarantees against data races. Section \ref{ssec:shared-memory-paralellism} of \Cref{ch:background} showed how easy it is to introduce a data race using OpenMP even for a trivial example. However, the ownership constraints and scoping rules of closures for functions over iterators ensure that data cannot be concurrently accessed across threads. The combination of these two factors, ease of switching to multi-threading and guarantees of correctness, empowers developers to quickly write performant code by leveraging shared memory parallelism.
 
-The use of packages such as \texttt{rayon} allows developers to write multithreaded Rust code incredibly quickly, and with confidence in its correctness. Due to the current trend in hardware design towards multiprocessor architectures in machines discussed in \Cref{ch:background}, this allows developers to fully leverage the performance of commodity hardware, which is crucial in a High-Performance Computing context.
+The use of packages such as \texttt{rayon} allows developers to write multithreaded Rust code incredibly quickly, and with confidence in its correctness. Due to the current trend in hardware design towards multiprocessor architectures in machines discussed in \Cref{ch:background}, this allows developers to fully leverage the performance of commodity hardware, which is crucial in a \acrshort{HPC} context.
 
 \subsection{Distributed memory parallelism}
 \label{sec:translation-mpi}
@@ -432,7 +432,7 @@ for (i = 0; i < num_neighbors; i++) {
 }
     \end{minted}
     %TC:endignore
-    \caption{A code snippet from the C++ implementation to exchange external mesh data between MPI ranks, from Heroux's original implementation of HPCCG \cite{MantevoHPCCG2023}.}
+    \caption{C++ implementation to exchange external mesh data between MPI ranks, from Heroux's original implementation of HPCCG \cite{MantevoHPCCG2023}.}
     \label{listing:cpp-mpi-exchange-externals}
 \end{code}
 
@@ -484,7 +484,7 @@ mpi::request::multiple_scope(matrix.num_send_neighbors, |scope, coll| {
 });
     \end{minted}
     %TC:endignore
-    \caption{A code snippet from the Rust translation to exchange external mesh data between MPI ranks.}
+    \caption{Rust translation to exchange external mesh data between MPI ranks.}
     \label{listing:rust-mpi-exchange-externals}
 \end{code}
 
@@ -494,24 +494,20 @@ Since the documentation for Rust's \texttt{mpi} library is very sparse, this tra
 
 In summary, it is possible to translate most existing C++ code using MPI into Rust with equivalent functionality using Rust's \texttt{mpi} library. However, this translation process is involved, requiring expertise which is hard to acquire due to the minimal documentation. As Rust and its ecosystem matures, this process is likely to get easier, with improved documentation and tweaks to the interface design.
 
-% TODO: (+ poor documentation, link to future open source work)
-
 \subsection{Performance comparison}
 \label{sec:translation-performance}
 
-% TODO: Could cut this as it partially duplicates later chapter?
-
-In order to fairly assess the suitability of Rust for High-Performance Computing workloads, the translation of the mini-app being assessed must fully leverage the performance capabilities of Rust. As a result of this, the translation effort was driven by achieving performance, with each incremental improvement making progress towards this goal.
+In order to fairly assess the suitability of Rust for \acrshort{HPC} workloads, the translation of the \acrshort{mini-app} being assessed must fully leverage the performance capabilities of Rust. As a result of this, the translation effort was driven by achieving performance, with each incremental improvement making progress towards this goal.
 
 This section presents performance measurements, using the HPC MultiBench tool introduced in \Cref{ch:hpc-multibench}, of the total and individual kernel runtimes across the translations, and discusses the impact of the techniques applied on these results.
 
-Figure \ref{fig:translations_total_line} provides an overall picture on how the different translations affect performance. It shows how the total wall time of each translation scales with the overall mesh size, making it clear that each incremental translation improves the performance of the mini-app as a whole, but with significant diminishing returns.
+Figure \ref{fig:translations_total_line} provides an overall picture on how the different translations affect performance. It shows how the total wall time of each translation scales with the overall mesh size, making it clear that each incremental translation improves the performance of the \acrshort{mini-app} as a whole, but with significant diminishing returns.
 
 \begin{figure}[H]
     \centering
     \include{images/3_translation/translations_total_line.tex}
     % \includegraphics[width=\textwidth]{images/3_translation/performance/translations_total_line.png}
-    \caption{A diagram showing the total wall time taken across the three kernels of each translation, as the overall mesh size is varied.}
+    \caption{Total wall time taken across the three kernels of each translation, as the overall mesh size is varied.}
     \label{fig:translations_total_line}
 \end{figure}
 
@@ -519,7 +515,7 @@ Figure \ref{fig:translations_total_line} provides an overall picture on how the 
 %     \centering
 %     \include{images/5_performance/scaling_tikz/strong_scaling_threaded}
 %     % \includegraphics[width=\textwidth]{images/5_performance/scaling/strong_scaling_threaded.png}
-%     \caption{A line plot comparing the strong scaling runtimes of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
+%     \caption{The strong scaling runtimes of the C++ and Rust implementations of HPCCG using shared memory parallelism.}
 %     \label{fig:strong_scaling_threaded}
 % \end{figure}
 
@@ -529,7 +525,7 @@ Figure \ref{fig:translations_total_line} provides an overall picture on how the 
 % \begin{figure}[H]
 %     \centering
 %     \includegraphics[width=\textwidth]{images/3_translation/performance/translations_sparsemv_line.png}
-%     \caption{A diagram showing the wall time taken for the sparsmv kernel only of each translation, as the overall mesh size is varied.}
+%     \caption{The wall time taken for the sparsmv kernel only of each translation, as the overall mesh size is varied.}
 %     \label{fig:translations_waxpby_line}
 % \end{figure}
 
@@ -538,24 +534,23 @@ Figure \ref{fig:translations_total_line} provides an overall picture on how the 
 % \begin{figure}[H]
 %     \centering
 %     \includegraphics[width=\textwidth]{images/3_translation/performance/translations_ddot_line.png}
-%     \caption{A diagram showing the wall time taken for the ddot kernel only of each translation, as the overall mesh size is varied.}
+%     \caption{The wall time taken for the ddot kernel only of each translation, as the overall mesh size is varied.}
 %     \label{fig:translations_ddot_line}
 % \end{figure}
 
 % \begin{figure}[H]
 %     \centering
 %     \includegraphics[width=\textwidth]{images/3_translation/performance/translations_waxpby_line.png}
-%     \caption{A diagram showing the wall time taken for the waxpby kernel only of each translation, as the overall mesh size is varied.}
+%     \caption{The wall time taken for the waxpby kernel only of each translation, as the overall mesh size is varied.}
 %     \label{fig:translations_waxpby_line}
 % \end{figure}
 
-% % TODO: Consider moving these summary charts to the performance analysis section?
 % In addition to characterising how different translations affect performance, we can also get a preliminary understanding of the efficacy of different parallelism techniques in Rust. Figure \ref{fig:translation_parallelism_rust} shows the relative performance as characterised by the scaling of total wall time for serial, multi-threaded, MPI, and hybrid translations of the HPCCG mini-app.
 
 % \begin{figure}[H]
 %     \centering
 %     \includegraphics[width=\textwidth]{images/3_translation/performance/translation_parallelism_rust.png}
-%     \caption{A diagram showing the total wall time taken for Rust implementations of parallelism approaches, as the overall mesh size is varied.}
+%     \caption{The total wall time taken for Rust implementations of parallelism approaches, as the overall mesh size is varied.}
 %     \label{fig:translation_parallelism_rust}
 % \end{figure}
 
@@ -570,7 +565,7 @@ Figure \ref{fig:translations_total_line} provides an overall picture on how the 
 %     \label{fig:translation_parallelism_cpp}
 % \end{figure}
 
-In summary, the translation effort resulted in a performant implementation of the HPCCG mini-app in Rust, supporting both shared-memory parallelism through \texttt{rayon}, along with the stretch goal of distributed memory parallelism through the Rust MPI bindings. In addition to this, the Rust implementations of parallelism approaches shared similar performance characteristics to their C++ counterparts. This demonstrates that it is possible to use Rust for High-Performance Applications, for which HPCCG is a representative workload. However, there are still aspects of Rust which add difficulty to this process, such as the state of the documentation of the Rust bindings to MPI -- but this is likely to improve in the future as Rust and its ecosystem matures.
+In summary, the translation effort resulted in a performant implementation of the HPCCG \acrshort{mini-app} in Rust, supporting both shared-memory parallelism through \texttt{rayon}, along with the stretch goal of distributed memory parallelism through the Rust MPI bindings. In addition to this, the Rust implementations of parallelism approaches shared similar performance characteristics to their C++ counterparts. This demonstrates that it is possible to use Rust for High-Performance Applications, for which HPCCG is a representative workload. However, there are still aspects of Rust which add difficulty to this process, such as the state of the documentation of the Rust bindings to MPI -- but this is likely to improve in the future as Rust and its ecosystem matures.
 
 
 \section{Equivalence checking}
@@ -603,9 +598,9 @@ Furthermore, traditional formal methods are not well suited to checking equivale
 \subsection{Intermediate representation comparison}
 \label{ssec:equivalence-ir-comparison}
 
-A further possible approach to equivalence checking is the comparison of assembly or intermediate representation emitted by the compiler. LLVM is a modular framework for compilation originally presented by Latner and Adve in 2004 \cite{lattner2004llvm}, which has since gained popularity, in part due to its ability to generate optimised code irrespective of language. First, language-specific front-end converts the semantics of the program into LLVM IR. Then, LLVM's language independent middle-end applies transformations passes to optimise the LLVM IR, which is structured to be amenable to this process. Finally, LLVM's hardware-specific back-end converts LLVM IR into appropriate machine code.
+A further possible approach to equivalence checking is the comparison of assembly or intermediate representation emitted by the compiler. LLVM is a modular framework for compilation originally presented by Latner and Adve in 2004 \cite{lattner2004llvm}, which has since gained popularity, in part due to its ability to generate optimised code irrespective of language. First, language specific front-end converts the semantics of the program into \acrfull{LLVM IR}. Then, LLVM's language independent middle-end applies transformations passes to optimise the \acrshort{LLVM IR}, which is structured to be amenable to this process. Finally, LLVM's hardware-specific back-end converts \acrshort{LLVM IR} into appropriate machine code.
 
-Since both C++ and Rust have compilers which use the LLVM framework, \texttt{clang} and \texttt{rustc} respectively, the HPCCG codebases can both converted into LLVM IR. If the programs are equivalent, these generated intermediate representations express the same functionality. As such, the intermediate representation may be similar. This process was attempted for a simple kernel, calculating the vector dot product, using the commands shown in Listing \ref{listing:llvm-ir-generation}, which both generate \texttt{ddot.ll} files containing the LLVM IR.
+Since both C++ and Rust have compilers which use the LLVM framework, \texttt{clang} and \texttt{rustc} respectively, the HPCCG codebases can both converted into \acrshort{LLVM IR}. If the programs are equivalent, these generated intermediate representations express the same functionality. As such, the intermediate representation may be similar. This process was attempted for a simple kernel, calculating the vector dot product, using the commands shown in Listing \ref{listing:llvm-ir-generation}, which both generate \texttt{ddot.ll} files containing the \acrshort{LLVM IR}.
 
 \begin{code}
     %TC:ignore
@@ -614,7 +609,7 @@ Since both C++ and Rust have compilers which use the LLVM framework, \texttt{cla
     clang++ -cc1 ddot.cpp -emit-llvm
     \end{minted}
     %TC:endignore
-    \caption{The \texttt{rustc} and \texttt{clang++} invocations to generated LLVM IR for the vector dot product kernel in HPCCG.}
+    \caption{\texttt{rustc} and \texttt{clang++} invocations to generate \acrshort{LLVM IR} for the vector dot product kernel in HPCCG.}
     \label{listing:llvm-ir-generation}
 \end{code}
 
@@ -632,7 +627,7 @@ As the software development industry has matured over the past decades, developm
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{images/3_translation/excalidraw_tdd.png}
-    \caption{A diagram to showing the stages of the Test-Driven Development methodology.}
+    \caption{Stages of the Test-Driven Development methodology.}
     \label{fig:excalidraw_tdd}
 \end{figure}
 
@@ -665,7 +660,7 @@ The original C++ version of HPCCG does not provide unit tests. As such, a set of
         }
     \end{minted}
     %TC:endignore
-    \caption{A C++ implementation of unit tests for the vector dot product kernel, using the Catch2 test framework.}
+    \caption{C++ implementation of unit tests for the vector dot product kernel, using the Catch2 test framework.}
     \label{listing:cpp-ddot-unit-test}
 \end{code}
 
@@ -686,7 +681,7 @@ Translated code often has a similar internal structure to the reference implemen
         }
     \end{minted}
     %TC:endignore
-    \caption{A Rust implementation of unit tests for the vector dot product kernel.}
+    \caption{Rust implementation of unit tests for the vector dot product kernel.}
     \label{listing:rust-ddot-unit-test}
 \end{code}
 
@@ -709,7 +704,7 @@ To strengthen the confidence and reduce the tedium of this process, we propose a
         }
     \end{minted}
     %TC:endignore
-    \caption{Using an \texttt{autocxx} macro in Rust to generate foreign function interface bindings to the C++ implementation of the dot product kernel.}
+    \caption{\texttt{autocxx} macro in Rust to generate foreign function interface bindings to the C++ implementation of the dot product kernel.}
     \label{listing:rust-autocxx-bindings}
 \end{code}
 
@@ -759,28 +754,33 @@ The combination of these two listings constitute a proof-of-concept for a transl
 \section{Developer productivity}
 \label{sec:developer-productivity}
 
-As discussed in the literature review, Diehl et al. use a COCOMO model to estimate the developer effort required across languages to implement the same functionality \cite{diehlBenchmarkingParallel1D2023}. They conclude that Rust requires slightly less developer effort by comparing the quantitative results of this model.
+As discussed in the literature review, Diehl et al. use a \acrshort{COCOMO} approach to estimate the developer effort required across languages to implement the same functionality \cite{diehlBenchmarkingParallel1D2023}. They conclude that Rust requires slightly less developer effort by comparing the quantitative results of this model.
 
-% TODO: Explain COCOMO here
-The \texttt{scc} tool counts lines of code, and uses a COCOMO model to quantitatively estimate developer effort. Table \ref{tab:scc-language-comparison} shows the results of running this tool on the source directories of the Rust and C++ implementations, both leveraging shared and distributed memory parallelism. For all metrics shown in the table, smaller is better.
+\acrshort{COCOMO} uses a combination of properties of a project, such as the number of lines of code it entails and its type, to estimate the cost required to undertake it. The \texttt{scc} tool counts lines of code, and uses a \acrshort{COCOMO} approach to quantitatively estimate developer effort. Table \ref{tab:scc-language-comparison} shows the results of running this tool on the source directories of the Rust and C++ implementations, both leveraging shared and distributed memory parallelism. Since this project requires only a small team and solves a well understood problem, the ``organic'' \acrshort{COCOMO} mode was used. For all metrics shown in the table, smaller is better.
 
-% TODO: Update based on stripped codebases using unifdef tool?
 \begin{table}[H]
     \centering
-    \caption{The results of running the \texttt{scc} on the C++ and Rust implementations of HPCCG, quantitatively assessing developer productivity.}
+    \caption{The results of running the \texttt{scc} on the C++ and Rust implementations of HPCCG with both shared and distributed memory parallelism, quantitatively assessing developer productivity with a organic mode \acrshort{COCOMO} approach.}
     \label{tab:scc-language-comparison}
+    %TC:ignore
     \begin{tabular}{|l||l|l|l|}
     \hline
     \textbf{Metric}             & \textbf{Rust} & \textbf{C++} & \textbf{Rust scale factor} \\ \hline\hline
-    Lines of code               & 999           & 1595         & 62.6\%                     \\ \hline
-    Estimated complexity        & 116           & 224          & 51.8\%                     \\ \hline
-    Estimated schedule (months) & 3.49          & 4.20         & 83.1\%                     \\ \hline
-    Estimated cost (\$)         & 26986         & 44105        & 61.2\%                     \\ \hline
+    % Lines of code               & 999           & 1595         & 62.6\%                     \\ \hline
+    % Estimated complexity        & 116           & 224          & 51.8\%                     \\ \hline
+    % Estimated schedule (months) & 3.49          & 4.20         & 83.1\%                     \\ \hline
+    % Estimated cost (\$)         & 26986         & 44105        & 61.2\%                     \\ \hline
+    Lines of code               & 1025          & 1643         & 62.4\%                     \\ \hline
+    Estimated complexity        & 116           & 241          & 48.1\%                     \\ \hline
+    Estimated schedule (months) & 3.52          & 4.25         & 82.8\%                     \\ \hline
+    Estimated cost (\$)         & 27723         & 45500        & 60.9\%                     \\ \hline
     \end{tabular}
+    %TC:endignore
 \end{table}
+% scc . --exclude-file Cargo.lock --exclude-dir target
+% scc . --exclude-file .gitignore YAML* dump_matlab*
 
 
-% TODO: Decide whether this is funny/appropriate/too close to the bone...
 % Under the crushing weight of capitalism, developer productivity can be most effectively assessed by the generation of shareholder value -- that is to say estimates of development cost for a fixed set of functionality. By the quantitative estimate of development cost shown in Table \ref{tab:scc-language-comparison}, Rust can be assessed as $1.5 \times$ more productive than C++. This contrasts Diehl et al.'s results of a very small impact in developer effort. Two possible reasons for this discrepancy is that the HPCCG is approximately five times larger in lines of code, and Diehl et al. do not consider MPI, for which the Rust bindings provide a terse API in comparison with the more verbose C++ specification implementation.
 Developer productivity can be assessed as the generation of value for stakeholders -- estimating the development cost for a fixed set of functionality. By the quantitative estimate of development cost shown in Table \ref{tab:scc-language-comparison}, Rust can be assessed as $1.5 \times$ more productive than C++.
 
