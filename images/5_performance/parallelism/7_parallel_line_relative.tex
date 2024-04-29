@@ -14,7 +14,7 @@
 axis line style={lightgray204},
 height=0.45\textheight,
 legend cell align={left},
-legend style={fill opacity=0.8, draw opacity=1, text opacity=1, anchor=south east, at={(0.97,0.03)}, draw=none},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1, anchor=south east, at={(0.97,0.03)},}, % draw=none},
 tick align=outside,
 tick pos=left,
 title={Multi-Threaded Implementation Relative Execution Times},
@@ -121,7 +121,7 @@ table {%
 % 64000000 1
 % };
 % \addlegendentry{C++ with 32 OpenMP threads}
-\addplot [semithick, crimson2143940, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, crimson2143940, mark=triangle, mark size=3, mark options={solid}]
 table {%
 1000000 1.21488606929779
 8000000 1.46715199947357
@@ -129,7 +129,7 @@ table {%
 64000000 1.47817730903625
 };
 \addlegendentry{Relative Rust with 1 Rayon thread}
-\addplot [semithick, mediumpurple148103189, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, mediumpurple148103189, mark=star, mark size=3, mark options={solid}]
 table {%
 1000000 1.04604995250702
 8000000 1.32496893405914
@@ -137,7 +137,7 @@ table {%
 64000000 1.57677209377289
 };
 \addlegendentry{Relative Rust with 8 Rayon threads}
-\addplot [semithick, sienna1408675, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, sienna1408675, mark=diamond, mark size=3, mark options={solid}]
 table {%
 1000000 0.663738250732422
 8000000 1.20730209350586

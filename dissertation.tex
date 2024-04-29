@@ -5,7 +5,7 @@
 \input{utils/acronyms.tex}
 
 \author{Edmund Goodman}
-\yearofstudy{3\textsuperscript{rd}} % year, excluding industrial placement
+\yearofstudy{3\textsuperscript{rd}}
 \title{Assessing the suitability of Rust for performant and productive implementations of HPC codebases}
 \supervisor{Dr Richard Kirk}
 
@@ -14,23 +14,19 @@
 % https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/format/
 % https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/marking/technical
 % https://warwick.ac.uk/fac/sci/dcs/teaching/material/cs310/components/final/marking/communication
+% page margins for printing (https://warwick.ac.uk/services/warwickprint/printing/printing-a4-a3/)
 
 \begin{document}
 
 %TC:ignore
 \pagenumbering{gobble}
 \input{utils/titlepage.tex}
-% TODO: Abstract is longer than 200 words - email Greg?
 \input{chapters/0_abstract.tex}
 
 \pagestyle{plain}
 \newpage
 \pagenumbering{roman}
 
-% TODO: Add quotations at chapter starts like eth rust in hpc paper (epigraph package)
-% TODO: Make quotes prettier...
-% TODO: Make the way figures/tables are captioned consistent, e.g. not starting with ``a figure that shows?''
-% TODO: Fix kerning on list of listings
 \tableofcontents
 \printglossary[type=\acronymtype,title={List of Abbreviations}]
 \addcontentsline{toc}{chapter}{List of Abbreviations}
@@ -41,13 +37,6 @@
 \newpage
 %TC:endignore
 
-% TODO: Consider switching to include for performance?
-% https://tex.stackexchange.com/questions/246/when-should-i-use-input-vs-include
-% TODO: Move chapters into separate folders with their own image folders?
-% TODO: Decide on sentence vs title case and be consistent throughout
-% TODO: Consider colouring headings
-% TODO: Make chapter numbers on right side adjacent to names
-% TODO: Consider colour captions, and adding figure/listing icons
 \pagenumbering{arabic}
 \input{chapters/1_introduction.tex}
 \input{chapters/2_background.tex}
@@ -59,7 +48,8 @@
 
 
 %TC:ignore
-\bibliographystyle{IEEEtran}
+% https://tex.stackexchange.com/questions/67444/doi-in-ieeetran-bibliography
+\bibliographystyle{IEEEtran_DOI.bst}
 \bibliography{bibliography}
 
 \input{chapters/8_appendix}

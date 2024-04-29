@@ -8,9 +8,9 @@
 
 \begin{axis}[
 axis line style={lightgray204},
-height=0.45\textheight,
+height=0.375\textheight,
 legend cell align={left},
-legend style={fill opacity=0.8, draw opacity=1, text opacity=1, draw=none},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1}, %, draw=none},
 tick align=outside,
 tick pos=left,
 title={Message Passing Weak Scaling Plot},
@@ -75,7 +75,7 @@ table {%
 16 2.95322751998901
 };
 \addlegendentry{C++ with MPI}
-\addplot [semithick, darkorange25512714, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, darkorange25512714, mark=triangle, mark size=3, mark options={solid}]
 table {%
 1 3.21657490730286
 2 3.21797490119934

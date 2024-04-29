@@ -5,18 +5,18 @@
 % \textbf{This chapter is now complete - but wasn't in the first three chapter draft submission!} %
 % =============================================================================================== %
 
-% Having implemented the Rust translation of the HPCCG codebase, the next step is to characterise its performance. This is typically done by running many tests across a wide variety of configurations and problem sizes to understand how the program scales across these metrics.
+% Having implemented the Rust translation of the \acrshort{HPCCG} codebase, the next step is to characterise its performance. This is typically done by running many tests across a wide variety of configurations and problem sizes to understand how the program scales across these metrics.
 
-HPC MultiBench is a tool to generate and run HPC batch compute jobs for performance comparison via Slurm from a convenient YAML configuration file. It can be thought of as ``a Swiss army knife for comparing programs on HPC resources''. This chapter will first discuss the motivation and use case for the tool, then go into technical detail about its design and implementation. Next, it will provide a concrete demonstration of its utility in an example use case, quickly constructing replication studies, by confirming the results of Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}. Finally, the chapter will conclude with thoughts from an industry review of the tool by two PhD candidates working in the High Performance and Scientific Computing Group at Warwick.
+HPC MultiBench is a tool to generate and run HPC batch compute jobs for performance comparison via Slurm from a convenient YAML configuration file. It can be thought of as ``a Swiss army knife for comparing programs on HPC resources''. This chapter will first discuss the motivation for and existing landscape around the tool, then go into technical detail about its design and implementation. Next, it will provide a concrete demonstration of its utility in an example use case, quickly constructing replication studies, by confirming the results of Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}. Finally, the chapter will conclude with thoughts from an industry review of the tool by two PhD candidates working in the High Performance and Scientific Computing Group at Warwick.
 
 \section{Motivations}
 \label{sec:hpc-multibench-motivation}
 
 Manually spawning and aggregating the metrics from many similar jobs with different configurations is tedious. It is a repetitive and time-consuming process, and as such discourages duplicating results for statistical confidence -- despite being susceptible to human error. However, it is a common task in workflows for designing \acrshort{HPC} software, as it provides critical metrics to characterise application performance.
 
-Consider a single trial comparing the performance of two programs across eight problem sizes, with eight different thread counts per problem size. In total, this requires 128 program runs. Re-running this trial five times for statistical confidence requires 640 program runs, which is an untenably large number of jobs to dispatch manually. Currently, there are two approaches to this problem: either ignore statistical confidence and manually spawn many jobs, or create an application-specific script to submit the jobs. Both of these approaches are time-consuming, either manually submitting the jobs or writing and debugging the custom script. As a result of this, this step can form a bottleneck in certain workflows.
+Consider a single trial comparing the performance of two programs across eight problem sizes, with eight different thread counts per problem size. In total, this requires 128 program runs. Re-running this trial five times for statistical confidence requires 640 program runs, which is an untenably large number of jobs to dispatch manually. Currently, researchers have two options in this scenario: either ignore statistical confidence and manually spawn many jobs, or create an application-specific script to submit the jobs. Both of these approaches are time-consuming, either manually submitting the jobs or writing and debugging the custom script. As a result of this, this step can form a bottleneck in certain workflows.
 
-However, this process of running and aggregating jobs is very similar between performance trials for different programs, meaning it is possible to create a program to automate the process. This combination of being both time-consuming and amenable to automation makes it a very good candidate for building tooling to facilitate it, as it has a good ratio of being high-impact to requiring achievable programming effort.
+However, this process of running and aggregating jobs is very similar between performance trials for different programs, meaning it is possible to create software tooling to automate the process. This combination of being both time-consuming and amenable to automation makes it a very good candidate for building tooling to facilitate it, as it has a good ratio of being high-impact to requiring achievable programming effort.
 
 \section{Existing tools}
 \label{sec:hpc-multibench-existing-tools}
@@ -24,7 +24,7 @@ However, this process of running and aggregating jobs is very similar between pe
 As \acrshort{HPC} is an active research space, there are a number of existing tools which also act as a wrapper around Slurm, as shown in Table \ref{tab:hpc-multibench-existing-tools}. However, none of these tools appear to provide first-class support for this particular use case.
 
 \begin{table}[H]
-    \caption{Existing tools which provide wrappers for Slurm.}
+    \caption{Existing tools which provide wrappers for Slurm for running programs on \acrshort{HPC} resources.}
     \label{tab:hpc-multibench-existing-tools}
     %TC:ignore
     \begin{tabular}{|p{0.2\linewidth}|p{0.8\linewidth}|}
@@ -38,7 +38,7 @@ As \acrshort{HPC} is an active research space, there are a number of existing to
     %TC:endignore
 \end{table}
 
-From this table, we can see that a number of tools exist as wrappers for Slurm for scientific computing workflows. However, these tools are generally focussed on orchestrating \acrshort{HPC} resources to run scientific computing programs, often in the R programming language, rather than providing a mechanism to run and compare the performance of programs in arbitrary languages. Our research did not identify any existing tools which directly compete with the purpose of HPC MultiBench.
+From Table \ref{tab:hpc-multibench-existing-tools}, we can see that a number of tools exist as wrappers for Slurm for scientific computing workflows. However, these tools are generally focussed on orchestrating \acrshort{HPC} resources to run scientific computing programs, often in the R programming language, rather than providing a mechanism to run and compare the performance of programs in arbitrary languages. Our research did not identify any existing tools which directly compete with the purpose of HPC MultiBench.
 
 \section{Design and implementation}
 \label{sec:hpc-multibench-design-implementation}
@@ -47,7 +47,7 @@ The HPC MultiBench tool started as a utility for personal use to facilitate perf
 
 \begin{enumerate}
     \item Run programs on \acrshort{HPC} resources across a range of configurations
-    \item Extract numerical metrics from program runs
+    \item Extract numerical metrics from program run outputs
     \item Re-run programs and aggregate their metrics for statistical confidence in results
     \item Plot graphs showing metric trends over configurations
     \item Use a YAML configuration file to allow the definition of program runs, their metrics, and resulting plots
@@ -61,7 +61,7 @@ The YAML schema of the HPC MultiBench is the key abstraction which drives its er
 
 Structurally, the YAML schema describes a \textit{test plan}, which is composed of two sections. Firstly, \textit{run configurations}, which describe how to run different versions of the program to compare on the computer resource. Secondly, \textit{test benches}, which describe which run configurations to compare, how many statistical re-runs to perform, what should be varied in the course of the experiment, along with the metrics to extract and the analysis to visualise.
 
-The values varied over the course of the experiment are described by a \textit{test matrix}, inspired by continuous integration configuration files to guarantee functionality across many machines. This allows expressing the cross product of two variables through adjacent items, and multiple variables changing independently, through tuple keys. The \textit{metrics} to be analysed are extracted from the outputs of the Slurm job runs with regex patterns. \textit{derived\_metrics} enhance their capabilities through  meta-programming capabilities within the tool to functionally define metrics in terms of ones matched with regex, whilst retaining correct uncertainty values.
+The values varied over the course of the experiment are described by a \textit{test matrix}, inspired by continuous integration configuration files to guarantee functionality across many machines. This allows expressing the Cartesian product of multiple variables through adjacent items, and multiple variables changing independently, through tuple keys. The \textit{metrics} to be analysed are extracted from the outputs of the Slurm job runs with regex patterns. \textit{derived\_metrics} enhance their capabilities through  meta-programming capabilities within the tool to functionally define metrics in terms of ones matched with regex, whilst retaining correct uncertainty values.
 
 % For brevity, an in-depth explanation of all the functionality the YAML schema can express is omitted here, but a more full explanation can be found on the documentation website \url{https://edmundgoodman.co.uk/hpc-multibench/yaml_schema.html}, along with relevant docstring-generated documentation of the source code \url{https://edmundgoodman.co.uk/hpc-multibench/reference/yaml_model.html}. In addition to this, an example of a YAML file under this schema for the replication study discussed in section \ref{ssec:hpc-multibench-replication-study} can be found in Appendix \ref{sec:tooling-replication-yaml}.
 
@@ -91,7 +91,7 @@ In this diagram, we can see that the record and report phases operate completely
 \subsection{User interface}
 \label{ssec:hpc-multibench-ui}
 
-A key design goal of the project was providing an interactive user interface, which can run on remote machines without requiring setup such as configuring X-forwarding. This was motivated by the fact most \acrshort{HPC} resources are accessed over an SSH connection, which may be proxied through other servers. To mitigate this, X-forwarded graphical applications can be flaky or have very high latency. As a result of this, the tool was designed to have a simple command line interface, including a mode to render results interactively in the terminal without requiring X-forwarding.
+A key design goal of the project was providing an interactive user interface, which can run on remote machines without requiring setup such as configuring X-forwarding. This was motivated by the fact most \acrshort{HPC} resources are accessed over an SSH connection, which may be proxied through many other geographically disparate servers. To mitigate this, X-forwarded graphical applications can be flaky or have very high latency. As a result of this, the tool was designed to have a simple command line interface, including a mode to render results interactively in the terminal without requiring X-forwarding.
 
 The HPC MultiBench command-line user interface is designed to be familiar to users of existing tools, such as the performance profiler \texttt{perf}. Much like \texttt{perf}, it provides two verb subcommands, \texttt{record} and \texttt{report}. The \texttt{record} command asynchronously dispatches experimental runs via Slurm, and the \texttt{report} command aggregates and presents an analysis of the results of these runs.
 
@@ -111,7 +111,7 @@ For any software development project of non-trivial size, it is critical to leve
 
 To ensure that the development was completed on time, best practices such as \texttt{git} for version control were leveraged. In addition to this, more esoteric tooling such as pre-commit hooks to run linters and type checkers, along with continuous integration infrastructure, allowed software bugs to be caught early.
 
-For a software tool to be adopted, users must be able to install it, run it, and apply it to their use cases. As a result of this, documentation is required to explain to users how to perform these steps. As part of its continuous integration infrastructure, HPC MultiBench generates a documentation website generated from markdown and docstrings in the python source code using \texttt{MkDocs-Material} framework \cite{donathSquidfunkMkdocsmaterial2024}, which is then deployed as a static site hosted on GitHub pages. This documentation site can be found at \url{https://edmundgoodman.co.uk/hpc-multibench/}, with a screenshot of the splash page shown in Figure \ref{fig:documentation_splash}.
+For a software tool to be adopted, users must be able to install it, run it, and apply it to their use cases. As a result of this, documentation is required to explain to users how to perform these steps. As part of its continuous integration infrastructure, HPC MultiBench generates a documentation website generated from markdown and docstrings in the Python source code using \texttt{MkDocs-Material} framework \cite{donathSquidfunkMkdocsmaterial2024}, which is then deployed as a static site hosted on GitHub pages. This documentation site can be found at \url{https://edmundgoodman.co.uk/hpc-multibench/}, with a screenshot of the splash page shown in Figure \ref{fig:documentation_splash}.
 
 \begin{figure}[H]
     \centering
@@ -120,18 +120,17 @@ For a software tool to be adopted, users must be able to install it, run it, and
     \label{fig:documentation_splash}
 \end{figure}
 
-% TODO: Could add screenshot of the auto-generated docs from docstrings
-
-% TODO: Is this needed?
-In addition to this, as part of the open source contributions made by this project, discussed in \ref{sec:open-source-work}, this tool will be made public on GitHub once the assessment phase of the module has finished. In addition to this, it will be released to PyPI -- allowing it to be installed with a single command using Python's package manage, \texttt{pip}.
+In addition to this, as part of the open source contributions made by this project, discussed in \ref{sec:open-source-work}, this tool will be made public on GitHub once the assessment phase of the module has finished. In addition to this, it will be released to \acrfull{PyPI} -- allowing it to be installed with a single command using Python's package manage, \texttt{pip}.
 
 
 \section{Example use case}
 \label{sec:hpc-multibench-example-use-case}
 
-As discussed in section \ref{sec:hpc-multibench-motivation}, a key motivation for this tool is streamlining the tedious process of manually running, aggregating, and analysing the results of many program runs to create a statistically confident characterisation of the performance of programs. Since this process is so time-consuming, due to both the process of conducting many runs, and re-writing scripts to aggregate and present the data, it is often not viable to spend time running replication studies of existing work, despite the benefits many benefits this work provides. Beyond the clear use case for this tool of running and analysing original results, which is showcased in full in \Cref{ch:performance}, this tool also makes it possible to very quickly conduct replication studies of existing work in the field.
+As discussed in section \ref{sec:hpc-multibench-motivation}, a key motivation for this tool is streamlining the tedious process of manually running, aggregating, and analysing the results of many program runs to create a statistically confident characterisation of the performance of programs. Since this process is so time-consuming, due to both the process of conducting many runs and re-writing scripts to aggregate and present the data, it is often not viable to spend time running replication studies of existing work, despite the benefits many benefits this activity provides. Beyond the clear use case for this tool of running and analysing original results, which is showcased in full in \Cref{ch:performance}, this tool also makes it possible to very quickly conduct replication studies of existing work in the field.
 
-In his paper ``Shall we Really do it Again? The Powerful Concept of Replication is Neglected in the Social Sciences'', Schmidt introduces replication as ``one of the central issues in any empirical science'', and goes on to define replication studies as ``'' \cite{schmidtShallWeReally2009}. In recent years, the absence of reproducible results in publications has been branded the ``replication crisis'', with Ioannidis publishing a paper title ``Why Most Published Research Findings Are False'' on the basis of a very high rate of non-reproducibility of experimental data \cite{ioannidisWhyMostPublished2005}. Since \acrshort{HPC} relies on many empirical measurements to draw conclusions about characteristics of hardware and software, tooling to facilitate reproducibility is clearly desirable.
+In his paper ``Shall we Really do it Again? The Powerful Concept of Replication is Neglected in the Social Sciences'', Schmidt introduces replication as ``one of the central issues in any empirical science''
+% , and goes on to define replication studies as ``''
+\cite{schmidtShallWeReally2009}. In recent years, the absence of reproducible results in publications has been branded the ``replication crisis'', with Ioannidis publishing a paper title ``Why Most Published Research Findings Are False'' on the basis of a very high rate of non-reproducibility of experimental data \cite{ioannidisWhyMostPublished2005}. Since \acrshort{HPC} relies on many empirical measurements to draw conclusions about characteristics of hardware and software, tooling to facilitate reproducibility is clearly desirable.
 
 \subsection{Replication study of ``Emerging technologies: Rust in HPC''}
 \label{ssec:hpc-multibench-replication-study}
@@ -143,7 +142,7 @@ As a result of the focussed design goals of the HPC MultiBench tool, the workflo
 \begin{enumerate}
     \item Clone the HPC MultiBench tool repository
     \item Install the HPC MultiBench tool using \texttt{poetry}
-    \item Add the GitHub repository containing the source code as a submodule
+    \item Add the GitHub repository containing the source code to trial as a submodule
     \item Write a YAML file defining the run configurations and analysis presented in the paper
     \item Use the \texttt{record} command of the HPC MultiBench tool to run the jobs defined by the YAML file
     \item Use the \texttt{report} command of the HPC MultiBench tool to run analyse the results defined by the YAML file
@@ -151,7 +150,7 @@ As a result of the focussed design goals of the HPC MultiBench tool, the workflo
 
 Listing \ref{listing:replication-study-workflow} shows the six terminal commands required to perform these six steps.
 
-\begin{code}
+\begin{listing}[H]
     %TC:ignore
     \begin{minted}{bash}
         git clone https://github.com/EdmundGoodman/hpc-multibench
@@ -166,11 +165,11 @@ Listing \ref{listing:replication-study-workflow} shows the six terminal commands
     %TC:endignore
     \caption{Six bash commands required to run a full replication study of Moran and Bull's paper ``Emerging technologies: Rust in HPC'' \cite{moranEmergingTechnologiesRust2023}.}
     \label{listing:replication-study-workflow}
-\end{code}
+\end{listing}
 
 The necessary complexity to represent the unique aspects of the results being replicated is encoded in the YAML file, which is shown in Listing \ref{listing:replication-study-workflow} as being written in \texttt{vim}. This is the most involved part of the process, but the abstractions in the design of the YAML schema are designed to make it as simple as possible, whilst still being able to represent most common analyses done by papers.
 
-A full listing of the YAML file for the replication study is provided in Appendix \ref{sec:tooling-replication-yaml}. It is only 190 lines long, much of which can be templated from examples in the tool documentation. This is significantly shorter in line length than the code that would be required to script running all the configurations of the programs, aggregating the results, and plotting graphs for them -- and avoids much of the time spent debugging that would be required for writing such custom scripts. Examples of the original and replicated figures from the paper are shown pairwise in figures \ref{fig:replication_mine_1}, \ref{fig:replication_original_1}, \ref{fig:replication_mine_2}, \ref{fig:replication_original_2}, \ref{fig:replication_mine_4}, and \ref{fig:replication_original_4}.
+A full listing of the YAML file for the replication study is provided in Appendix \ref{sec:tooling-replication-yaml}. It is only 190 lines long, much of which can be templated from examples in the tool documentation. This is significantly shorter in line length than the custom code that would be required to script running all the configurations of the programs, aggregating the results, and plotting graphs for them -- and avoids much of the time spent debugging that would be required for writing such custom scripts. Examples of the original and replicated figures from the paper are shown pairwise in figures \ref{fig:replication_mine_1}, \ref{fig:replication_original_1}, \ref{fig:replication_mine_2}, \ref{fig:replication_original_2}, \ref{fig:replication_mine_4}, and \ref{fig:replication_original_4}.
 
 \newpage
 \begin{figure}[H]

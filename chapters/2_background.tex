@@ -6,7 +6,7 @@
 The background for this project will provide a summary of relevant aspects of the Rust programming language and the field of \acrshort{HPC}, along with a literature review of existing performance analyses of Rust in \acrshort{HPC} applications.
 
 
-\section{The Rust Language}
+\section{The Rust language}
 \label{sec:rust}
 
 This section provides a description of salient features of the Rust language, which are required to understand the intricacies of the translation, equivalence checking, and performance analysis processes described in this project. Aspects of the content of this introduction are derived from Klabnik and Nichols' book ``The Rust Programming Language'' \cite{RustProgrammingLanguage}. This is the seminal text for beginners learning Rust, affectionately nicknamed ``the book'' within the Rust community \cite{LearnRust}.
@@ -16,7 +16,7 @@ This section provides a description of salient features of the Rust language, wh
 
 In any programming language, the first program written tends to be printing ``Hello World'', a tradition introduced by Kernighan and Ritchie in the first chapter of ``The C Programming Language'' \cite{kernighan2002c}. In Rust, the ``Hello world'' program is shown in Listing \ref{listing:rust-hello-world}.
 
-\begin{code}
+\begin{listing}[H]
     %TC:ignore
     \begin{minted}{rust}
         fn main() {
@@ -26,7 +26,7 @@ In any programming language, the first program written tends to be printing ``He
     %TC:endignore
     \caption{Rust program to print ``Hello, world!'', derived from Listing 1-1 of ``The Rust Programming Language'' \cite{RustProgrammingLanguage}.}
     \label{listing:rust-hello-world}
-\end{code}
+\end{listing}
 
 The influence of the C-family of languages on Rust's syntax is clear, for example the use of braces and semicolons, along with the presence of a \mintinline{rust}{main} function.
 
@@ -50,17 +50,19 @@ As mentioned in the introduction, a core feature of Rust is its guarantees again
 
 Rust takes a third approach to memory management, enforcing a set of ownership rules checked by the compiler. By following these rules, the compiler can always infer when memory is no longer in use through scope or explicit lifetimes, and deallocate it as required. Furthermore, it provides strong guarantees against undefined behaviour as a result of invalid memory accesses and data races, since these are prohibited by the ownership rules. In ``The Rust Programming Language'' \cite{RustProgrammingLanguage}, Klabnik and Nichols summarise Rust's ownership model through three rules:
 
-\begin{quote}
+
+\begin{quotebox}
     \begin{enumerate}
         \item Each value in Rust has an owner.
         \item There can only be one owner at a time.
         \item When the owner goes out of scope, the value will be dropped.
     \end{enumerate}
-\end{quote}
+\end{quotebox}
+
 
 From the third rule of Rust's ownership model, we can see that memory management is based on lexical scopes, and the inferences which can be made about data lifetimes from them. Variables are valid for the scope in which they are defined, and as soon as the scope ends, Rust automatically ``drops'' the variable \cite{sautterOBSERVINGPARALLELEXECUTION}. This automatically performs an operation similar to the \mintinline{c}{free} function in C, hence avoiding all ``double-free'' memory management bugs. An example of scopes in Rust is shown in Listing \ref{listing:rust-scope}.
 
-\begin{code}
+\begin{listing}[H]
     %TC:ignore
     \begin{minted}{rust}
         {
@@ -75,16 +77,16 @@ From the third rule of Rust's ownership model, we can see that memory management
     %TC:endignore
     \caption{Rust program to demonstrate the scope of variables, derived from Listing 4-1 of Klabnik and Nichols' ``The Rust Programming Language'' \cite{RustProgrammingLanguage}.}
     \label{listing:rust-scope}
-\end{code}
+\end{listing}
 
 The first two rules of Rust's ownership model enforce exclusive ownership of memory by a single variable. Whilst this guarantees memory safety, as only one variable has access to data at a time, it is incredibly restrictive \cite{sautterOBSERVINGPARALLELEXECUTION}. To mitigate this, Rust provides ``references'', which improve expressiveness whilst maintaining safety guarantees. In ``The Rust Programming Language'' \cite{RustProgrammingLanguage}, Klabnik and Nichols summarise the Rule's of borrowed references as:
 
-\begin{quote}
+\begin{quotebox}
     \begin{enumerate}
         \item At any given time, you can have either one mutable reference or any number of immutable references.
         \item References must always be valid.
     \end{enumerate}
-\end{quote}
+\end{quotebox}
 
 References allow the owner of a piece of data to explicitly hand over access to it via references, without giving up ownership. An arbitrary number of immutable references, denoted by \mintinline{rust}{&} and granting read-only access to the data, are allowed. However, only a single mutable reference, denoted by \mintinline{rust}{&mut} and granting both read and write access, is permitted. A corollary of this rule is the prohibition of data races in safe Rust, as only one variable can write to a value in memory at a time.
 
@@ -99,7 +101,7 @@ References allow the owner of a piece of data to explicitly hand over access to 
 
 In some cases, the rules for borrowed references to guarantee memory safety are too restrictive to implement the desired functionality, which in other languages could be implemented using raw pointers. In this case, Rust provides smart pointers, which originated in C++, as structures which Klabnik and Nichols' define as ``act[ing] like a pointer but also hav[ing] additional metadata and capabilities'' \cite{RustProgrammingLanguage}. These are a general design pattern in Rust, with many different concrete implementations, each providing different properties.
 
-Rust's enforcement of rules including the ownership model at statically at compile time provide strong guarantees of memory safety without impacting program performance. However, sometimes programmers need to be able to express functionality which violates these rules, such as dereferencing a raw pointer. This can be done through \mintinline{rust}{unsafe} Rust. As Klabnik and Nichols state, ``unsafe Rust exists because, by nature, static analysis is conservative'' \cite{RustProgrammingLanguage}. The details of unsafe Rust are beyond the scope of this introduction, but are covered by ``The Rustonomicon''  \cite{IntroductionRustonomicon}.
+Rust's enforcement of rules including the ownership model at statically at compile time provide strong guarantees of memory safety without impacting program performance. However, sometimes programmers need to be able to express functionality which violates these rules, such as dereferencing a raw pointer. This can be done through unsafe Rust. As Klabnik and Nichols state, ``unsafe Rust exists because, by nature, static analysis is conservative'' \cite{RustProgrammingLanguage}. The details of unsafe Rust are beyond the scope of this introduction, but are covered by ``The Rustonomicon''  \cite{IntroductionRustonomicon}.
 
 \subsection{Fearless concurrency}
 \label{ssec:rust-fearless-concurrency}
@@ -143,14 +145,13 @@ Even in the past two months at the time of writing, there have been widely repor
 \section{High performance computing}
 \label{sec:hpc}
 
-This background to \acrshort{HPC} will address recent trends in hardware design, and how they impact modern approaches to writing highly performant software. It will then address the Mantevo project, giving a brief history and linking its motivation to software approaches. Finally, it will discuss HPCCG, a \acrshort{mini-app} in the Mantevo project, and the target of the translation effort in this project.
+This background to \acrshort{HPC} will address recent trends in hardware design, and how they impact modern approaches to writing highly performant software. It will then address the Mantevo project, giving a brief history and linking its motivation to software approaches. Finally, it will discuss \acrshort{HPCCG}, a \acrshort{mini-app} in the Mantevo project, and the target of the translation effort in this project.
 
 \subsection{Recent trends in hardware design}
 \label{ssec:hardware-design-trends}
 
 In the early 2010s, physical limitations began to change how computer hardware was designed. Before this point, performance gains in hardware could be guaranteed by increasing clock speeds. However, as shown in Figure \ref{fig:scaling-trends-transistor-clock}, power limitations heralded the so-called ``death of CPU frequency scaling'', marked by Intel's cancellation of the 4GHz CPU project in 2004 \cite{markovLimitsFundamentalLimits2014}.
 
-% TODO: Check rules about replicating diagrams from paper with correct attribution
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{images/2_background/1-Trends-in-transistor-count-performance-core-count-and-power-over-the-past-decades.png}
@@ -167,7 +168,7 @@ Shared memory parallelism refers to dividing work between multiple threads or pr
 
 The OpenMP API is designed to make it easy for programmers to leverage parallelism in common programming scenarios, such as iteration. Listings \ref{listing:cpp-ddot}, \ref{listing:cpp-ddot-openmp-race}, and \ref{listing:cpp-ddot-openmp-reduction} provide a simple example of an application of OpenMP to parallelise an implementation of the dot product operation.
 
-\begin{code}
+\begin{listing}[H]
     %TC:ignore
     \begin{minted}{c++}
         double dot_product (
@@ -183,9 +184,9 @@ The OpenMP API is designed to make it easy for programmers to leverage paralleli
     %TC:endignore
     \caption{C++ function implementing the dot product operation on two arrays.}
     \label{listing:cpp-ddot}
-\end{code}
+\end{listing}
 
-\begin{code}
+\begin{listing}[H]
     %TC:ignore
     \begin{minted}{c++}
         double dot_product (
@@ -202,11 +203,11 @@ The OpenMP API is designed to make it easy for programmers to leverage paralleli
     %TC:endignore
     \caption{C++ function using OpenMP to parallelise the dot product operation, containing a race condition.}
     \label{listing:cpp-ddot-openmp-race}
-\end{code}
+\end{listing}
 
 In Figure \ref{listing:cpp-ddot-openmp-race}, we can see the application of the OpenMP pragma \mintinline[breaklines]{c++}{#pragma omp parallel for} on line 5. This demonstrates how intuitive and readable the OpenMP API is, achieving in one line what would take many lines of code to manually implement using \texttt{pthread} primitives. However, Listing \ref{listing:cpp-ddot-openmp-race} contains a data race. On line 7, multiple threads may concurrently increment the result, which is not an atomic operation. This may lead to the program missing array cells from the sum, making the result unreliable.
 
-\begin{code}
+\begin{listing}[H]
     %TC:ignore
     \begin{minted}{c++}
         double dot_product (
@@ -223,7 +224,7 @@ In Figure \ref{listing:cpp-ddot-openmp-race}, we can see the application of the 
     %TC:endignore
     \caption{C++ function using OpenMP to parallelise the dot product operation, using a reduction to avoid a race condition.}
     \label{listing:cpp-ddot-openmp-reduction}
-\end{code}
+\end{listing}
 
 Listing \ref{listing:cpp-ddot-openmp-reduction} shows how this can be simply mitigated by using an OpenMP reduction, which avoids this issue by maintaining local copies of the result across threads, then combining them at the end. However, this shows how susceptible even simple parallel programs can be to errors which are difficult to debug. As discussed in section \ref{ssec:rust-fearless-concurrency}, Rust provides guarantees against this category of undefined behaviour, motivating its use in \acrshort{HPC} applications, which often rely heavily on multi-threading.
 
@@ -232,7 +233,7 @@ The multi-threading approach to parallel is very effective for single machines r
 \subsection{Distributed memory parallelism}
 \label{ssec:distributed-memory-paralellism}
 
-Distributed memory parallelism refers to dividing work across ``a computing system in which each processor has its memory'' \cite{pardo2021modeling}. A common approach to implement this is a message passing across a high-speed network connection. MPI, an initialism for Message Passing Interface, is a standard first proposed in 1993 which defined a communication protocol for exchanging data between ``MIMD distributed memory concurrent computers'' \cite{thempiforumMPIMessagePassing1993}. Two pieces of key terminology in MPI are ``rank'' and ``size''. Size refers to the number of distributed processors being used to execute the program, and rank the unique index of the processor an instance of code is executing on -- bounded between $0$ and $size-1$. MPI allows the concurrent execution of programs across many distributed processors, with each individual program rank running independently, but able to communicate with other ranks via message passing.
+Distributed memory parallelism refers to dividing work across a set of processors which each have their own memory architecture \cite{pattersonHennessyComputerOrganisationArchitecture}. A common approach to implement this is a message passing across a high-speed network connection. MPI, an initialism for Message Passing Interface, is a standard first proposed in 1993 which defined a communication protocol for exchanging data between ``MIMD distributed memory concurrent computers'' \cite{thempiforumMPIMessagePassing1993}. Two pieces of key terminology in MPI are ``rank'' and ``size''. Size refers to the number of distributed processors being used to execute the program, and rank the unique index of the processor an instance of code is executing on -- bounded between $0$ and $size-1$. MPI allows the concurrent execution of programs across many distributed processors, with each individual program rank running independently, but able to communicate with other ranks via message passing.
 
 There are multiple implementations of the MPI standard, such as OpenMPI \cite{gabriel2004open} and MPICH \cite{gropp1996user}. These provide the functionality defined by the MPI standard for languages such as C++, FORTRAN, and Java. The MPI API is more complex than OpenMP, without the convenient compiler directives for parallelising loops, instead requiring more manual control over the way in which work is distributed. However, this provides the commensurate benefit of the ability to precisely control how data is shared, and allows it to operate over a distributed memory architecture.
 
@@ -277,7 +278,7 @@ Even in this simple code snippet, we can see the additional programmer effort re
 
 There also exist portability frameworks, such as Kokkos \cite{edwardsKokkosEnablingPerformance2013} and RAJA \cite{RAJAPortabilitySuite}, which provide an abstraction over many parallelism techniques to improve software portability. This reduces the programmer effort to write software which is highly performant across different hardware, but can incur a performance cost. As with OpenMP and MPI, taking the example of the dot product operation shown in Listing \ref{listing:cpp-ddot}, an implementation of the same function using Kokkos for parallel execution is shown in Listing \ref{listing:cpp-ddot-kokkos}.
 
-\begin{code}
+\begin{listing}[H]
     %TC:ignore
     \begin{minted}{c++}
         #include <Kokkos_Core.hpp>
@@ -299,7 +300,7 @@ There also exist portability frameworks, such as Kokkos \cite{edwardsKokkosEnabl
     %TC:endignore
     \caption{C++ function using OpenMP to parallelise the dot product operation, using a reduction to avoid a race condition.}
     \label{listing:cpp-ddot-kokkos}
-\end{code}
+\end{listing}
 
 Kokkos is designed to be ``hardware agnostic'', providing an abstraction for writing performant code which can run on across CPUs and GPUs from a variety of hardware vendors \cite{KokkosEcosystem}. As discussed in the later section \ref{ssec:p3hpc}, this provides both productivity and portability for the programmer, as this abstraction means they can be less concerned about compatibility across hardware. However, this can come at a performance cost, as the abstraction may not be able to compile to be as performant as hand-optimised code. The prominence of Kokkos in the \acrshort{HPC} space is encouraging for the suitability of Rust for the same space, as it means that programmers are willing to make sacrifices in performance for commensurate improvements to other aspects of software development, such as productivity and portability.
 
@@ -312,23 +313,24 @@ The Mantevo project at Sandia National Labs pioneered the concept of \acrshort{m
 
 The use of \acrshort{mini-app}s makes hardware-software co-design for large, complex applications possible. This is because they can be used in place of the production application whose performance they model when making very early design decisions, without incurring the cost of massive complexity of the production application. Traditionally, \acrshort{mini-app}s have been used to predict the performance of production applications on new hardware. However, this concept can be inverted to instead use \acrshort{mini-app}s to predict the performance on the underlying software stack, for example the programming language of implementation.
 
-\subsection{HPCCG}
+\subsection{High Performance Computing Conjugate Gradients}
 \label{ssec:hpccg}
 
-HPCCG is an initialism for ``High Performance Computing Conjugate Gradients'', and is ``the original Mantevo mini-app'' \cite{herouxHPCCGSolverPackage2007}. It is designed to be ``the best approximation to an unstructured implicit finite element or finite volume application in 800 lines or fewer.'' \cite{PackagesMantevo}. This short length, along with its simple build system, and support for OpenMP and MPI with no other dependencies made it a good choice for translation to Rust. A full description of the process leading to the selection of HPCCG is described in Appendix \ref{sec:miniapp-selection}.
+% HPCCG is an initialism for ``High Performance Computing Conjugate Gradients'', and
+\acrfull{HPCCG} is ``the original Mantevo mini-app'' \cite{herouxHPCCGSolverPackage2007}. It is designed to be ``the best approximation to an unstructured implicit finite element or finite volume application in 800 lines or fewer.'' \cite{PackagesMantevo}. This short length, along with its simple build system, and support for OpenMP and MPI with no other dependencies made it a good choice for translation to Rust. A full description of the process leading to the selection of \acrshort{HPCCG} is described in Appendix \ref{sec:miniapp-selection}.
 
 It is based on the iterative method of gradient descent for conjugate gradients first proposed by Hestnes and Steifel in 1952\cite{hestenesMethodsConjugateGradients1952}, who researched it and wrote an implementation for the contemporary Z4 processor. This process can be used to model, and hence visualise, pressure dissipation over time in a three-dimensional mesh as shown in Figure \ref{fig:acacgs_silo_output}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{images/2_background/acacgs_silo_output.png}
-    \caption{VisIt visualisation from ACACGS, a C translation of HPCCG by Dr Richard Kirk which is used in the CS257 Advanced Computer Architecture coursework.}
+    \caption{VisIt visualisation of ACACGS, a C translation of \acrshort{HPCCG} by Dr Richard Kirk which is used in the CS257 Advanced Computer Architecture coursework.}
     \label{fig:acacgs_silo_output}
 \end{figure}
 
 There are three main operations in this iterative method of conjugate gradients: calculating a vector dot product, pairwise summation of two scaled vectors, and calculating the product of a sparse matrix and a vector. Of the three operations, the third operation is responsible for most of the floating point operations, and consequently the majority of the runtime. This is because calculating sparse matrix-vector products requires larger and more complex data structures to efficiently represent sparse matrices, rather than just vectors.
 
-Sparse matrix-vector products are a common workload in \acrshort{HPC}, and remain an active field of research, with Lane and Booth describing them as ``one of the most important kernels in high-performance computing'' \cite{laneHeterogeneousSparseMatrixVector2023}. This means that the performance characteristics of HPCCG, which are dominated by this kernel, are representative of many large applications. Since sparse matrices are ubiquitous in computational tasks, there are well-established data structures to represent them. One of these representations is compressed row storage, often called Yale format, as it was first proposed in the 1977 Yale Sparse Matrix Package report \cite{eisenstat1977yale}.
+Sparse matrix-vector products are a common workload in \acrshort{HPC}, and remain an active field of research, with Lane and Booth describing them as ``one of the most important kernels in high-performance computing'' \cite{laneHeterogeneousSparseMatrixVector2023}. This means that the performance characteristics of \acrshort{HPCCG}, which are dominated by this kernel, are representative of many large applications. Since sparse matrices are ubiquitous in computational tasks, there are well-established data structures to represent them. One of these representations is compressed row storage, often called Yale format, as it was first proposed in the 1977 Yale Sparse Matrix Package report \cite{eisenstat1977yale}.
 
 \subsection{Performance, Productivity, and Portability}
 \label{ssec:p3hpc}
@@ -361,7 +363,6 @@ Diehl et al. present a general overview of the landscape of language performance
     \includegraphics[width=0.75\textwidth]{images/2_background/1d_heat_results.png}
     \caption{``Two-dimensional classification using the computational time and the \acrshort{COCOMO} model [sic]'', reproduced from Diehl et al.'s paper \cite{diehlBenchmarkingParallel1D2023}.}
     \label{fig:1d_heat_results}
-    % TODO: Check paper website for permission to reproduce
 \end{figure}
 
 Diehl et al. provide a strong empirical analysis of the landscape of languages in the context of \acrshort{HPC}, and provide source code as a GitHub repository \cite{diehlInitialRelease2023} along with naming the multiple processors used for benchmarking, allowing reproducibility of their results. However, they explicitly do not provide their measurements other than in plots, choosing ``not to name a winner with respect to speed''. Additionally, they do not provide details on their test methodology beyond naming the metrics measured and the names of hardware they used. Providing concrete results, along with a more specific methodology such as thread counts, memory size, or number of experiment re-runs would provide much more confidence in the conclusions drawn. Finally, their future work notes that the selected algorithm only runs on a single CPU, and as such does not explore using MPI for distributing compute over a clustered resource, nor does it explore GPU support using a language like CUDA, nor abstractions layers like Kokkos.
@@ -399,7 +400,9 @@ Moran and Bull \cite{moranEmergingTechnologiesRust2023} investigate the performa
 
 Moran and Bull present a similar empirical analysis to Costanzo et al., comparing a small custom codebase which is representative of \acrshort{HPC} workloads, but differs by including FORTRAN in its comparisons, along with placing a greater focus on performance analysis and scaling, and less consideration to programming effort. However, Moran and Bull report significantly slower performance, significantly trailing C++ and FORTRAN, which contrasts Costanzo et al.'s findings of Rust being slightly slower or equally performant. Moran and Bull attribute their findings to the Rust compiler's attitude to memory safety.
 
-However, inspecting the source code made public after the publication of the paper \cite{Lmoran94Eurocc_cfdCFD}, it can be seen that the implementation does not leverage all the performance capabilities of Rust. For example, it does not apply all of the optimisation techniques enumerated in Costanzo et al.'s paper. A reader of the paper created an optimised version  \cite{moranPaperFalse} \cite{phazer99HerePlayground2023}, which shows a 50\% performance increase over the paper's implementation by avoiding an extraneous copy operation, bringing Rust's performance closer to C++ and FORTRAN. However, this change makes the comparison against FORTRAN and C++ unfair, as the reference implementations also rely on this extraneous copy operation. A replication trial of the experiments in the paper using the published code is presented in section \ref{ssec:hpc-multibench-replication-study}, as both a demonstration of the utility of the HPC MultiBench tool, and to investigate the difference to Costanzo et al.'s findings.
+However, inspecting the source code made public after the publication of the paper \cite{Lmoran94Eurocc_cfdCFD}, it can be seen that the implementation does not leverage all the performance capabilities of Rust. For example, it does not apply all of the optimisation techniques enumerated in Costanzo et al.'s paper.
+% A reader of the paper created an optimised version \cite{moranPaperFalse} \cite{phazer99HerePlayground2023}, which shows a 50\% performance increase over the paper's implementation by avoiding an extraneous copy operation, bringing Rust's performance closer to C++ and FORTRAN. However, this change makes the comparison against FORTRAN and C++ unfair, as the reference implementations also rely on this extraneous copy operation.
+A replication trial of the experiments in the paper using the published code is presented in section \ref{ssec:hpc-multibench-replication-study}, as both a demonstration of the utility of the HPC MultiBench tool, and to investigate the difference to Costanzo et al.'s findings.
 % In summary, possibly flawed due to bounds checked memory access, but not as flawed as some commentators looking only at the Rust implementation think it is.
 
 
@@ -412,7 +415,6 @@ However, inspecting the source code made public after the publication of the pap
 %     \includegraphics[width=0.75\textwidth]{images/2_background/actors_bad_histogram.png}
 %     \caption{The performance of the Histogram kernel across various implementations, reproduced from Appendix A of Parrish et al. \cite{parrishSafeHPCProductivity2023}.}
 %     \label{fig:actors_bad_histogram}
-%     % TODO: Check paper website for permission to reproduce
 % \end{figure}
 
 % However, the data shown in Figure \ref{fig:actors_bad_histogram} does not support the claim that Rust is as performant as C++. The inclusion of the much slower ``upc'' and ``shmem'' implementations skew the scale of the plot so Rust and C++ versions look the same, but in fact by examining the data labels we can see the implementation is on average $1.46\times$ slower for this kernel, which is non-negligibly slower. This aligns with the results of other publications such as Costanzo et al. who observed a $1.18\times$ slowdown, and noted it as such. In the author's opinion, this paper is emblematic of a common problem in literature about the Rust programming language -- the bias held by some that the Rust programming language is better in all respects than other programming languages. Despite the fact that the data in the paper shows that the Rust implementation is slower \ref{fig:actors_bad_histogram}, the data is presented disingenuously in order to draw the conclusion that it is equally performant.

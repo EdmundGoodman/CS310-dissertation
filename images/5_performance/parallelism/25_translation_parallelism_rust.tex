@@ -18,7 +18,7 @@ legend style={
   text opacity=1,
   at={(0.03,0.97)},
   anchor=north west,
-  draw=none
+  % draw=none
 },
 tick align=outside,
 tick pos=left,
@@ -143,7 +143,7 @@ table {%
 5359375 40.8832740783691
 };
 \addlegendentry{Serial Rust}
-\addplot [semithick, darkorange25512714, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, darkorange25512714, mark=triangle, mark size=3, mark options={solid}]
 table {%
 125000 0.313024997711182
 421875 0.767400026321411
@@ -153,7 +153,7 @@ table {%
 5359375 8.1744499206543
 };
 \addlegendentry{Rust with Rayon}
-\addplot [semithick, forestgreen4416044, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, forestgreen4416044, mark=star, mark size=3, mark options={solid}]
 table {%
 125000 0.819999933242798
 421875 2.97434997558594
@@ -163,7 +163,7 @@ table {%
 5359375 42.867374420166
 };
 \addlegendentry{Rust with MPI}
-\addplot [semithick, crimson2143940, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, crimson2143940, mark=diamond, mark size=3, mark options={solid}]
 table {%
 125000 0.679899930953979
 421875 2.18214988708496

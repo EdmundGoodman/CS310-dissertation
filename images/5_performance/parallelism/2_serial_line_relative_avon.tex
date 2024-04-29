@@ -8,15 +8,15 @@
 
 \begin{axis}[
 axis line style={lightgray204},
-height=0.45\textheight,
+height=0.375\textheight,
 legend cell align={left},
 legend style={
   fill opacity=0.8,
   draw opacity=1,
   text opacity=1,
-  at={(0.03,0.97)},
-  anchor=north west,
-  draw=none
+  at={(0.95,0.5)},
+  anchor=east
+  % draw=none
 },
 tick align=outside,
 tick pos=left,
@@ -84,7 +84,7 @@ table {%
 27000000 1
 };
 \addlegendentry{Baseline serial C++}
-\addplot [semithick, darkorange25512714, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, darkorange25512714, mark=triangle, mark size=3, mark options={solid}]
 table {%
 1000000 1.30003118515015
 3375000 1.18719208240509

@@ -20,7 +20,7 @@ legend style={
   text opacity=1,
   at={(0.03,0.97)},
   anchor=north west,
-  draw=none
+  % draw=none
 },
 tick align=outside,
 tick pos=left,
@@ -143,7 +143,7 @@ table {%
 64000000 354.355010986328
 };
 \addlegendentry{C++ with 1 OpenMP thread}
-\addplot [semithick, darkorange25512714, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, darkorange25512714, mark=triangle, mark size=3, mark options={solid}]
 table {%
 1000000 1.6763299703598
 8000000 10.9937677383423
@@ -151,7 +151,7 @@ table {%
 64000000 64.2862243652344
 };
 \addlegendentry{C++ with 8 OpenMP threads}
-\addplot [semithick, forestgreen4416044, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, forestgreen4416044, mark=star, mark size=3, mark options={solid}]
 table {%
 1000000 2.31634998321533
 8000000 9.75304794311523
@@ -159,7 +159,7 @@ table {%
 64000000 52.4876747131348
 };
 \addlegendentry{C++ with 32 OpenMP threads}
-\addplot [semithick, crimson2143940, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, crimson2143940, mark=diamond, mark size=3, mark options={solid}]
 table {%
 1000000 6.54169988632202
 8000000 64.8030776977539
@@ -167,7 +167,7 @@ table {%
 64000000 523.799499511719
 };
 \addlegendentry{Rust with 1 Rayon thread}
-\addplot [semithick, mediumpurple148103189, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, mediumpurple148103189, mark=square, mark size=3, mark options={solid}]
 table {%
 1000000 1.75352501869202
 8000000 14.5663995742798
@@ -175,7 +175,7 @@ table {%
 64000000 101.364723205566
 };
 \addlegendentry{Rust with 8 Rayon threads}
-\addplot [semithick, sienna1408675, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, sienna1408675, mark=o, mark size=3, mark options={solid}]
 table {%
 1000000 1.53744995594025
 8000000 11.7748746871948

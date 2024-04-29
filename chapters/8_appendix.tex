@@ -3,7 +3,7 @@
 \chapter{Specification and Progress Report content}
 \label{ch:specification-progress-report-content}
 
-\section{Project Requirements}
+\section{Project requirements}
 \label{sec:project-requirements}
 
 The specification document enumerated the set of MoSCoW prioritised \cite{CaseMethodFastTrack} requirements which unambiguously define the project scope. These requirements are replicated below:
@@ -13,7 +13,9 @@ The specification document enumerated the set of MoSCoW prioritised \cite{CaseMe
   Select a target mini-app from ECP proxy applications or UK-MAC
   (\textbf{Must have})
 \item
-  Fuzz test\footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990 \cite{millerEmpiricalStudyReliability1990}\cite{liangFuzzingStateArt2018}} the possible mini-apps for memory safety issues using static analysis tooling \cite{stepanovMemorySanitizerFastDetector2015}
+  Fuzz test
+  % \footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990 \cite{millerEmpiricalStudyReliability1990}\cite{liangFuzzingStateArt2018}}
+  the possible mini-apps for memory safety issues using static analysis tooling \cite{stepanovMemorySanitizerFastDetector2015}
   (\textbf{Should have}, \textit{depends on 1})
 \item
   Build tooling for running Rust unit tests on C++ code
@@ -113,7 +115,7 @@ After the automated step of the selection process, six of the remaining thirty-s
 These mini-apps were manually inspected for the size and quality of their codebase (smaller and higher quality is better, assessed using the \texttt{sloccount} \cite{SLOCCount} and the \texttt{clang-tidy} linter \cite{ClangTidyExtraClang}), whether they had unit tests, whether they had multiple versions for serial/parallel, historical prominence, and whether they had any memory leaks using \texttt{valgrind} \cite{ValgrindHome}.
 
 \begin{code}
-    \begin{verbatim}
+    \begin{minted}{text}
 ==33790== 
 ==33790== HEAP SUMMARY:
 ==33790==     in use at exit: 5,875,096 bytes in 10 blocks
@@ -130,7 +132,7 @@ These mini-apps were manually inspected for the size and quality of their codeba
 ==33790== 
 ==33790== For lists of detected and suppressed errors, rerun with: -s
 ==33790== ERROR SUMMARY: 4 errors from 4 contexts (suppressed: 0 from 0)
-    \end{verbatim}
+    \end{minted}
     \caption{Snippet of the output of running \texttt{valgrind} on the HPCCG mini-app, with over 375kB directly lost over a test run with mesh size $25 \times 25 \times 25$.}
     \label{fig:minimdValgrindOutput}
 \end{code}
@@ -144,8 +146,8 @@ After a manual comparison process on the aspects shown above, the decision was m
 
 % When generating the Risk Matrix for the specification, some possible risks were excluded, such as personal computer failure. However, this was experienced multiple times during the project
 
-\begin{table}[ht]
-\begin{adjustwidth}{-3em}{-3em}
+\begin{table}[H]
+\begin{adjustwidth}{-5em}{-3em}
     \centering
     \caption{The proposed Risk Matrix for the project, from the project specification.}
     \label{tab:risk_matrix}
@@ -576,6 +578,8 @@ Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cm
 
 \chapter{Open source work}
 \label{ch:open-source-appendix}
+
+\newpage
 
 \section{\texttt{autocxx} pull request}
 \label{sec:autocxx-pull-request-appendix}

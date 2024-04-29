@@ -11,7 +11,7 @@
 
 \begin{axis}[
 axis line style={lightgray204},
-height=0.45\textheight,
+height=0.5\textheight,
 legend cell align={left},
 legend style={
   fill opacity=0.8,
@@ -19,7 +19,7 @@ legend style={
   text opacity=1,
   at={(0.03,0.97)},
   anchor=north west,
-  draw=none
+  % draw=none
 },
 tick align=outside,
 tick pos=left,
@@ -147,7 +147,7 @@ table {%
 15625000 645.013549804688
 };
 \addlegendentry{Direct translation}
-\addplot [semithick, darkorange25512714, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, darkorange25512714, mark=triangle, mark size=3, mark options={solid}]
 table {%
 125000 0.919350028038025
 1000000 6.93349981307983
@@ -156,7 +156,7 @@ table {%
 15625000 126.426971435547
 };
 \addlegendentry{Indexed translation}
-\addplot [semithick, forestgreen4416044, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, forestgreen4416044, mark=star, mark size=3, mark options={solid}]
 table {%
 125000 0.852800011634827
 1000000 6.59402513504028
@@ -165,7 +165,7 @@ table {%
 15625000 119.605422973633
 };
 \addlegendentry{Single indexed translation}
-\addplot [semithick, crimson2143940, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, crimson2143940, mark=diamond, mark size=3, mark options={solid}]
 table {%
 125000 0.772249937057495
 1000000 6.25587511062622
@@ -174,7 +174,7 @@ table {%
 15625000 114.327224731445
 };
 \addlegendentry{No bounds checking translation}
-\addplot [semithick, mediumpurple148103189, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, mediumpurple148103189, mark=square, mark size=3, mark options={solid}]
 table {%
 125000 0.790650010108948
 1000000 6.2592248916626
