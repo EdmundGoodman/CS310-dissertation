@@ -135,7 +135,7 @@ to extend the functionality of Rust beyond the base language. As a result of thi
 
 Efforts to adopt Rust in security sensitive parts of existing products, such as parsers for untrusted inputs \cite{OxidationMozillaWiki}, have existed for many years. For example, the first production code example of Mozilla's Oxidation effort to ``integrat[e] Rust code in and around Firefox'' was a MP4 metadata parser in Firefox 48 \cite{OxidationMozillaWiki}, released in 2016. However, in recent years these efforts have become far more widespread, for example Google introducing first-class Rust support for Android development in 2021, motivated by its memory safe properties \cite{RustAndroidPlatform}.
 
-Even in the past two months at the time of writing, there have been widely reported moves towards Rust adoption. Firstly, the White House Office of the National Cyber Director publishing a press release ``Future Software Should Be Memory Safe'', encouraging developers to adopt memory safe languages, such as Rust for systems programming applications, to ``to reduce the attack surface in cyberspace'' as a matter of national security \cite{PressReleaseFuture2024}. In addition to this, Google pledged one million dollars to improve Rust's interoperability with C++, including through tooling such as \texttt{autocxx} \cite{GoogleAutocxx2024} and \texttt{bindgen} \cite{RustlangRustbindgen2024}. In the course of this project, the author made an open source contribution to \texttt{autocxx} to unblock an issue around the use of arrays \cite{goodmanAddIntegrationTests}, a common task in \acrshort{HPC}. This is discussed in more detail in section \ref{sec:open-source-work}.
+Even in the past two months at the time of writing, there have been widely reported moves towards Rust adoption. Firstly, the White House Office of the National Cyber Director publishing a press release ``Future Software Should Be Memory Safe'', encouraging developers to adopt memory safe languages, such as Rust for systems programming applications, to ``to reduce the attack surface in cyberspace'' as a matter of national security \cite{PressReleaseFuture2024}. In addition to this, Google pledged one million dollars to improve Rust's interoperability with C++, including through tooling such as \texttt{autocxx} \cite{GoogleAutocxx2024} and \texttt{bindgen} \cite{RustlangRustbindgen2024}. In the course of this project, the author made an open source contribution to \texttt{autocxx} to unblock an issue around the use of arrays \cite{goodmanAddIntegrationTests}, a common task in \acrshort{HPC}. This is discussed in more detail in Section \ref{sec:open-source-work}.
 
 
 
@@ -421,6 +421,8 @@ A replication trial of the experiments in the paper using the published code is 
 
 \subsection{Summary of literature}
 \label{ssec:literature-summary}
+
+\enlargethispage{1\baselineskip}
 
 % % Summary
 % In summary, there is existing research around the suitability of Rust in High-Performance Computing, which broadly concludes that Rust is slightly slower than C++, but provides other benefits which might mitigate this fact. Some papers, such as Parrish et al. \cite{parrishSafeHPCProductivity2023} over-report the performance of Rust as equal to C++, in spite of the data they present to justify their conclusions. However, other papers, such as Moran and Bull \cite{moranEmergingTechnologiesRust2023}, under-report the performance of Rust as significantly slower than C++, likely due to not fully leveraging possible performance optimisations.

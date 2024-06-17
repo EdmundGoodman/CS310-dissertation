@@ -136,13 +136,13 @@ The first key insight in the translation process is that the interior mutability
     %TC:ignore
     \begin{minted}{rust}
         struct SparseMatrix {
-            pub total_nrow: i32,
-            pub total_nnz: i32,
-            pub nnz_in_row: Vec<i64>,
-            pub ptr_to_vals_in_row: Vec<Rc<RefCell<f64>>>,
-            pub ptr_to_inds_in_row: Vec<Rc<RefCell<i32>>>,
-            pub list_of_vals: Vec<Rc<RefCell<f64>>>,
-            pub list_of_inds: Vec<Rc<RefCell<i32>>>,
+            total_nrow: i32,
+            total_nnz: i32,
+            nnz_in_row: Vec<i64>,
+            ptr_to_vals_in_row: Vec<Rc<RefCell<f64>>>,
+            ptr_to_inds_in_row: Vec<Rc<RefCell<i32>>>,
+            list_of_vals: Vec<Rc<RefCell<f64>>>,
+            list_of_inds: Vec<Rc<RefCell<i32>>>,
         }
     \end{minted}
     %TC:endignore
@@ -234,12 +234,12 @@ In addition to this, a second key insight is that the pointers in \mintinline[br
     %TC:ignore
     \begin{minted}{rust}
         struct SparseMatrix {
-            pub total_nrow: usize,
-            pub total_nnz: usize,
-            pub nnz_in_row: Vec<usize>,
-            pub row_start_inds: Vec<usize>,
-            pub list_of_vals: Vec<f64>,
-            pub list_of_inds: Vec<usize>,
+            total_nrow: usize,
+            total_nnz: usize,
+            nnz_in_row: Vec<usize>,
+            row_start_inds: Vec<usize>,
+            list_of_vals: Vec<f64>,
+            list_of_inds: Vec<usize>,
         }
     \end{minted}
     %TC:endignore
@@ -308,7 +308,7 @@ Fortunately, Rust provides a mechanism to disable these runtime checks -- the \m
     \label{listing:rust-sparsemv-unchecked}
 \end{listing}
 
-However, this approach nullifies Rust's beneficial property of guaranteeing memory safety. We are disabling runtime checks of indexes to gain performance, and hence regressing back to C++ with the only guarantees of memory safety being through programmer confidence. However, the Rust language provides syntax sugars in the form of zero-cost abstractions which can help avoid these unsafe operations in common use cases.
+This approach nullifies Rust's beneficial property of guaranteeing memory safety. We are disabling runtime checks of indexes to gain performance, and hence regressing back to C++ with the only guarantees of memory safety being through programmer confidence. However, the Rust language provides syntax sugars in the form of zero-cost abstractions which can help avoid these unsafe operations in common use cases.
 
 \subsection{Iterators}
 \label{sec:translation-iterators}
@@ -397,7 +397,7 @@ The process of translating the MPI aspect of \acrshort{HPCCG} into Rust was by f
 
 An example of how these difficulties manifest is in
 %both the final stage of making the local matrix and
-the operation to exchange external data between ranks each iteration, there is an MPI idiom which maps particularly poorly to Rust, shown in Listing \ref{listing:cpp-mpi-exchange-externals}.
+the operation to exchange external data between ranks each iteration, as it relies on an MPI idiom which maps particularly poorly to Rust, shown in Listing \ref{listing:cpp-mpi-exchange-externals}.
 
 \begin{code}
     %TC:ignore
