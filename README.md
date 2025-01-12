@@ -36,6 +36,6 @@ University of Warwick, supervised by [Dr Richard Kirk](https://warwick.ac.uk/fac
 
 ## Links
 
-- [Dissertation](https://github.com/EdmundGoodman/CS310-dissertation/releases/download/tabula-submission/CS310_dissertation.pdf)
+- [Dissertation (you are here)](https://github.com/EdmundGoodman/CS310-dissertation/releases/download/tabula-submission/CS310_dissertation.pdf)
 - [P3HPC workshop short-format talk](https://p3hpc.org/workshop/2024/program/#lightning-talks)
-- [Meta-repo (you are here)](https://github.com/EdmundGoodman/rust-in-hpc)
+- [Meta-repo](https://github.com/EdmundGoodman/rust-in-hpc)
